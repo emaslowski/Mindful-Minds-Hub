@@ -9,7 +9,7 @@ import {
   studioPeerReviewsTable,
   studioSourcesTable,
 } from '@workspace/db/schema';
-import { eq, desc, inArray } from 'drizzle-orm';
+import { eq, desc, inArray, sql } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
 
@@ -27,15 +27,20 @@ router.get('/teacher/projects', requireStudioRole('teacher'), async (req: Reques
       status: studioProjectsTable.status,
       contentFlagged: studioProjectsTable.contentFlagged,
       assignedStudentId: studioProjectsTable.assignedStudentId,
-      // Display name from studio profile
+      // Display name from studio profile — cast assigned_student_id to text to handle
+      // DB columns that are stored as integer but referenced as varchar in the schema
       studentName: studioProfilesTable.displayName,
       teamId: studioProjectsTable.teamId,
       teamName: studioTeamsTable.name,
+      jobId: studioProjectsTable.jobId,
       createdAt: studioProjectsTable.createdAt,
       updatedAt: studioProjectsTable.updatedAt,
     })
     .from(studioProjectsTable)
-    .leftJoin(studioProfilesTable, eq(studioProjectsTable.assignedStudentId, studioProfilesTable.userId))
+    .leftJoin(
+      studioProfilesTable,
+      sql`${studioProjectsTable.assignedStudentId}::text = ${studioProfilesTable.userId}`,
+    )
     .leftJoin(studioTeamsTable, eq(studioProjectsTable.teamId, studioTeamsTable.id))
     .orderBy(desc(studioProjectsTable.updatedAt));
 
@@ -52,12 +57,18 @@ router.get('/teacher/review/queue', requireStudioRole('teacher'), async (_req, r
       contentType: studioProjectsTable.contentType,
       status: studioProjectsTable.status,
       contentFlagged: studioProjectsTable.contentFlagged,
+      assignedStudentId: studioProjectsTable.assignedStudentId,
+      jobId: studioProjectsTable.jobId,
+      // Cast assigned_student_id to text to handle integer vs varchar type mismatch in DB
       studentName: studioProfilesTable.displayName,
       teamName: studioTeamsTable.name,
       updatedAt: studioProjectsTable.updatedAt,
     })
     .from(studioProjectsTable)
-    .leftJoin(studioProfilesTable, eq(studioProjectsTable.assignedStudentId, studioProfilesTable.userId))
+    .leftJoin(
+      studioProfilesTable,
+      sql`${studioProjectsTable.assignedStudentId}::text = ${studioProfilesTable.userId}`,
+    )
     .leftJoin(studioTeamsTable, eq(studioProjectsTable.teamId, studioTeamsTable.id))
     .where(
       inArray(studioProjectsTable.status, [
