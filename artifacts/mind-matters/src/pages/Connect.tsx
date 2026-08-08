@@ -45,6 +45,56 @@ export default function Connect() {
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
+
+      {/* Butterfly — top left */}
+      <div className="absolute top-6 left-4 md:left-14 pointer-events-none opacity-25">
+        <svg width="100" height="90" viewBox="0 0 100 90" fill="none">
+          {/* Left wings */}
+          <path d="M50 45 Q20 15 5 25 Q0 45 25 55 Q40 60 50 45Z" fill="#C4829A" opacity="0.7"/>
+          <path d="M50 45 Q18 55 10 70 Q20 85 40 75 Q52 65 50 45Z" fill="#C4829A" opacity="0.5"/>
+          {/* Right wings */}
+          <path d="M50 45 Q80 15 95 25 Q100 45 75 55 Q60 60 50 45Z" fill="#D4A44C" opacity="0.7"/>
+          <path d="M50 45 Q82 55 90 70 Q80 85 60 75 Q48 65 50 45Z" fill="#D4A44C" opacity="0.5"/>
+          {/* Body */}
+          <ellipse cx="50" cy="48" rx="3" ry="18" fill="#5A3A1A" opacity="0.6"/>
+          {/* Antennae */}
+          <path d="M50 30 Q42 18 38 12" stroke="#5A3A1A" strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
+          <circle cx="38" cy="12" r="2.5" fill="#C4622D" opacity="0.5"/>
+          <path d="M50 30 Q58 18 62 12" stroke="#5A3A1A" strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
+          <circle cx="62" cy="12" r="2.5" fill="#C4622D" opacity="0.5"/>
+          {/* Wing spots */}
+          <circle cx="28" cy="38" r="5" fill="#FAF3E3" opacity="0.5"/>
+          <circle cx="72" cy="38" r="5" fill="#FAF3E3" opacity="0.5"/>
+        </svg>
+      </div>
+
+      {/* Floral spray — top right */}
+      <div className="absolute top-4 right-4 md:right-14 pointer-events-none opacity-22 -rotate-6">
+        <svg width="110" height="120" viewBox="0 0 110 120" fill="none">
+          <path d="M55 120 Q55 70 55 15" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M55 90 Q32 72 18 54" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M55 65 Q78 48 90 30" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M55 42 Q34 27 26 10" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <ellipse cx="18" cy="54" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-32 18 54)"/>
+          <ellipse cx="89" cy="30" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(28 89 30)"/>
+          <ellipse cx="27" cy="10" rx="9" ry="4" fill="#688A52" opacity="0.5" transform="rotate(-38 27 10)"/>
+          {/* Blooms */}
+          <circle cx="55" cy="15" r="9" fill="#C4829A" opacity="0.5"/>
+          <circle cx="55" cy="15" r="4.5" fill="#D4A44C"/>
+        </svg>
+      </div>
+
+      {/* Stars + dots — bottom left */}
+      <div className="absolute bottom-32 left-4 md:left-12 pointer-events-none opacity-20">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <path d="M20 12 L22 20 L30 22 L22 24 L20 32 L18 24 L10 22 L18 20Z" fill="#D4A44C"/>
+          <path d="M60 50 L61.5 55.5 L67 57 L61.5 58.5 L60 64 L58.5 58.5 L53 57 L58.5 55.5Z" fill="#C4622D" opacity="0.7"/>
+          <circle cx="50" cy="15" r="4" fill="#688A52" opacity="0.6"/>
+          <circle cx="12" cy="55" r="3" fill="#C4829A"/>
+          <circle cx="70" cy="25" r="2.5" fill="#D4A44C"/>
+        </svg>
+      </div>
+
       <div className="flex-1 w-full max-w-6xl mx-auto px-4 mb-24 text-center relative z-10">
         
         {/* Wildflower bunch SVG decoration */}

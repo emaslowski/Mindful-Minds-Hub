@@ -46,6 +46,58 @@ export default function Contact() {
       <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-terracotta/5 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 -left-20 w-72 h-72 rounded-full bg-sage/8 blur-3xl pointer-events-none" />
 
+      {/* Floral branch — top left */}
+      <div className="absolute top-4 left-2 md:left-10 pointer-events-none opacity-25 rotate-6">
+        <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+          <path d="M10 120 Q35 85 60 55 Q85 25 115 8" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          {/* Flowers along branch */}
+          <circle cx="38" cy="88" r="10" fill="#C4829A" opacity="0.5"/>
+          <circle cx="38" cy="88" r="5" fill="#D4A44C"/>
+          <circle cx="38" cy="77" r="4" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="38" cy="99" r="4" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="27" cy="88" r="4" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="49" cy="88" r="4" fill="#FAF3E3" opacity="0.8"/>
+
+          <circle cx="72" cy="50" r="8" fill="#C4622D" opacity="0.4"/>
+          <circle cx="72" cy="50" r="4" fill="#D4A44C"/>
+          <circle cx="72" cy="41" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="72" cy="59" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="63" cy="50" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="81" cy="50" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+
+          {/* Leaves */}
+          <ellipse cx="22" cy="105" rx="12" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-45 22 105)"/>
+          <ellipse cx="55" cy="70" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-40 55 70)"/>
+          <ellipse cx="95" cy="28" rx="10" ry="4.5" fill="#688A52" opacity="0.5" transform="rotate(-50 95 28)"/>
+        </svg>
+      </div>
+
+      {/* Botanical stems — bottom right */}
+      <div className="absolute bottom-32 right-2 md:right-8 pointer-events-none opacity-20 -rotate-6">
+        <svg width="100" height="130" viewBox="0 0 100 130" fill="none">
+          <path d="M50 130 Q50 80 50 10" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M50 100 Q25 80 15 60" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M50 70 Q72 52 82 35" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M50 40 Q30 25 22 10" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <ellipse cx="16" cy="60" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-30 16 60)"/>
+          <ellipse cx="81" cy="35" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(28 81 35)"/>
+          <ellipse cx="23" cy="10" rx="9" ry="4.5" fill="#688A52" opacity="0.5" transform="rotate(-35 23 10)"/>
+          {/* Small blooms */}
+          <circle cx="50" cy="10" r="7" fill="#C4829A" opacity="0.4"/>
+          <circle cx="50" cy="10" r="3.5" fill="#D4A44C"/>
+        </svg>
+      </div>
+
+      {/* Sparkle dots — mid right */}
+      <div className="absolute top-1/2 right-4 md:right-20 pointer-events-none opacity-20">
+        <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
+          <path d="M30 5 L32 14 L41 16 L32 18 L30 27 L28 18 L19 16 L28 14Z" fill="#D4A44C"/>
+          <circle cx="10" cy="50" r="4" fill="#C4829A"/>
+          <circle cx="50" cy="42" r="3" fill="#688A52"/>
+          <circle cx="25" cy="68" r="3.5" fill="#C4622D" opacity="0.7"/>
+        </svg>
+      </div>
+
       <div className="flex-1 w-full max-w-2xl mx-auto px-4 mb-24 z-10">
         {/* Header */}
         <div className="text-center mb-12">

@@ -12,6 +12,62 @@ export default function Listen() {
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
+
+      {/* Feather — top left */}
+      <div className="absolute top-6 left-4 md:left-14 pointer-events-none opacity-25 -rotate-12">
+        <svg width="80" height="140" viewBox="0 0 80 140" fill="none">
+          <path d="M40 135 Q38 90 30 50 Q20 20 10 5" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M10 5 Q30 25 45 55 Q58 82 40 135" fill="#688A52" opacity="0.35"/>
+          <path d="M40 135 Q42 90 50 50 Q60 20 70 5" stroke="#688A52" strokeWidth="1" strokeLinecap="round" opacity="0.4"/>
+          {/* Barbs */}
+          <path d="M15 30 Q28 32 38 100" stroke="#688A52" strokeWidth="0.8" opacity="0.4"/>
+          <path d="M22 18 Q33 22 39 110" stroke="#688A52" strokeWidth="0.8" opacity="0.4"/>
+          <path d="M55 22 Q46 28 41 105" stroke="#688A52" strokeWidth="0.8" opacity="0.4"/>
+          <path d="M62 34 Q50 38 42 95" stroke="#688A52" strokeWidth="0.8" opacity="0.4"/>
+        </svg>
+      </div>
+
+      {/* Music notes — top right */}
+      <div className="absolute top-4 right-4 md:right-14 pointer-events-none opacity-25">
+        <svg width="120" height="110" viewBox="0 0 120 110" fill="none">
+          {/* Note 1 */}
+          <ellipse cx="22" cy="75" rx="10" ry="7" fill="#C4622D" transform="rotate(-15 22 75)"/>
+          <line x1="32" y1="72" x2="32" y2="35" stroke="#C4622D" strokeWidth="2.5"/>
+          <path d="M32 35 L70 25 L70 35 L32 45Z" fill="#C4622D"/>
+          {/* Note 2 */}
+          <ellipse cx="80" cy="85" rx="10" ry="7" fill="#D4A44C" transform="rotate(-15 80 85)"/>
+          <line x1="90" y1="82" x2="90" y2="45" stroke="#D4A44C" strokeWidth="2.5"/>
+          {/* Stars/dots */}
+          <circle cx="15" cy="30" r="3" fill="#C4829A"/>
+          <circle cx="50" cy="15" r="2.5" fill="#688A52"/>
+          <circle cx="105" cy="25" r="2" fill="#C4622D"/>
+          <path d="M100 55 L101.5 60 L107 61.5 L101.5 63 L100 68 L98.5 63 L93 61.5 L98.5 60Z" fill="#D4A44C" opacity="0.7"/>
+        </svg>
+      </div>
+
+      {/* Sound wave rings — bottom left */}
+      <div className="absolute bottom-32 left-2 md:left-10 pointer-events-none opacity-15">
+        <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+          <circle cx="55" cy="55" r="50" stroke="#C4622D" strokeWidth="1.5" strokeDasharray="4 4" fill="none"/>
+          <circle cx="55" cy="55" r="36" stroke="#688A52" strokeWidth="1.5" strokeDasharray="4 4" fill="none"/>
+          <circle cx="55" cy="55" r="22" stroke="#D4A44C" strokeWidth="1.5" strokeDasharray="4 4" fill="none"/>
+          <circle cx="55" cy="55" r="9" fill="#C4829A" opacity="0.5"/>
+        </svg>
+      </div>
+
+      {/* Botanical sprigs — bottom right */}
+      <div className="absolute bottom-28 right-4 md:right-12 pointer-events-none opacity-20 rotate-6">
+        <svg width="90" height="100" viewBox="0 0 90 100" fill="none">
+          <path d="M45 100 Q45 60 45 10" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M45 75 Q22 58 12 40" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M45 50 Q68 35 78 18" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <ellipse cx="13" cy="40" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-30 13 40)"/>
+          <ellipse cx="77" cy="18" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(28 77 18)"/>
+          <circle cx="45" cy="10" r="7" fill="#C4829A" opacity="0.5"/>
+          <circle cx="45" cy="10" r="3.5" fill="#D4A44C"/>
+        </svg>
+      </div>
+
       <div className="flex-1 w-full max-w-6xl mx-auto px-4 mb-24 text-center relative z-10">
         
         <h1 className="text-6xl md:text-8xl font-display italic text-foreground mb-4 drop-shadow-sm">

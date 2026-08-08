@@ -9,6 +9,59 @@ export default function Events() {
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative bg-[url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20zM20 0h20v20H20V0z\' fill=\'%23688a52\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'/%3E%3C/svg%3E')]">
+
+      {/* Sunflower — top left */}
+      <div className="absolute top-4 left-2 md:left-10 pointer-events-none opacity-25">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+          {/* Petals */}
+          {[0,30,60,90,120,150,180,210,240,270,300,330].map((angle, i) => (
+            <ellipse key={i} cx="60" cy="60" rx="8" ry="22"
+              fill={i % 2 === 0 ? "#D4A44C" : "#C4622D"}
+              opacity="0.7"
+              transform={`rotate(${angle} 60 60) translate(0 -18)`}/>
+          ))}
+          {/* Center */}
+          <circle cx="60" cy="60" r="18" fill="#5A3A1A"/>
+          <circle cx="60" cy="60" r="12" fill="#7A5A2A" opacity="0.7"/>
+          {/* Seed dots */}
+          <circle cx="56" cy="56" r="2" fill="#D4A44C" opacity="0.6"/>
+          <circle cx="63" cy="55" r="2" fill="#D4A44C" opacity="0.6"/>
+          <circle cx="58" cy="63" r="2" fill="#D4A44C" opacity="0.6"/>
+          <circle cx="65" cy="62" r="2" fill="#D4A44C" opacity="0.6"/>
+          {/* Stem */}
+          <path d="M60 78 Q58 100 55 115" stroke="#688A52" strokeWidth="3" strokeLinecap="round"/>
+          <ellipse cx="45" cy="100" rx="14" ry="7" fill="#688A52" opacity="0.5" transform="rotate(-30 45 100)"/>
+        </svg>
+      </div>
+
+      {/* Stars + sparkles — top right */}
+      <div className="absolute top-6 right-4 md:right-14 pointer-events-none opacity-25">
+        <svg width="130" height="100" viewBox="0 0 130 100" fill="none">
+          <path d="M30 15 L33 25 L43 28 L33 31 L30 41 L27 31 L17 28 L27 25Z" fill="#D4A44C"/>
+          <path d="M90 8 L92 14 L98 16 L92 18 L90 24 L88 18 L82 16 L88 14Z" fill="#C4829A"/>
+          <path d="M110 50 L111.5 55 L117 56.5 L111.5 58 L110 63 L108.5 58 L103 56.5 L108.5 55Z" fill="#C4622D" opacity="0.7"/>
+          <circle cx="60" cy="20" r="4" fill="#688A52" opacity="0.6"/>
+          <circle cx="15" cy="60" r="3" fill="#C4622D" opacity="0.5"/>
+          <circle cx="75" cy="70" r="2.5" fill="#D4A44C"/>
+          <circle cx="50" cy="80" r="2" fill="#C4829A"/>
+        </svg>
+      </div>
+
+      {/* Botanical arch — bottom left */}
+      <div className="absolute bottom-28 left-2 md:left-8 pointer-events-none opacity-20 rotate-3">
+        <svg width="100" height="120" viewBox="0 0 100 120" fill="none">
+          <path d="M50 120 Q50 70 50 10" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M50 95 Q28 75 18 55" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M50 68 Q72 50 82 32" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M50 42 Q30 28 22 10" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <ellipse cx="19" cy="55" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-30 19 55)"/>
+          <ellipse cx="81" cy="32" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(28 81 32)"/>
+          <ellipse cx="23" cy="10" rx="9" ry="4.5" fill="#688A52" opacity="0.5" transform="rotate(-35 23 10)"/>
+          <circle cx="50" cy="10" r="7" fill="#C4622D" opacity="0.5"/>
+          <circle cx="50" cy="10" r="3.5" fill="#D4A44C"/>
+        </svg>
+      </div>
+
       <div className="flex-1 w-full max-w-6xl mx-auto px-4 mb-24 z-10">
         
         <div className="text-center mb-12">

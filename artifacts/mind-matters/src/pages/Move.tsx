@@ -100,6 +100,61 @@ export default function Move() {
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
+
+      {/* Sun rays — top left */}
+      <div className="absolute top-2 left-2 md:left-10 pointer-events-none opacity-20">
+        <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+          <circle cx="55" cy="55" r="22" fill="#D4A44C"/>
+          <circle cx="55" cy="55" r="15" fill="#FAF3E3" opacity="0.5"/>
+          {[0,30,60,90,120,150,180,210,240,270,300,330].map((angle, i) => {
+            const rad = (angle * Math.PI) / 180;
+            const x1 = 55 + 26 * Math.cos(rad);
+            const y1 = 55 + 26 * Math.sin(rad);
+            const x2 = 55 + 48 * Math.cos(rad);
+            const y2 = 55 + 48 * Math.sin(rad);
+            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#D4A44C" strokeWidth={i % 2 === 0 ? 3 : 1.5} strokeLinecap="round"/>;
+          })}
+        </svg>
+      </div>
+
+      {/* Botanical stems — top right */}
+      <div className="absolute top-4 right-4 md:right-12 pointer-events-none opacity-22 -rotate-6">
+        <svg width="100" height="120" viewBox="0 0 100 120" fill="none">
+          <path d="M50 120 Q50 70 50 10" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M50 90 Q27 72 15 54" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M50 62 Q73 46 85 28" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M50 38 Q30 24 22 8" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <ellipse cx="15" cy="54" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-30 15 54)"/>
+          <ellipse cx="84" cy="28" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(28 84 28)"/>
+          <ellipse cx="22" cy="8" rx="9" ry="4" fill="#688A52" opacity="0.5" transform="rotate(-36 22 8)"/>
+          <circle cx="50" cy="10" r="8" fill="#C4622D" opacity="0.4"/>
+          <circle cx="50" cy="10" r="4" fill="#D4A44C"/>
+        </svg>
+      </div>
+
+      {/* Sparkle stars — bottom right */}
+      <div className="absolute bottom-32 right-4 md:right-14 pointer-events-none opacity-22">
+        <svg width="80" height="90" viewBox="0 0 80 90" fill="none">
+          <path d="M20 15 L22 23 L30 25 L22 27 L20 35 L18 27 L10 25 L18 23Z" fill="#C4829A"/>
+          <path d="M60 55 L61.5 60.5 L67 62 L61.5 63.5 L60 69 L58.5 63.5 L53 62 L58.5 60.5Z" fill="#D4A44C"/>
+          <circle cx="55" cy="18" r="4" fill="#688A52" opacity="0.6"/>
+          <circle cx="15" cy="62" r="3" fill="#C4622D" opacity="0.5"/>
+          <circle cx="68" cy="32" r="2.5" fill="#C4829A"/>
+          <circle cx="35" cy="78" r="2" fill="#D4A44C"/>
+        </svg>
+      </div>
+
+      {/* Bottom left leaf cluster */}
+      <div className="absolute bottom-36 left-2 md:left-8 pointer-events-none opacity-20 rotate-6">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <path d="M40 80 Q40 50 40 10" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M40 60 Q20 44 12 30" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M40 40 Q60 26 68 12" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <ellipse cx="13" cy="30" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-30 13 30)"/>
+          <ellipse cx="67" cy="12" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(28 67 12)"/>
+        </svg>
+      </div>
+
       <div className="flex-1 w-full max-w-6xl mx-auto px-4 mb-24 text-center relative z-10">
         
         {/* Decorative elements */}

@@ -4,6 +4,50 @@ import { Phone, MessageSquare, HeartHandshake, Info, ShieldAlert } from "lucide-
 export default function Resources() {
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
+
+      {/* Olive/laurel branch — top left */}
+      <div className="absolute top-4 left-2 md:left-10 pointer-events-none opacity-25 -rotate-6">
+        <svg width="140" height="120" viewBox="0 0 140 120" fill="none">
+          <path d="M10 110 Q40 75 70 50 Q100 25 130 10" stroke="#688A52" strokeWidth="2.5" strokeLinecap="round"/>
+          <ellipse cx="30" cy="88" rx="14" ry="7" fill="#688A52" opacity="0.6" transform="rotate(-35 30 88)"/>
+          <ellipse cx="48" cy="72" rx="14" ry="7" fill="#688A52" opacity="0.6" transform="rotate(-40 48 72)"/>
+          <ellipse cx="65" cy="56" rx="13" ry="6.5" fill="#688A52" opacity="0.6" transform="rotate(-42 65 56)"/>
+          <ellipse cx="83" cy="40" rx="13" ry="6" fill="#688A52" opacity="0.6" transform="rotate(-45 83 40)"/>
+          <ellipse cx="100" cy="26" rx="12" ry="6" fill="#688A52" opacity="0.6" transform="rotate(-48 100 26)"/>
+          <ellipse cx="118" cy="14" rx="11" ry="5.5" fill="#688A52" opacity="0.6" transform="rotate(-50 118 14)"/>
+          {/* Berries */}
+          <circle cx="36" cy="82" r="3.5" fill="#C4622D" opacity="0.7"/>
+          <circle cx="72" cy="50" r="3" fill="#C4622D" opacity="0.7"/>
+          <circle cx="107" cy="22" r="2.5" fill="#C4622D" opacity="0.7"/>
+        </svg>
+      </div>
+
+      {/* Botanical leaf spray — bottom right */}
+      <div className="absolute bottom-32 right-2 md:right-10 pointer-events-none opacity-20 rotate-6">
+        <svg width="120" height="140" viewBox="0 0 120 140" fill="none">
+          <path d="M60 140 Q60 90 60 20" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M60 110 Q35 90 18 75" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M60 85 Q38 68 25 50" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M60 60 Q42 45 35 28" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M60 100 Q84 82 100 68" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M60 76 Q83 60 98 44" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M60 52 Q80 37 92 22" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+          <ellipse cx="19" cy="75" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-40 19 75)"/>
+          <ellipse cx="26" cy="50" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(-35 26 50)"/>
+          <ellipse cx="99" cy="68" rx="11" ry="5" fill="#688A52" opacity="0.5" transform="rotate(38 99 68)"/>
+          <ellipse cx="97" cy="44" rx="10" ry="5" fill="#688A52" opacity="0.5" transform="rotate(32 97 44)"/>
+        </svg>
+      </div>
+
+      {/* Heart cluster — top right */}
+      <div className="absolute top-8 right-6 md:right-16 pointer-events-none opacity-20">
+        <svg width="90" height="80" viewBox="0 0 90 80" fill="none">
+          <path d="M25 20 Q25 12 33 12 Q41 12 41 20 Q41 28 25 38 Q9 28 9 20 Q9 12 17 12 Q25 12 25 20Z" fill="#C4829A"/>
+          <path d="M65 35 Q65 29 71 29 Q77 29 77 35 Q77 41 65 49 Q53 41 53 35 Q53 29 59 29 Q65 29 65 35Z" fill="#C4622D" opacity="0.7"/>
+          <path d="M45 60 Q45 56 48 56 Q51 56 51 60 Q51 64 45 68 Q39 64 39 60 Q39 56 42 56 Q45 56 45 60Z" fill="#D4A44C" opacity="0.7"/>
+        </svg>
+      </div>
+
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 mb-24 z-10">
         
         <div className="text-center mb-16">

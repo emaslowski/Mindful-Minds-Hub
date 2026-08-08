@@ -97,6 +97,64 @@ export default function Learn() {
         </svg>
       </div>
 
+      {/* Boho sun — top right */}
+      <div className="absolute top-4 right-4 md:right-12 pointer-events-none opacity-22">
+        <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+          {/* Outer dashed ring */}
+          <circle cx="55" cy="55" r="50" stroke="#D4A44C" strokeWidth="1.5" strokeDasharray="5 5" fill="none"/>
+          {/* Sun body */}
+          <circle cx="55" cy="55" r="28" fill="#D4A44C" opacity="0.8"/>
+          <circle cx="55" cy="55" r="18" fill="#FAF3E3" opacity="0.5"/>
+          {/* Rays */}
+          <line x1="55" y1="20" x2="55" y2="8" stroke="#D4A44C" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="55" y1="90" x2="55" y2="102" stroke="#D4A44C" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="20" y1="55" x2="8" y2="55" stroke="#D4A44C" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="90" y1="55" x2="102" y2="55" stroke="#D4A44C" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="30" y1="30" x2="21" y2="21" stroke="#D4A44C" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="80" y1="30" x2="89" y2="21" stroke="#D4A44C" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="30" y1="80" x2="21" y2="89" stroke="#D4A44C" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="80" y1="80" x2="89" y2="89" stroke="#D4A44C" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      </div>
+
+      {/* Daisy cluster — bottom right */}
+      <div className="absolute bottom-32 right-4 md:right-12 pointer-events-none opacity-22 rotate-6">
+        <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
+          {/* Daisy 1 */}
+          <circle cx="40" cy="45" r="14" fill="#C4829A" opacity="0.4"/>
+          <circle cx="40" cy="30" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="40" cy="60" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="25" cy="45" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="55" cy="45" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="29" cy="34" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="51" cy="34" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="29" cy="56" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="51" cy="56" r="5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="40" cy="45" r="9" fill="#D4A44C"/>
+          {/* Daisy 2 (smaller) */}
+          <circle cx="78" cy="75" r="10" fill="#C4622D" opacity="0.3"/>
+          <circle cx="78" cy="64" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="78" cy="86" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="67" cy="75" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="89" cy="75" r="3.5" fill="#FAF3E3" opacity="0.8"/>
+          <circle cx="78" cy="75" r="7" fill="#D4A44C"/>
+          {/* Stems */}
+          <path d="M40 59 Q38 78 35 95" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M78 85 Q76 96 74 108" stroke="#688A52" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      </div>
+
+      {/* Sparkle dots — bottom left */}
+      <div className="absolute bottom-40 left-4 md:left-12 pointer-events-none opacity-20">
+        <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
+          <path d="M15 10 L17 17 L24 19 L17 21 L15 28 L13 21 L6 19 L13 17Z" fill="#C4829A"/>
+          <path d="M55 40 L56.5 45.5 L62 47 L56.5 48.5 L55 54 L53.5 48.5 L48 47 L53.5 45.5Z" fill="#688A52" opacity="0.7"/>
+          <circle cx="45" cy="12" r="4" fill="#C4622D" opacity="0.5"/>
+          <circle cx="10" cy="50" r="3" fill="#D4A44C"/>
+          <circle cx="62" cy="20" r="2.5" fill="#C4829A"/>
+        </svg>
+      </div>
+
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 mb-24 text-center z-10">
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-display italic text-foreground mb-4 drop-shadow-sm">
           Activities & Strategies
