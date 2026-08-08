@@ -3,7 +3,6 @@ import {
   studioHandoffsTable,
   studioProjectsTable,
   studioClassCyclesTable,
-  studioAccountsTable,
 } from '@workspace/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
@@ -66,7 +65,7 @@ router.post(
   requireStudioRole('teacher'),
   async (req: Request, res: Response) => {
     const id = Number(req.params.id);
-    const { studentId, cycleId } = req.body as { studentId?: number; cycleId?: number };
+    const { studentId, cycleId } = req.body as { studentId?: string; cycleId?: number };
 
     if (!studentId) {
       res.status(400).json({ error: 'studentId is required' });

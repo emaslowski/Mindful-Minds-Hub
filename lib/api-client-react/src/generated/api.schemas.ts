@@ -9,6 +9,15 @@ export interface HealthStatus {
   status: string;
 }
 
+export type AuthUserRole = typeof AuthUserRole[keyof typeof AuthUserRole];
+
+
+export const AuthUserRole = {
+  teacher: 'teacher',
+  student: 'student',
+  none: 'none',
+} as const;
+
 export interface AuthUser {
   id: string;
   /** @nullable */
@@ -19,6 +28,9 @@ export interface AuthUser {
   lastName: string | null;
   /** @nullable */
   profileImageUrl: string | null;
+  /** @nullable */
+  displayName?: string | null;
+  role: AuthUserRole;
 }
 
 export interface AuthUserEnvelope {

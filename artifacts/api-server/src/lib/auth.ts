@@ -6,17 +6,20 @@ import { type Request, type Response } from 'express';
 import * as client from 'openid-client';
 
 export const ISSUER_URL = process.env.ISSUER_URL ?? 'https://replit.com/oidc';
+export const GOOGLE_ISSUER_URL = 'https://accounts.google.com';
 export const SESSION_COOKIE = 'sid';
 export const SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
 
 export interface SessionData {
   user: AuthUser;
+  provider: 'replit' | 'google';
   access_token: string;
   refresh_token?: string;
   expires_at?: number;
 }
 
 let oidcConfig: client.Configuration | null = null;
+let googleOidcConfig: client.Configuration | null = null;
 
 export async function getOidcConfig(): Promise<client.Configuration> {
   if (!oidcConfig) {
@@ -26,6 +29,17 @@ export async function getOidcConfig(): Promise<client.Configuration> {
     );
   }
   return oidcConfig;
+}
+
+export async function getGoogleOidcConfig(): Promise<client.Configuration> {
+  if (!googleOidcConfig) {
+    googleOidcConfig = await client.discovery(
+      new URL(GOOGLE_ISSUER_URL),
+      process.env.GOOGLE_CLIENT_ID!,
+      process.env.GOOGLE_CLIENT_SECRET!,
+    );
+  }
+  return googleOidcConfig;
 }
 
 export async function createSession(data: SessionData): Promise<string> {

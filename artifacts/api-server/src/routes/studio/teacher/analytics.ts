@@ -1,14 +1,13 @@
 import { db } from '@workspace/db';
 import {
-  studioAccountsTable,
+  studioProfilesTable,
   studioProjectsTable,
   studioPublicationsTable,
   studioHandoffsTable,
   studioClassCyclesTable,
   studioImpactSettingsTable,
-  pageViewsTable,
 } from '@workspace/db/schema';
-import { eq, count, desc, and, sql } from 'drizzle-orm';
+import { eq, count, and, sql } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
 
@@ -16,10 +15,16 @@ const router = Router();
 
 // GET /api/teacher/analytics — full analytics for teacher
 router.get('/teacher/analytics', requireStudioRole('teacher'), async (_req, res) => {
+  // Active students = enrolled profiles with accountStatus = 'active'
   const [activeStudents] = await db
     .select({ count: count() })
-    .from(studioAccountsTable)
-    .where(and(eq(studioAccountsTable.role, 'student'), eq(studioAccountsTable.accountStatus, 'active')));
+    .from(studioProfilesTable)
+    .where(
+      and(
+        eq(studioProfilesTable.role, 'student'),
+        eq(studioProfilesTable.accountStatus, 'active'),
+      ),
+    );
 
   const [totalProjects] = await db
     .select({ count: count() })
@@ -135,8 +140,13 @@ router.get('/public/impact', async (_req, res) => {
   if (visibleKeys.has('student_creators')) {
     const [r] = await db
       .select({ count: count() })
-      .from(studioAccountsTable)
-      .where(and(eq(studioAccountsTable.role, 'student'), eq(studioAccountsTable.accountStatus, 'active')));
+      .from(studioProfilesTable)
+      .where(
+        and(
+          eq(studioProfilesTable.role, 'student'),
+          eq(studioProfilesTable.accountStatus, 'active'),
+        ),
+      );
     stats.student_creators = r.count;
   }
 

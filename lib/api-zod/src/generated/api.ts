@@ -29,7 +29,9 @@ export const GetCurrentAuthUserResponse = zod.object({
   "email": zod.string().nullable(),
   "firstName": zod.string().nullable(),
   "lastName": zod.string().nullable(),
-  "profileImageUrl": zod.string().nullable()
+  "profileImageUrl": zod.string().nullable(),
+  "displayName": zod.string().nullish(),
+  "role": zod.enum(['teacher', 'student', 'none'])
 }),zod.null()])
 })
 

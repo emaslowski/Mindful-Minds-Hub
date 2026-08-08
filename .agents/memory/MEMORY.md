@@ -1,4 +1,4 @@
 - [Mind Matters auth setup](mind-matters-auth.md) — Replit Auth wired; mobile endpoint types must be inlined in auth.ts (not from api-zod)
 - [Mind Matters OpenAPI quirks](mind-matters-openapi-quirks.md) — zod v3: never use format:email/format:uri; never use type:integer; mobile schemas must be in components but NOT as path operations
 - [Mind Matters red-flag email](mind-matters-redflag.md) — Journal red-flag scanning keywords + nodemailer alert logic in routes/journal.ts
-- [Mind Matters studio auth](mind-matters-studio-auth.md) — username/password auth for student studio; separate studio_sid cookie; teacher auto-seeded from env vars
+- [Mind Matters Google OAuth + roles](mind-matters-google-auth.md) — Google OAuth added alongside Replit OIDC; role in AuthUser; studio_profiles for pre-created students; studioAuth bridges to main session

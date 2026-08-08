@@ -1,11 +1,8 @@
 import { db } from '@workspace/db';
 import {
   studioClassCyclesTable,
-  studioProjectsTable,
-  studioAccountsTable,
-  studioStudentProfilesTable,
 } from '@workspace/db/schema';
-import { eq, count, desc } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
 

@@ -1,10 +1,9 @@
-import bcrypt from 'bcryptjs';
 import { db } from '@workspace/db';
 import {
-  studioAccountsTable,
   studioJobsTable,
   studioTeamsTable,
   studioImpactSettingsTable,
+  studioProfilesTable,
 } from '@workspace/db/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from './logger';
@@ -76,31 +75,34 @@ export async function runSeed(): Promise<void> {
         .onConflictDoNothing();
     }
 
-    // Seed teacher account from env vars if provided
-    const adminUsername = process.env.ADMIN_USERNAME;
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    // Seed teacher studio profile from ADMIN_EMAILS if not already present.
+    // This pre-creates a teacher profile so the first teacher login works without
+    // needing a separate onboarding step.
+    const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
 
-    if (adminUsername && adminPassword) {
+    for (const email of adminEmails) {
       const existing = await db
         .select()
-        .from(studioAccountsTable)
-        .where(eq(studioAccountsTable.username, adminUsername));
+        .from(studioProfilesTable)
+        .where(eq(studioProfilesTable.email, email))
+        .limit(1);
 
       if (existing.length === 0) {
-        const passwordHash = await bcrypt.hash(adminPassword, 12);
-        await db.insert(studioAccountsTable).values({
-          username: adminUsername,
-          passwordHash,
-          displayName: 'Teacher',
+        await db.insert(studioProfilesTable).values({
+          email,
           role: 'teacher',
+          displayName: 'Teacher',
           accountStatus: 'active',
         });
-        logger.info({ username: adminUsername }, 'Teacher account created from env vars');
+        logger.info({ email }, 'Teacher studio profile created from ADMIN_EMAILS');
       }
-    } else {
-      logger.warn(
-        'ADMIN_USERNAME and ADMIN_PASSWORD env vars not set — no teacher account auto-created.',
-      );
+    }
+
+    if (adminEmails.length === 0) {
+      logger.warn('ADMIN_EMAILS env var not set — no teacher profile auto-created.');
     }
 
     logger.info('Studio seed completed');

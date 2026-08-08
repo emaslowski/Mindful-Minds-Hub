@@ -3,7 +3,7 @@ import {
   studioProjectsTable,
   studioTeacherReviewsTable,
   studioPublicationsTable,
-  studioAccountsTable,
+  studioProfilesTable,
   studioTeamsTable,
   studioSafetyFlagsTable,
   studioPeerReviewsTable,
@@ -27,14 +27,15 @@ router.get('/teacher/projects', requireStudioRole('teacher'), async (req: Reques
       status: studioProjectsTable.status,
       contentFlagged: studioProjectsTable.contentFlagged,
       assignedStudentId: studioProjectsTable.assignedStudentId,
-      studentName: studioAccountsTable.displayName,
+      // Display name from studio profile
+      studentName: studioProfilesTable.displayName,
       teamId: studioProjectsTable.teamId,
       teamName: studioTeamsTable.name,
       createdAt: studioProjectsTable.createdAt,
       updatedAt: studioProjectsTable.updatedAt,
     })
     .from(studioProjectsTable)
-    .leftJoin(studioAccountsTable, eq(studioProjectsTable.assignedStudentId, studioAccountsTable.id))
+    .leftJoin(studioProfilesTable, eq(studioProjectsTable.assignedStudentId, studioProfilesTable.userId))
     .leftJoin(studioTeamsTable, eq(studioProjectsTable.teamId, studioTeamsTable.id))
     .orderBy(desc(studioProjectsTable.updatedAt));
 
@@ -51,12 +52,12 @@ router.get('/teacher/review/queue', requireStudioRole('teacher'), async (_req, r
       contentType: studioProjectsTable.contentType,
       status: studioProjectsTable.status,
       contentFlagged: studioProjectsTable.contentFlagged,
-      studentName: studioAccountsTable.displayName,
+      studentName: studioProfilesTable.displayName,
       teamName: studioTeamsTable.name,
       updatedAt: studioProjectsTable.updatedAt,
     })
     .from(studioProjectsTable)
-    .leftJoin(studioAccountsTable, eq(studioProjectsTable.assignedStudentId, studioAccountsTable.id))
+    .leftJoin(studioProfilesTable, eq(studioProjectsTable.assignedStudentId, studioProfilesTable.userId))
     .leftJoin(studioTeamsTable, eq(studioProjectsTable.teamId, studioTeamsTable.id))
     .where(
       inArray(studioProjectsTable.status, [
@@ -89,10 +90,12 @@ router.get('/teacher/projects/:id', requireStudioRole('teacher'), async (req: Re
     project.status = 'Teacher Reviewing';
   }
 
-  const [student] = await db
-    .select({ displayName: studioAccountsTable.displayName })
-    .from(studioAccountsTable)
-    .where(eq(studioAccountsTable.id, project.assignedStudentId!));
+  const [student] = project.assignedStudentId
+    ? await db
+        .select({ displayName: studioProfilesTable.displayName, email: studioProfilesTable.email })
+        .from(studioProfilesTable)
+        .where(eq(studioProfilesTable.userId, project.assignedStudentId))
+    : [];
 
   const safetyFlags = await db
     .select()
@@ -117,7 +120,7 @@ router.get('/teacher/projects/:id', requireStudioRole('teacher'), async (req: Re
 
   res.json({
     project,
-    student,
+    student: student ?? null,
     safetyFlags,
     peerReviews,
     sources,
@@ -156,7 +159,7 @@ router.post(
 
     if (!project) { res.status(404).json({ error: 'Project not found' }); return; }
 
-    // Record the teacher review
+    // Record the teacher review (teacherId is the Google user ID string)
     await db.insert(studioTeacherReviewsTable).values({
       projectId: id,
       teacherId: req.studioUser!.id,
@@ -222,7 +225,8 @@ router.post(
   requireStudioRole('teacher'),
   async (req: Request, res: Response) => {
     const id = Number(req.params.id);
-    const { reviewerId } = req.body as { reviewerId?: number };
+    // reviewerId is now a Google user ID string
+    const { reviewerId } = req.body as { reviewerId?: string };
 
     if (!reviewerId) {
       res.status(400).json({ error: 'reviewerId is required' });

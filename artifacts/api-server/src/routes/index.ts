@@ -22,6 +22,7 @@ import teacherReviewRouter from "./studio/teacher/review";
 import teacherHandoffsRouter from "./studio/teacher/handoffs";
 import teacherAnalyticsRouter from "./studio/teacher/analytics";
 import publicContentRouter from "./studio/publicContent";
+import { requireRole } from "../middlewares/requireRoleMiddleware";
 
 const router: IRouter = Router();
 
@@ -50,5 +51,11 @@ router.use(teacherHandoffsRouter);
 router.use(teacherAnalyticsRouter);
 // Public (no auth)
 router.use(publicContentRouter);
+
+// Studio API routes — gated by role (added in the next task)
+// Students and teachers can access /studio routes
+router.use('/studio', requireRole('student', 'teacher'), Router());
+// Only teachers can access /teacher routes
+router.use('/teacher', requireRole('teacher'), Router());
 
 export default router;

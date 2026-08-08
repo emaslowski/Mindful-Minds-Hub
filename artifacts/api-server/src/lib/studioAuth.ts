@@ -7,19 +7,19 @@ export const STUDIO_SESSION_COOKIE = 'studio_sid';
 export const STUDIO_SESSION_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface StudioUserSession {
-  id: number;
-  username: string;
-  displayName: string;
+  /** Google user ID (usersTable.id / Google sub) */
+  id: string;
+  email: string | null;
+  displayName: string | null;
   role: 'teacher' | 'student';
   accountStatus: 'active' | 'disabled';
-  // Student-only fields
+  // Student-only fields (from studioProfilesTable)
   teamId?: number | null;
   jobId?: number | null;
   cycleId?: number | null;
   teamName?: string | null;
   jobTitle?: string | null;
   cycleName?: string | null;
-  className?: string | null;
 }
 
 export interface StudioSessionData {

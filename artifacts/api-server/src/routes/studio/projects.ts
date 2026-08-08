@@ -3,7 +3,6 @@ import {
   studioProjectsTable,
   studioProjectContributorsTable,
   studioSafetyFlagsTable,
-  studioAccountsTable,
   studioTeamsTable,
   studioClassCyclesTable,
 } from '@workspace/db/schema';

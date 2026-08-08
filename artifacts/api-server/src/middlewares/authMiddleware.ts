@@ -31,6 +31,10 @@ async function refreshIfExpired(
   sid: string,
   session: SessionData,
 ): Promise<SessionData | null> {
+  // Google sessions do not use Replit's token refresh — the session itself
+  // is the source of truth (7-day TTL). Skip refresh for Google provider.
+  if (session.provider === 'google') return session;
+
   const now = Math.floor(Date.now() / 1000);
   if (!session.expires_at || now <= session.expires_at) return session;
 

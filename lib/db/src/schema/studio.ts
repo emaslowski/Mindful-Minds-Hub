@@ -1,8 +1,19 @@
 import {
-  pgTable, pgEnum, serial, text, boolean, timestamp, integer, date,
+  pgTable,
+  pgEnum,
+  serial,
+  text,
+  boolean,
+  timestamp,
+  integer,
+  varchar,
+  date,
+  unique,
 } from 'drizzle-orm/pg-core';
+import { usersTable } from './auth';
 
 // ── Enums ──────────────────────────────────────────────────────────────────
+
 export const studioRoleEnum = pgEnum('studio_role', ['teacher', 'student']);
 export const accountStatusEnum = pgEnum('studio_account_status', ['active', 'disabled']);
 export const projectStatusEnum = pgEnum('studio_project_status', [
@@ -15,7 +26,8 @@ export const teacherDecisionEnum = pgEnum('studio_teacher_decision', [
 ]);
 export const publicationStatusEnum = pgEnum('studio_publication_status', ['active', 'archived']);
 
-// ── Teams ──────────────────────────────────────────────────────────────────
+// ── Reference tables ───────────────────────────────────────────────────────
+
 export const studioTeamsTable = pgTable('studio_teams', {
   id: serial('id').primaryKey(),
   name: text('name').notNull().unique(),
@@ -23,7 +35,6 @@ export const studioTeamsTable = pgTable('studio_teams', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-// ── Jobs ───────────────────────────────────────────────────────────────────
 export const studioJobsTable = pgTable('studio_jobs', {
   id: serial('id').primaryKey(),
   title: text('title').notNull().unique(),
@@ -31,7 +42,15 @@ export const studioJobsTable = pgTable('studio_jobs', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
+export const studioContentTypesTable = pgTable('studio_content_types', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  description: text('description'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
 // ── Class Cycles ───────────────────────────────────────────────────────────
+
 export const studioClassCyclesTable = pgTable('studio_class_cycles', {
   id: serial('id').primaryKey(),
   name: text('name').notNull().unique(),
@@ -41,31 +60,30 @@ export const studioClassCyclesTable = pgTable('studio_class_cycles', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-// ── Accounts (username + password) ────────────────────────────────────────
-export const studioAccountsTable = pgTable('studio_accounts', {
-  id: serial('id').primaryKey(),
-  username: text('username').notNull().unique(),
-  passwordHash: text('password_hash').notNull(),
-  displayName: text('display_name').notNull(),
-  role: studioRoleEnum('role').notNull(),
-  accountStatus: accountStatusEnum('account_status').notNull().default('active'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
+// ── Studio Profiles ────────────────────────────────────────────────────────
+// One row per enrolled user. Teacher creates this before the student logs in
+// (with email only, userId = null). On first Google login, userId is backfilled.
 
-// ── Student Profiles (extra data for students) ────────────────────────────
-export const studioStudentProfilesTable = pgTable('studio_student_profiles', {
+export const studioProfilesTable = pgTable('studio_profiles', {
   id: serial('id').primaryKey(),
-  accountId: integer('account_id').notNull().unique()
-    .references(() => studioAccountsTable.id, { onDelete: 'cascade' }),
-  className: text('class_name'),
+  // null until the student completes their first Google login
+  userId: varchar('user_id').references(() => usersTable.id),
+  // used for pre-creation lookup before userId is known
+  email: varchar('email').notNull().unique(),
+  role: studioRoleEnum('role').notNull().default('student'),
+  displayName: text('display_name'),
+  accountStatus: accountStatusEnum('account_status').notNull().default('active'),
   cycleId: integer('cycle_id').references(() => studioClassCyclesTable.id),
   teamId: integer('team_id').references(() => studioTeamsTable.id),
   jobId: integer('job_id').references(() => studioJobsTable.id),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 // ── Projects ───────────────────────────────────────────────────────────────
+// assignedStudentId and peerReviewerId are varchar FKs to the Google-auth
+// usersTable (keeping the original column names for route backward compat).
+
 export const studioProjectsTable = pgTable('studio_projects', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
@@ -76,29 +94,33 @@ export const studioProjectsTable = pgTable('studio_projects', {
   contentFlagged: boolean('content_flagged').notNull().default(false),
   originalCycleId: integer('original_cycle_id').references(() => studioClassCyclesTable.id),
   currentCycleId: integer('current_cycle_id').references(() => studioClassCyclesTable.id),
-  assignedStudentId: integer('assigned_student_id')
-    .references(() => studioAccountsTable.id),
-  peerReviewerId: integer('peer_reviewer_id')
-    .references(() => studioAccountsTable.id),
+  assignedStudentId: varchar('assigned_student_id').references(() => usersTable.id),
+  peerReviewerId: varchar('peer_reviewer_id').references(() => usersTable.id),
   teamId: integer('team_id').references(() => studioTeamsTable.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
   publishedAt: timestamp('published_at'),
 });
 
 // ── Project Contributors ───────────────────────────────────────────────────
-export const studioProjectContributorsTable = pgTable('studio_project_contributors', {
-  id: serial('id').primaryKey(),
-  projectId: integer('project_id').notNull()
-    .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
-  studentId: integer('student_id').notNull()
-    .references(() => studioAccountsTable.id),
-  contributionType: text('contribution_type').notNull(), // 'author' | 'editor' | 'peer_reviewer' | 'handoff'
-  cycleId: integer('cycle_id').references(() => studioClassCyclesTable.id),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+
+export const studioProjectContributorsTable = pgTable(
+  'studio_project_contributors',
+  {
+    id: serial('id').primaryKey(),
+    projectId: integer('project_id').notNull()
+      .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
+    // keeping 'studentId' column name for route backward compat (varchar → usersTable)
+    studentId: varchar('student_id').notNull().references(() => usersTable.id),
+    contributionType: text('contribution_type').notNull(), // 'author' | 'editor' | 'peer_reviewer' | 'handoff'
+    cycleId: integer('cycle_id').references(() => studioClassCyclesTable.id),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => [unique('uq_studio_project_contributor').on(t.projectId, t.studentId)],
+);
 
 // ── Sources / Research ─────────────────────────────────────────────────────
+
 export const studioSourcesTable = pgTable('studio_sources', {
   id: serial('id').primaryKey(),
   projectId: integer('project_id').notNull()
@@ -113,12 +135,13 @@ export const studioSourcesTable = pgTable('studio_sources', {
 });
 
 // ── Peer Reviews ───────────────────────────────────────────────────────────
+
 export const studioPeerReviewsTable = pgTable('studio_peer_reviews', {
   id: serial('id').primaryKey(),
   projectId: integer('project_id').notNull()
     .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
-  reviewerId: integer('reviewer_id').notNull()
-    .references(() => studioAccountsTable.id),
+  // keeping 'reviewerId' column name for route backward compat (varchar → usersTable)
+  reviewerId: varchar('reviewer_id').notNull().references(() => usersTable.id),
   checklistInfoClear: boolean('checklist_info_clear'),
   checklistAgeAppropriate: boolean('checklist_age_appropriate'),
   checklistSourcesIncluded: boolean('checklist_sources_included'),
@@ -132,18 +155,20 @@ export const studioPeerReviewsTable = pgTable('studio_peer_reviews', {
 });
 
 // ── Teacher Reviews ────────────────────────────────────────────────────────
+
 export const studioTeacherReviewsTable = pgTable('studio_teacher_reviews', {
   id: serial('id').primaryKey(),
   projectId: integer('project_id').notNull()
     .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
-  teacherId: integer('teacher_id').notNull()
-    .references(() => studioAccountsTable.id),
+  // keeping 'teacherId' column name for route backward compat (varchar → usersTable)
+  teacherId: varchar('teacher_id').notNull().references(() => usersTable.id),
   decision: teacherDecisionEnum('decision').notNull(),
   feedback: text('feedback'),
   reviewedAt: timestamp('reviewed_at').notNull().defaultNow(),
 });
 
 // ── Handoffs ───────────────────────────────────────────────────────────────
+
 export const studioHandoffsTable = pgTable('studio_handoffs', {
   id: serial('id').primaryKey(),
   projectId: integer('project_id').notNull()
@@ -160,27 +185,37 @@ export const studioHandoffsTable = pgTable('studio_handoffs', {
 });
 
 // ── Publications ───────────────────────────────────────────────────────────
+
 export const studioPublicationsTable = pgTable('studio_publications', {
   id: serial('id').primaryKey(),
   projectId: integer('project_id').notNull().unique()
     .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
   destinationSection: text('destination_section').notNull(),
+  // nullable — set when a publication gets a public URL (task 8)
+  slug: text('slug').unique(),
   authorDisplay: text('author_display').notNull().default('Mind Matters Student Team'),
   publicationStatus: publicationStatusEnum('publication_status').notNull().default('active'),
+  featured: boolean('featured').notNull().default(false),
   publishedAt: timestamp('published_at').notNull().defaultNow(),
+  unpublishedAt: timestamp('unpublished_at'),
 });
 
-// ── Safety Flags (never shown to students) ─────────────────────────────────
+// ── Safety Flags ───────────────────────────────────────────────────────────
+
 export const studioSafetyFlagsTable = pgTable('studio_safety_flags', {
   id: serial('id').primaryKey(),
   projectId: integer('project_id').notNull()
     .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
   flagReason: text('flag_reason').notNull(),
   teacherAttentionRecommended: boolean('teacher_attention_recommended').notNull().default(true),
+  flaggedByUserId: varchar('flagged_by_user_id').references(() => usersTable.id),
+  resolvedAt: timestamp('resolved_at'),
+  resolvedByUserId: varchar('resolved_by_user_id').references(() => usersTable.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-// ── Impact Settings ────────────────────────────────────────────────────────
+// ── Impact / Visibility Settings ───────────────────────────────────────────
+
 export const studioImpactSettingsTable = pgTable('studio_impact_settings', {
   id: serial('id').primaryKey(),
   settingKey: text('setting_key').notNull().unique(),
@@ -189,12 +224,14 @@ export const studioImpactSettingsTable = pgTable('studio_impact_settings', {
 });
 
 // ── Type exports ───────────────────────────────────────────────────────────
-export type StudioAccount = typeof studioAccountsTable.$inferSelect;
+
 export type StudioTeam = typeof studioTeamsTable.$inferSelect;
 export type StudioJob = typeof studioJobsTable.$inferSelect;
+export type StudioContentType = typeof studioContentTypesTable.$inferSelect;
 export type StudioClassCycle = typeof studioClassCyclesTable.$inferSelect;
-export type StudioStudentProfile = typeof studioStudentProfilesTable.$inferSelect;
+export type StudioProfile = typeof studioProfilesTable.$inferSelect;
 export type StudioProject = typeof studioProjectsTable.$inferSelect;
+export type StudioProjectContributor = typeof studioProjectContributorsTable.$inferSelect;
 export type StudioSource = typeof studioSourcesTable.$inferSelect;
 export type StudioPeerReview = typeof studioPeerReviewsTable.$inferSelect;
 export type StudioTeacherReview = typeof studioTeacherReviewsTable.$inferSelect;

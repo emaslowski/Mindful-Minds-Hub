@@ -3,10 +3,7 @@ import {
   studioProjectsTable,
   studioProjectContributorsTable,
   studioPeerReviewsTable,
-  studioSourcesTable,
   studioHandoffsTable,
-  studioPublicationsTable,
-  studioStudentProfilesTable,
   studioClassCyclesTable,
 } from '@workspace/db/schema';
 import { eq, and, count, desc } from 'drizzle-orm';

@@ -10,6 +10,7 @@ export * from './analyticsSummary';
 export * from './authorizationSessionHeaderParameter';
 export * from './authUser';
 export * from './authUserEnvelope';
+export * from './authUserRole';
 export * from './beginBrowserLoginParams';
 export * from './blogPost';
 export * from './blogSubmissionInput';
