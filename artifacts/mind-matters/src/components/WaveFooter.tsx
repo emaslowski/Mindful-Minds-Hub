@@ -4,21 +4,17 @@ interface WaveFooterProps {
 
 export function WaveFooter({ quote = "You Matter. We Matter. Your Mind Matters." }: WaveFooterProps) {
   return (
-    <div className="w-full relative z-0 mt-auto">
-      {/* SVG Double Wave */}
-      <div className="w-full -mb-1 overflow-hidden">
-        <svg viewBox="0 0 1440 250" preserveAspectRatio="none" className="w-full h-[120px] md:h-[180px] lg:h-[250px]">
-          {/* Back wave — slightly darker deep sage */}
-          <path d="M0,120 C180,60 360,180 540,120 C720,60 900,160 1080,100 C1260,40 1380,140 1440,110 L1440,250 L0,250 Z" fill="#4A6741" opacity="0.5"/>
-          {/* Front wave — main deep sage */}
-          <path d="M0,150 C200,80 400,200 600,140 C800,80 1000,180 1200,120 C1350,75 1420,160 1440,140 L1440,250 L0,250 Z" fill="#4A6741"/>
-        </svg>
-      </div>
-      
-      {/* Footer text area extending below the wave */}
-      <div className="w-full bg-[#4A6741] flex flex-col items-center pb-16 pt-8 px-4 text-center relative overflow-hidden">
-        
-        {/* Botanical SVG accents left */}
+    <div className="relative z-20 mt-auto" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
+      {/* Double wave */}
+      <svg viewBox="0 0 1440 220" preserveAspectRatio="none" className="w-full h-[160px] md:h-[220px] block">
+        <path d="M0,100 C240,40 480,170 720,100 C960,30 1200,150 1440,70 L1440,220 L0,220 Z" fill="#5A7A44" opacity="0.35"/>
+        <path d="M0,130 C200,60 400,190 600,120 C800,50 1000,170 1200,100 C1350,50 1420,130 1440,110 L1440,220 L0,220 Z" fill="#5A7A44"/>
+      </svg>
+
+      {/* Footer text area */}
+      <div className="w-full bg-[#5A7A44] flex flex-col items-center pb-12 pt-6 px-4 text-center relative overflow-hidden">
+
+        {/* Botanical accents left */}
         <div className="absolute left-4 md:left-24 top-1/2 -translate-y-1/2 opacity-40">
           <svg width="40" height="60" viewBox="0 0 40 60" fill="none">
             <path d="M20 60 C20 60 20 20 20 0" stroke="#FAF3E3" strokeWidth="2" strokeLinecap="round"/>
@@ -33,7 +29,7 @@ export function WaveFooter({ quote = "You Matter. We Matter. Your Mind Matters."
           {quote}
         </p>
 
-        {/* Botanical SVG accents right */}
+        {/* Botanical accents right */}
         <div className="absolute right-4 md:right-24 top-1/2 -translate-y-1/2 opacity-40">
           <svg width="40" height="60" viewBox="0 0 40 60" fill="none">
             <path d="M20 60 C20 60 20 20 20 0" stroke="#FAF3E3" strokeWidth="2" strokeLinecap="round"/>

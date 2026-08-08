@@ -48,19 +48,39 @@ export function Layout({ children }: { children: ReactNode }) {
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 md:mb-0 hover:opacity-80 transition-opacity duration-300 group">
-          <div className="relative w-10 h-10 flex items-center justify-center">
-            {/* Inline SVG Crescent Moon + Star */}
-            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full text-terracotta">
-              <path d="M50 15 A 35 35 0 1 0 85 50 A 25 25 0 1 1 50 15" fill="currentColor" opacity="0.8"/>
-              <polygon points="80,10 82,18 90,20 82,22 80,30 78,22 70,20 78,18" fill="#D4A44C" opacity="0.8"/>
+          <div className="relative w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            {/* Cartoon smiling brain */}
+            <svg viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              {/* Left hemisphere */}
+              <path d="M50 20 C50 20 38 14 28 18 C18 22 12 32 14 42 C16 52 22 58 28 62 C34 66 44 68 50 68 Z" fill="#C4622D"/>
+              {/* Right hemisphere */}
+              <path d="M50 20 C50 20 62 14 72 18 C82 22 88 32 86 42 C84 52 78 58 72 62 C66 66 56 68 50 68 Z" fill="#D4734A"/>
+              {/* Center divider */}
+              <path d="M50 18 C50 18 48 30 49 45 C49.5 55 50 68 50 68" stroke="#A8522A" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+              {/* Brain folds — left */}
+              <path d="M30 28 C26 33 25 40 27 46" stroke="#A8522A" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5"/>
+              <path d="M36 22 C32 28 30 36 32 43" stroke="#A8522A" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4"/>
+              <path d="M42 20 C39 26 38 34 40 41" stroke="#A8522A" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.35"/>
+              {/* Brain folds — right */}
+              <path d="M70 28 C74 33 75 40 73 46" stroke="#A8522A" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5"/>
+              <path d="M64 22 C68 28 70 36 68 43" stroke="#A8522A" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4"/>
+              <path d="M58 20 C61 26 62 34 60 41" stroke="#A8522A" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.35"/>
+              {/* Bottom bumps */}
+              <path d="M32 66 C36 72 44 74 50 74 C56 74 64 72 68 66" stroke="#C4622D" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+              {/* Eyes */}
+              <circle cx="38" cy="46" r="4.5" fill="#FAF3E3"/>
+              <circle cx="62" cy="46" r="4.5" fill="#FAF3E3"/>
+              <circle cx="39" cy="46" r="2.5" fill="#3D2314"/>
+              <circle cx="63" cy="46" r="2.5" fill="#3D2314"/>
+              {/* Eye shine */}
+              <circle cx="40" cy="44.5" r="1" fill="white"/>
+              <circle cx="64" cy="44.5" r="1" fill="white"/>
+              {/* Smile */}
+              <path d="M38 56 Q50 65 62 56" stroke="#3D2314" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+              {/* Rosy cheeks */}
+              <circle cx="32" cy="54" r="5" fill="#E8A090" opacity="0.35"/>
+              <circle cx="68" cy="54" r="5" fill="#E8A090" opacity="0.35"/>
             </svg>
-            <div className="absolute -bottom-2 -right-4 w-6 h-10 group-hover:-translate-y-1 transition-transform">
-              <svg width="20" height="40" viewBox="0 0 20 40" fill="none" className="text-terracotta opacity-60">
-                <path d="M10 38 C10 38 2 25 4 12 C6 0 10 2 10 2 C10 2 14 0 16 12 C18 25 10 38 10 38Z" fill="currentColor" opacity="0.4"/>
-                <path d="M10 38 L10 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                <path d="M4 12 L10 16 M5 18 L10 22 M6 25 L10 28 M16 12 L10 16 M15 18 L10 22 M14 25 L10 28" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/>
-              </svg>
-            </div>
           </div>
           <div className="flex items-center font-display font-semibold text-3xl md:text-4xl text-foreground tracking-wide italic mt-1">
             <span className="text-terracotta">M</span>ind <span className="text-terracotta ml-2">M</span>atters

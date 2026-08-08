@@ -72,7 +72,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="w-full flex flex-col min-h-[calc(100vh-100px)] pt-12 md:pt-24 relative overflow-hidden">
+    <div className="w-full flex flex-col min-h-[calc(100vh-100px)] pt-12 md:pt-24 relative">
 
       {/* Boho Sun Mandala — pinned to top-left screen edge */}
       <div className="absolute top-0 left-0 -z-10 animate-[spin_120s_linear_infinite] opacity-70 -translate-x-6 -translate-y-6">
@@ -93,9 +93,8 @@ export default function Home() {
         </svg>
       </div>
 
-      <div className="flex-1 flex flex-col items-center pb-32 relative z-10 w-full max-w-5xl mx-auto">
-
-        {/* Hero Text */}
+      {/* Hero Text */}
+      <div className="flex-1 flex flex-col items-center pb-12 relative z-10 w-full max-w-5xl mx-auto">
         <h1 className="text-7xl md:text-[110px] lg:text-[130px] font-display text-foreground text-center leading-[0.9] mt-8 mb-6 drop-shadow-sm">
           <span className="italic block mb-2">Mind</span> 
           <span>Matters</span>
@@ -114,38 +113,32 @@ export default function Home() {
           <br />
           <span className="italic opacity-80 block mt-1">You are not alone.</span>
         </p>
-
       </div>
 
-      {/* Embedded footer/wave with cards */}
-      <div className="w-full relative z-20 mt-auto -mx-0">
-        {/* Double wave for earthy layered feel */}
-        <svg viewBox="0 0 1440 300" preserveAspectRatio="none" className="w-full h-[300px] md:h-[350px] block">
-          <path d="M0,150 C240,90 480,220 720,150 C960,80 1200,200 1440,120 L1440,300 L0,300 Z" fill="#688A52" opacity="0.3"/>
-          <path d="M0,180 C200,100 400,240 600,170 C800,100 1000,220 1200,150 C1350,100 1420,180 1440,160 L1440,300 L0,300 Z" fill="#688A52"/>
-        </svg>
-        
-        <div className="absolute bottom-12 md:bottom-20 left-0 w-full px-4 md:px-12 flex justify-center">
-          <div className="flex flex-wrap justify-center gap-6 md:gap-10 max-w-6xl w-full">
-            {categories.map((cat, idx) => (
-              <Link key={idx} href={cat.path} className="group relative">
-                {/* Circle button */}
-                <div className="w-28 h-28 md:w-36 md:h-36 bg-background rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl border border-background/50">
-                  
-                  {/* Line art Icon */}
-                  <div className="w-10 h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110 mb-2">
-                    {cat.icon}
-                  </div>
-                  
-                  {/* Label */}
-                  <div className="font-display italic text-lg md:text-xl text-foreground font-semibold text-center">
-                    {cat.name}
-                  </div>
+      {/* Category buttons — above the hills */}
+      <div className="w-full flex justify-center px-4 md:px-12 pb-10 relative z-10">
+        <div className="flex flex-wrap justify-center gap-6 md:gap-10 max-w-6xl w-full">
+          {categories.map((cat, idx) => (
+            <Link key={idx} href={cat.path} className="group relative">
+              <div className="w-28 h-28 md:w-36 md:h-36 bg-[#E8DFC8] rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl border border-[#D4C9A8]">
+                <div className="w-10 h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110 mb-2">
+                  {cat.icon}
                 </div>
-              </Link>
-            ))}
-          </div>
+                <div className="font-display italic text-lg md:text-xl text-foreground font-semibold text-center">
+                  {cat.name}
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
+      </div>
+
+      {/* Hills — full-bleed, no buttons inside */}
+      <div className="relative z-20 mt-auto" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
+        <svg viewBox="0 0 1440 220" preserveAspectRatio="none" className="w-full h-[160px] md:h-[220px] block">
+          <path d="M0,100 C240,40 480,170 720,100 C960,30 1200,150 1440,70 L1440,220 L0,220 Z" fill="#5A7A44" opacity="0.35"/>
+          <path d="M0,130 C200,60 400,190 600,120 C800,50 1000,170 1200,100 C1350,50 1420,130 1440,110 L1440,220 L0,220 Z" fill="#5A7A44"/>
+        </svg>
       </div>
     </div>
   );
