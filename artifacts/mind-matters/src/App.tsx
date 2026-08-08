@@ -50,9 +50,12 @@ import ReviewQueue from '@/pages/studio/teacher/ReviewQueue';
 import ProjectReview from '@/pages/studio/teacher/ProjectReview';
 import AllProjects from '@/pages/studio/teacher/AllProjects';
 import Students from '@/pages/studio/teacher/Students';
+import Teams from '@/pages/studio/teacher/Teams';
+import Jobs from '@/pages/studio/teacher/Jobs';
 import Cycles from '@/pages/studio/teacher/Cycles';
 import Handoffs from '@/pages/studio/teacher/Handoffs';
 import Analytics from '@/pages/studio/teacher/Analytics';
+import TeacherSettings from '@/pages/studio/teacher/Settings';
 
 const queryClient = new QueryClient();
 
@@ -77,9 +80,12 @@ function StudioRouter() {
       <Route path="/studio/teacher/review" component={ReviewQueue} />
       <Route path="/studio/teacher/projects" component={AllProjects} />
       <Route path="/studio/teacher/students" component={Students} />
+      <Route path="/studio/teacher/teams" component={Teams} />
+      <Route path="/studio/teacher/jobs" component={Jobs} />
       <Route path="/studio/teacher/cycles" component={Cycles} />
       <Route path="/studio/teacher/handoffs" component={Handoffs} />
       <Route path="/studio/teacher/analytics" component={Analytics} />
+      <Route path="/studio/teacher/settings" component={TeacherSettings} />
       <Route path="/studio/teacher" component={CommandCenter} />
       <Route path="/studio/projects/:id" component={ProjectWorkspace} />
       <Route path="/studio/projects" component={ProjectList} />

@@ -200,6 +200,23 @@ export const teacherAnalytics = {
     }),
 };
 
+// ── Teacher: Settings ─────────────────────────────────────────────────────
+export const teacherSettings = {
+  get: () =>
+    studioFetch<{ adminEmails: string[]; authorDisplayOptions: string[] }>(
+      '/teacher/settings',
+    ),
+  getAuthorDisplayOptions: () =>
+    studioFetch<{ authorDisplayOptions: string[] }>(
+      '/teacher/settings/author-display-options',
+    ),
+  updateAuthorDisplayOptions: (authorDisplayOptions: string[]) =>
+    studioFetch('/teacher/settings', {
+      method: 'PATCH',
+      body: JSON.stringify({ authorDisplayOptions }),
+    }),
+};
+
 // ── Shared (student + teacher) ─────────────────────────────────────────────
 export const studioShared = {
   teams: () => studioFetch<{ teams: Team[] }>('/studio/teams'),

@@ -3,7 +3,7 @@ import { useParams, useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherReview, AUTHOR_DISPLAY_OPTIONS, DESTINATION_SECTIONS, type DecisionData } from '@/lib/studioApi';
+import { teacherReview, teacherSettings, AUTHOR_DISPLAY_OPTIONS, DESTINATION_SECTIONS, type DecisionData } from '@/lib/studioApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,9 +41,17 @@ export default function ProjectReview() {
     enabled: !!user,
   });
 
+  const { data: settingsData } = useQuery({
+    queryKey: ['teacher-author-display-options'],
+    queryFn: () => teacherSettings.getAuthorDisplayOptions(),
+    enabled: !!user,
+  });
+
+  const authorDisplayOptions = settingsData?.authorDisplayOptions ?? AUTHOR_DISPLAY_OPTIONS;
+
   const [feedback, setFeedback] = useState('');
   const [destinationSection, setDestinationSection] = useState('');
-  const [authorDisplay, setAuthorDisplay] = useState(AUTHOR_DISPLAY_OPTIONS[0]);
+  const [authorDisplay, setAuthorDisplay] = useState('');
 
   const { mutate: decide, isPending } = useMutation({
     mutationFn: (decisionData: DecisionData) =>
@@ -216,12 +224,15 @@ export default function ProjectReview() {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-[#453329]">Author display name</Label>
-                  <Select value={authorDisplay} onValueChange={setAuthorDisplay}>
+                  <Select
+                    value={authorDisplay || authorDisplayOptions[0] || ''}
+                    onValueChange={setAuthorDisplay}
+                  >
                     <SelectTrigger className="bg-white border-[#d5cabe] text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {AUTHOR_DISPLAY_OPTIONS.map((o) => (
+                      {authorDisplayOptions.map((o) => (
                         <SelectItem key={o} value={o}>{o}</SelectItem>
                       ))}
                     </SelectContent>
@@ -235,7 +246,7 @@ export default function ProjectReview() {
             <div className="space-y-2">
               <Button
                 className="w-full bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-2"
-                onClick={() => decide({ decision: 'approve_and_publish', feedback, destinationSection: destinationSection || suggestedDestination, authorDisplay })}
+                onClick={() => decide({ decision: 'approve_and_publish', feedback, destinationSection: destinationSection || suggestedDestination, authorDisplay: authorDisplay || authorDisplayOptions[0] || AUTHOR_DISPLAY_OPTIONS[0] })}
                 disabled={isPending}
               >
                 <CheckCircle className="h-4 w-4" /> Approve &amp; Publish

@@ -214,6 +214,14 @@ export const studioSafetyFlagsTable = pgTable('studio_safety_flags', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
+// ── General Settings (key/value store) ────────────────────────────────────
+
+export const studioAppSettingsTable = pgTable('studio_app_settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
 // ── Impact / Visibility Settings ───────────────────────────────────────────
 
 export const studioImpactSettingsTable = pgTable('studio_impact_settings', {
