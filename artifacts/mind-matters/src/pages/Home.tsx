@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { ImpactStats } from "@/components/ImpactStats";
 
 export default function Home() {
   const categories = [
@@ -239,6 +240,9 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* Our Impact */}
+      <ImpactStats />
 
       {/* Hills — full-bleed, no buttons inside */}
       <div className="relative z-20 mt-auto" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>

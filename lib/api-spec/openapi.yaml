@@ -440,6 +440,42 @@ paths:
                 items:
                   $ref: "#/components/schemas/Event"
 
+  # Public published content (no auth required)
+  /public/published:
+    get:
+      operationId: getPublishedContent
+      tags: [public]
+      summary: Get all active published student content
+      description: Returns publications joined to projects where publication_status = active. Never includes student PII.
+      parameters:
+        - name: section
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by destination_section (e.g. podcast, move, blog, meditation, wellness, recipe, events)
+      responses:
+        "200":
+          description: Published content list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedContentEnvelope"
+
+  /public/impact:
+    get:
+      operationId: getImpactStats
+      tags: [public]
+      summary: Get teacher-controlled public impact stats
+      description: Returns only stats the teacher has toggled visible. Never requires auth.
+      responses:
+        "200":
+          description: Impact statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImpactStatsEnvelope"
+
 components:
   parameters:
     AuthorizationSessionHeader:
@@ -781,6 +817,44 @@ components:
         createdAt:
           type: string
       required: [id, title, eventDate, createdAt]
+
+    # Public published content
+    PublishedItem:
+      type: object
+      properties:
+        id:
+          type: number
+        projectId:
+          type: number
+        title:
+          type: string
+        contentType:
+          type: string
+        content:
+          type: string
+        destinationSection:
+          type: string
+        authorDisplay:
+          type: string
+        publishedAt:
+          type: string
+      required: [id, projectId, title, contentType, content, destinationSection, authorDisplay, publishedAt]
+    PublishedContentEnvelope:
+      type: object
+      properties:
+        publications:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublishedItem"
+      required: [publications]
+    ImpactStatsEnvelope:
+      type: object
+      properties:
+        stats:
+          type: object
+          additionalProperties:
+            type: number
+      required: [stats]
 
     # Shared
     SubmissionResult:

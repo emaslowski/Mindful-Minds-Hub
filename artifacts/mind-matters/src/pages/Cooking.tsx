@@ -1,6 +1,45 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
+import { useGetPublishedContent } from "@workspace/api-client-react";
+import { Star } from "lucide-react";
+
+function PublishedRecipesSection() {
+  const { data, isLoading } = useGetPublishedContent({ section: "cooking" });
+  const items = data?.publications ?? [];
+  if (isLoading || items.length === 0) return null;
+
+  return (
+    <div className="w-full max-w-6xl mx-auto px-4 mb-12">
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="h-px flex-1 bg-sage/20 max-w-[100px]"></div>
+        <h2 className="font-display italic text-2xl text-foreground">Student Recipes</h2>
+        <div className="h-px flex-1 bg-sage/20 max-w-[100px]"></div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {items.map((item, i) => {
+          const colors = ["from-sage/20 to-amber/20", "from-terracotta/20 to-sage/20", "from-amber/20 to-dusty-rose/20"];
+          return (
+            <div
+              key={item.id}
+              className={`bg-gradient-to-br ${colors[i % colors.length]} rounded-[2rem] p-6 flex flex-col border border-white/40 shadow-sm`}
+            >
+              <div className="flex items-center gap-1.5 mb-2">
+                <Star size={12} className="text-amber fill-amber" />
+                <span className="font-sans text-xs font-bold text-amber uppercase tracking-widest">Student Recipe</span>
+              </div>
+              <h3 className="font-display italic text-2xl text-foreground mb-2 leading-tight">{item.title}</h3>
+              {item.content && (
+                <p className="font-sans text-sm text-foreground/70 leading-relaxed line-clamp-4 flex-1">{item.content}</p>
+              )}
+              <span className="mt-3 font-sans text-xs text-foreground/50">{item.authorDisplay}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function Cooking() {
   const [activeTab, setActiveTab] = useState<"videos" | "recipes">("recipes");
@@ -157,6 +196,7 @@ export default function Cooking() {
         )}
       </div>
 
+      <PublishedRecipesSection />
       <WaveFooter quote="Nourish to flourish." />
     </div>
   );

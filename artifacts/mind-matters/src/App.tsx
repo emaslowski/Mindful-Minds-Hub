@@ -34,6 +34,7 @@ import CheckIn from '@/pages/CheckIn';
 import Review from '@/pages/Review';
 import Contact from '@/pages/Contact';
 import ListenPodcast from '@/pages/ListenPodcast';
+import ListenMeditations from '@/pages/ListenMeditations';
 
 // ── Studio pages ──────────────────────────────────────────────────────────
 import StudioLogin from '@/pages/studio/Login';
@@ -165,9 +166,7 @@ function PublicRouter() {
         <Route path="/listen/focus-sounds">
           {() => <BlankTemplate title="Focus Sounds" subtitle="Focus playlists coming soon. Students can add content here!" />}
         </Route>
-        <Route path="/listen/meditations">
-          {() => <BlankTemplate title="Guided Meditations" subtitle="Meditation videos coming soon. Students can add content here!" />}
-        </Route>
+        <Route path="/listen/meditations" component={ListenMeditations} />
         <Route path="/listen/nature-sounds">
           {() => <BlankTemplate title="Nature Sounds" subtitle="Nature sound playlists coming soon. Students can add content here!" />}
         </Route>

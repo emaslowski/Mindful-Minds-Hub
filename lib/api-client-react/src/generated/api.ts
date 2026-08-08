@@ -32,14 +32,17 @@ import type {
   CollabPost,
   CollabPostInput,
   Event,
+  GetPublishedContentParams,
   GratitudeEntry,
   GratitudeEntryInput,
   HandleBrowserLoginCallbackParams,
   HealthStatus,
+  ImpactStatsEnvelope,
   JournalEntry,
   JournalEntryInput,
   LogoutBrowserSessionParams,
   PageViewInput,
+  PublishedContentEnvelope,
   Review,
   ReviewInput,
   SubmissionResult,
@@ -1806,6 +1809,169 @@ export function useGetEvents<TData = Awaited<ReturnType<typeof getEvents>>, TErr
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetEventsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPublishedContentUrl = (params?: GetPublishedContentParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/public/published?${stringifiedParams}` : `/api/public/published`
+}
+
+/**
+ * Returns publications joined to projects where publication_status = active. Never includes student PII.
+ * @summary Get all active published student content
+ */
+export const getPublishedContent = async (params?: GetPublishedContentParams, options?: Parameters<typeof customFetch>[1]): Promise<PublishedContentEnvelope> => {
+
+  return customFetch<PublishedContentEnvelope>(getGetPublishedContentUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublishedContentQueryKey = (params?: GetPublishedContentParams,) => {
+    return [
+    `/api/public/published`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetPublishedContentQueryOptions = <TData = Awaited<ReturnType<typeof getPublishedContent>>, TError = ErrorType<unknown>>(params?: GetPublishedContentParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublishedContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublishedContentQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublishedContent>>> = ({ signal }) => getPublishedContent(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublishedContent>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublishedContentQueryResult = NonNullable<Awaited<ReturnType<typeof getPublishedContent>>>
+export type GetPublishedContentQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get all active published student content
+ */
+
+export function useGetPublishedContent<TData = Awaited<ReturnType<typeof getPublishedContent>>, TError = ErrorType<unknown>>(
+ params?: GetPublishedContentParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublishedContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublishedContentQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetImpactStatsUrl = () => {
+
+
+
+
+  return `/api/public/impact`
+}
+
+/**
+ * Returns only stats the teacher has toggled visible. Never requires auth.
+ * @summary Get teacher-controlled public impact stats
+ */
+export const getImpactStats = async ( options?: Parameters<typeof customFetch>[1]): Promise<ImpactStatsEnvelope> => {
+
+  return customFetch<ImpactStatsEnvelope>(getGetImpactStatsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetImpactStatsQueryKey = () => {
+    return [
+    `/api/public/impact`
+    ] as const;
+    }
+
+
+export const getGetImpactStatsQueryOptions = <TData = Awaited<ReturnType<typeof getImpactStats>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getImpactStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetImpactStatsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getImpactStats>>> = ({ signal }) => getImpactStats({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getImpactStats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetImpactStatsQueryResult = NonNullable<Awaited<ReturnType<typeof getImpactStats>>>
+export type GetImpactStatsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get teacher-controlled public impact stats
+ */
+
+export function useGetImpactStats<TData = Awaited<ReturnType<typeof getImpactStats>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getImpactStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetImpactStatsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

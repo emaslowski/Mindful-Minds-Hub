@@ -1,10 +1,12 @@
 import { WaveFooter } from "@/components/WaveFooter";
-import { useGetEvents } from "@workspace/api-client-react";
+import { useGetEvents, useGetPublishedContent } from "@workspace/api-client-react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, MapPin, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, MapPin, Clock, Star } from "lucide-react";
 
 export default function Events() {
   const { data: events, isLoading } = useGetEvents();
+  const { data: publishedData } = useGetPublishedContent({ section: "events" });
+  const publishedEvents = publishedData?.publications ?? [];
   const currentMonth = format(new Date(), "MMMM yyyy");
 
   return (
@@ -140,6 +142,37 @@ export default function Events() {
         )}
 
       </div>
+      {/* Published community events from Studio */}
+      {publishedEvents.length > 0 && (
+        <div className="w-full max-w-6xl mx-auto px-4 mb-12">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="h-px flex-1 bg-sage/20 max-w-[120px]"></div>
+            <h2 className="font-display italic text-2xl text-foreground">Student-Organized Events</h2>
+            <div className="h-px flex-1 bg-sage/20 max-w-[120px]"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {publishedEvents.map((ev, idx) => (
+              <div
+                key={ev.id}
+                className="bg-[#fcf8f2] p-8 rounded-sm shadow-md border-l-4 border-sage relative"
+                style={{ transform: `rotate(${idx % 2 === 0 ? '-1deg' : '1deg'})` }}
+              >
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-4 bg-[#e8e4db] shadow-sm transform -rotate-2"></div>
+                <div className="flex items-center gap-1.5 mb-3">
+                  <Star size={12} className="text-amber fill-amber" />
+                  <span className="font-sans text-xs font-bold text-amber uppercase tracking-widest">Student Event</span>
+                </div>
+                <h3 className="font-display font-bold text-2xl text-foreground mb-3">{ev.title}</h3>
+                {ev.content && (
+                  <p className="font-sans text-foreground/80 mb-4 leading-relaxed text-sm">{ev.content}</p>
+                )}
+                <span className="font-sans text-xs text-foreground/50">{ev.authorDisplay}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <WaveFooter quote="Get involved and connect." />
     </div>
   );

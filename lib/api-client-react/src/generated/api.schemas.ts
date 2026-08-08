@@ -207,6 +207,27 @@ export interface Event {
   createdAt: string;
 }
 
+export interface PublishedItem {
+  id: number;
+  projectId: number;
+  title: string;
+  contentType: string;
+  content: string;
+  destinationSection: string;
+  authorDisplay: string;
+  publishedAt: string;
+}
+
+export interface PublishedContentEnvelope {
+  publications: PublishedItem[];
+}
+
+export type ImpactStatsEnvelopeStats = {[key: string]: number};
+
+export interface ImpactStatsEnvelope {
+  stats: ImpactStatsEnvelopeStats;
+}
+
 export interface SubmissionResult {
   success: boolean;
   message: string;
@@ -226,5 +247,12 @@ iss?: string;
 
 export type LogoutBrowserSessionParams = {
 returnTo?: string;
+};
+
+export type GetPublishedContentParams = {
+/**
+ * Filter by destination_section (e.g. podcast, move, blog, meditation, wellness, recipe, events)
+ */
+section?: string;
 };
 

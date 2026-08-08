@@ -365,3 +365,34 @@ export const GetEventsResponseItem = zod.object({
 export const GetEventsResponse = zod.array(GetEventsResponseItem)
 
 
+/**
+ * Returns publications joined to projects where publication_status = active. Never includes student PII.
+ * @summary Get all active published student content
+ */
+export const GetPublishedContentQueryParams = zod.object({
+  "section": zod.coerce.string().optional().describe('Filter by destination_section (e.g. podcast, move, blog, meditation, wellness, recipe, events)')
+})
+
+export const GetPublishedContentResponse = zod.object({
+  "publications": zod.array(zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "title": zod.string(),
+  "contentType": zod.string(),
+  "content": zod.string(),
+  "destinationSection": zod.string(),
+  "authorDisplay": zod.string(),
+  "publishedAt": zod.string()
+}))
+})
+
+
+/**
+ * Returns only stats the teacher has toggled visible. Never requires auth.
+ * @summary Get teacher-controlled public impact stats
+ */
+export const GetImpactStatsResponse = zod.object({
+  "stats": zod.record(zod.string(), zod.number())
+})
+
+

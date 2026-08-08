@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
-import { useGetBlogPosts } from "@workspace/api-client-react";
+import { useGetBlogPosts, useGetPublishedContent } from "@workspace/api-client-react";
+import { Star } from "lucide-react";
 
 const SAMPLE_POSTS = [
   {
@@ -28,6 +29,8 @@ const SAMPLE_POSTS = [
 
 export default function Connect() {
   const { data: apiPosts, isLoading } = useGetBlogPosts();
+  const { data: publishedData } = useGetPublishedContent({ section: "blog" });
+  const publishedPosts = publishedData?.publications ?? [];
   
   const gradients = [
     "from-amber/30 to-terracotta/20",
@@ -179,6 +182,41 @@ export default function Connect() {
           </div>
         )}
       </div>
+
+      {/* Published student blog articles from Studio */}
+      {publishedPosts.length > 0 && (
+        <div className="w-full max-w-6xl mx-auto px-4 mb-12">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="h-px flex-1 bg-sage/20 max-w-[120px]"></div>
+            <h2 className="font-display italic text-2xl text-foreground">From Our Students</h2>
+            <div className="h-px flex-1 bg-sage/20 max-w-[120px]"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            {publishedPosts.map((item, i) => (
+              <div
+                key={item.id}
+                className={`bg-gradient-to-br ${gradients[i % gradients.length]} rounded-[2rem] p-6 flex flex-col border border-white/40 shadow-sm hover:shadow-md transition-shadow`}
+              >
+                <div className="flex items-center gap-1.5 mb-3">
+                  <Star size={12} className="text-amber fill-amber" />
+                  <span className="font-sans text-xs font-bold text-amber uppercase tracking-widest">
+                    Mind Matters Student Team
+                  </span>
+                </div>
+                <h3 className="font-display italic font-semibold text-2xl text-foreground mb-3 leading-tight">
+                  {item.title}
+                </h3>
+                {item.content && (
+                  <p className="font-sans text-sm text-foreground/70 leading-relaxed line-clamp-4 flex-1">
+                    {item.content.slice(0, 200)}{item.content.length > 200 ? "…" : ""}
+                  </p>
+                )}
+                <span className="mt-4 font-sans text-xs text-foreground/50">{item.authorDisplay}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <WaveFooter quote="Your voice matters." />
     </div>
