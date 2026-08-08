@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { db } from '@workspace/db';
 import {
   studioProfilesTable,
@@ -9,11 +10,59 @@ import { eq } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import {
   clearStudioSession,
+  createStudioSession,
   getStudioSessionId,
+  setStudioSessionCookie,
+  type StudioUserSession,
 } from '../../lib/studioAuth';
 import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
 
 const router = Router();
+
+// POST /api/studio/auth/login — teacher username/password login
+router.post('/studio/auth/login', async (req: Request, res: Response) => {
+  const { username, password } = req.body ?? {};
+
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    res.status(400).json({ error: 'Username and password required' });
+    return;
+  }
+
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminUsername || !adminPassword) {
+    res.status(503).json({ error: 'Teacher login is not configured on this server' });
+    return;
+  }
+
+  // Timing-safe comparison to prevent enumeration attacks
+  const usernameOk = username.length === adminUsername.length &&
+    crypto.timingSafeEqual(Buffer.from(username), Buffer.from(adminUsername));
+  const passwordOk = password.length === adminPassword.length &&
+    crypto.timingSafeEqual(Buffer.from(password), Buffer.from(adminPassword));
+
+  if (!usernameOk || !passwordOk) {
+    res.status(401).json({ error: 'Invalid username or password' });
+    return;
+  }
+
+  const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+    .split(',').map((e) => e.trim()).filter(Boolean);
+  const teacherEmail = adminEmails[0] ?? adminUsername;
+
+  const studioUser: StudioUserSession = {
+    id: 'teacher-admin',
+    email: teacherEmail,
+    displayName: 'Teacher',
+    role: 'teacher',
+    accountStatus: 'active',
+  };
+
+  const sid = await createStudioSession({ studioUser });
+  setStudioSessionCookie(res, sid);
+  res.json({ user: studioUser });
+});
 
 // GET /api/studio/auth/me — returns current studio user or null
 router.get('/studio/auth/me', (req: Request, res: Response) => {
