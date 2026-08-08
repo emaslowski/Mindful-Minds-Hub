@@ -5,13 +5,64 @@ import {
   studioSafetyFlagsTable,
   studioTeamsTable,
   studioClassCyclesTable,
+  studioProfilesTable,
 } from '@workspace/db/schema';
 import { eq, and, desc, or } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
 import { checkContent } from '../../lib/safetyCheck';
+import nodemailer from 'nodemailer';
+import { logger } from '../../lib/logger';
 
 const router = Router();
+
+async function sendReadyForReviewEmail(
+  projectTitle: string,
+  studentDisplayName: string,
+  teacherEmails: string[],
+): Promise<void> {
+  const smtpHost = process.env.SMTP_HOST;
+  if (!smtpHost || teacherEmails.length === 0) return;
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: teacherEmails.join(', '),
+    subject: `📬 New Submission Ready for Review — ${projectTitle}`,
+    text: [
+      `A student has submitted a project for your review.`,
+      ``,
+      `Project: ${projectTitle}`,
+      `Student: ${studentDisplayName}`,
+      ``,
+      `Please log in to the Mind Matters Command Center to review and provide feedback.`,
+    ].join('\n'),
+    html: `
+      <h2 style="color:#4a4a8a">📬 New Submission Ready for Review</h2>
+      <p>A student has submitted a project for your review.</p>
+      <table style="border-collapse:collapse;margin:16px 0">
+        <tr>
+          <td style="padding:6px 12px 6px 0;font-weight:bold;color:#555">Project</td>
+          <td style="padding:6px 0">${projectTitle}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 12px 6px 0;font-weight:bold;color:#555">Student</td>
+          <td style="padding:6px 0">${studentDisplayName}</td>
+        </tr>
+      </table>
+      <p>Please log in to the <strong>Mind Matters Command Center</strong> to review and provide feedback.</p>
+    `,
+  });
+}
 
 const WORKFLOW_TRANSITIONS: Record<string, string[]> = {
   'Assigned':                  ['Researching'],
@@ -279,6 +330,34 @@ router.post(
       .set({ status: toStatus as typeof project.status, updatedAt: new Date() })
       .where(eq(studioProjectsTable.id, id))
       .returning();
+
+    // Notify teachers when a student submits for review
+    if (toStatus === 'Ready for Teacher Review') {
+      (async () => {
+        try {
+          // Fetch all active teacher emails
+          const teachers = await db
+            .select({ email: studioProfilesTable.email })
+            .from(studioProfilesTable)
+            .where(eq(studioProfilesTable.role, 'teacher'));
+
+          const teacherEmails = teachers.map((t) => t.email).filter(Boolean);
+
+          // Fetch the student's display name
+          const [studentProfile] = await db
+            .select({ displayName: studioProfilesTable.displayName })
+            .from(studioProfilesTable)
+            .where(eq(studioProfilesTable.userId, req.studioUser!.id))
+            .limit(1);
+
+          const studentName = studentProfile?.displayName ?? 'A student';
+
+          await sendReadyForReviewEmail(project.title, studentName, teacherEmails);
+        } catch (err) {
+          logger.error({ err }, 'Failed to send ready-for-review email');
+        }
+      })();
+    }
 
     res.json({ project: updated });
   },
