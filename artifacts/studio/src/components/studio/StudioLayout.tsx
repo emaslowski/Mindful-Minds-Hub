@@ -118,12 +118,11 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
 
         {/* Footer */}
         <div className="px-3 py-4 border-t border-[#5a4035] space-y-1">
-          <Link href="/">
-            <span className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#d5cabe] hover:bg-[#5a4035] hover:text-white transition-colors cursor-pointer">
-              <Globe className="h-4 w-4" />
-              Public Website
-            </span>
-          </Link>
+          {/* Plain <a> so clicking does a full-page navigation to the public site */}
+          <a href="/" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#d5cabe] hover:bg-[#5a4035] hover:text-white transition-colors">
+            <Globe className="h-4 w-4" />
+            Public Website
+          </a>
           <button
             onClick={() => logout()}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#d5cabe] hover:bg-[#5a4035] hover:text-white transition-colors"

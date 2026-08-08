@@ -117,6 +117,10 @@ export function Layout({ children }: { children: ReactNode }) {
             <Link href="/review" className="flex items-center gap-2 bg-sage/20 hover:bg-sage/30 text-sage-foreground px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-colors">
               <Star size={16} /> Review
             </Link>
+            {/* Full-page nav to the separate Studio artifact */}
+            <a href="/studio/" className="flex items-center gap-2 bg-terracotta/15 hover:bg-terracotta/25 text-terracotta px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-colors">
+              ✏️ Student Studio
+            </a>
             
             {isAuthenticated ? (
               <div className="flex items-center gap-3 ml-2 border-l-2 border-border/50 pl-4">
