@@ -3,10 +3,12 @@ import {
   studioPeerReviewsTable,
   studioProjectsTable,
   studioProjectContributorsTable,
+  studioSafetyFlagsTable,
 } from '@workspace/db/schema';
 import { eq } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
+import { checkContent } from '../../lib/safetyCheck';
 
 const router = Router();
 
@@ -108,6 +110,21 @@ router.post(
       comments?: string;
       recommendRevision?: boolean;
     };
+
+    // Safety check on reviewer's comment — silent flag only
+    if (comments) {
+      const safety = checkContent(comments);
+      if (safety.flagged) {
+        await db
+          .insert(studioSafetyFlagsTable)
+          .values({
+            projectId,
+            flagReason: safety.reasons.join('; '),
+            teacherAttentionRecommended: true,
+          })
+          .onConflictDoNothing();
+      }
+    }
 
     const [review] = await db
       .insert(studioPeerReviewsTable)

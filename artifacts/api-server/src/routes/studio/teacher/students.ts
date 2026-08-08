@@ -93,6 +93,64 @@ router.post(
   },
 );
 
+// POST /api/teacher/students/bulk — bulk pre-enroll students by email list
+// Stub: imports a list of { email, displayName?, cycleId?, teamId?, jobId? } and
+// inserts them, skipping duplicates. Returns counts for created / skipped rows.
+router.post(
+  '/teacher/students/bulk',
+  requireStudioRole('teacher'),
+  async (req: Request, res: Response) => {
+    const { students } = req.body as {
+      students?: Array<{
+        email?: string;
+        displayName?: string;
+        teamId?: number;
+        jobId?: number;
+        cycleId?: number;
+      }>;
+    };
+
+    if (!Array.isArray(students) || students.length === 0) {
+      res.status(400).json({ error: 'students array is required and must not be empty' });
+      return;
+    }
+
+    let created = 0;
+    let skipped = 0;
+    const errors: string[] = [];
+
+    for (const s of students) {
+      if (!s.email?.trim()) {
+        errors.push(`Skipped row with missing email`);
+        skipped++;
+        continue;
+      }
+      const normalizedEmail = s.email.trim().toLowerCase();
+      const [inserted] = await db
+        .insert(studioProfilesTable)
+        .values({
+          email: normalizedEmail,
+          displayName: s.displayName?.trim() ?? null,
+          role: 'student',
+          accountStatus: 'active',
+          teamId: s.teamId ?? null,
+          jobId: s.jobId ?? null,
+          cycleId: s.cycleId ?? null,
+        })
+        .onConflictDoNothing()
+        .returning();
+
+      if (inserted) {
+        created++;
+      } else {
+        skipped++;
+      }
+    }
+
+    res.status(201).json({ created, skipped, errors });
+  },
+);
+
 // PATCH /api/teacher/students/:id — update student profile (team, job, cycle, status, displayName)
 router.patch(
   '/teacher/students/:id',

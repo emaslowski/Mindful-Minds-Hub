@@ -198,6 +198,51 @@ router.patch(
   },
 );
 
+// DELETE /api/studio/projects/:id — soft-delete by archiving (students only on own projects)
+router.delete(
+  '/studio/projects/:id',
+  requireStudioRole('student', 'teacher'),
+  async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    const [project] = await db
+      .select()
+      .from(studioProjectsTable)
+      .where(eq(studioProjectsTable.id, id));
+
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+
+    if (
+      req.studioUser!.role === 'student' &&
+      project.assignedStudentId !== req.studioUser!.id
+    ) {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    // Students may only delete projects in early stages
+    if (
+      req.studioUser!.role === 'student' &&
+      !['Assigned', 'Researching', 'Drafting'].includes(project.status)
+    ) {
+      res.status(400).json({
+        error: 'Projects in this status can only be deleted by a teacher',
+      });
+      return;
+    }
+
+    await db
+      .update(studioProjectsTable)
+      .set({ status: 'Archived', updatedAt: new Date() })
+      .where(eq(studioProjectsTable.id, id));
+
+    res.json({ success: true });
+  },
+);
+
 // POST /api/studio/projects/:id/transition — advance workflow status
 router.post(
   '/studio/projects/:id/transition',
