@@ -73,56 +73,53 @@ export default function Home() {
 
   return (
     <div className="w-full flex flex-col min-h-[calc(100vh-100px)] pt-12 md:pt-24 relative overflow-hidden">
-      
+
+      {/* Boho Sun Mandala — pinned to top-left screen edge */}
+      <div className="absolute top-0 left-0 -z-10 animate-[spin_120s_linear_infinite] opacity-70 -translate-x-6 -translate-y-6">
+        <svg width="280" height="280" viewBox="0 0 100 100">
+          {Array.from({length: 12}).map((_, i) => (
+            <polygon
+              key={i}
+              points="50,8 47,20 53,20"
+              fill="#D4A44C"
+              transform={`rotate(${i * 30} 50 50)`}
+              opacity="0.7"
+            />
+          ))}
+          <circle cx="50" cy="50" r="28" fill="none" stroke="#D4A44C" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.6"/>
+          <circle cx="50" cy="50" r="22" fill="#D4A44C" opacity="0.8"/>
+          <circle cx="50" cy="50" r="14" fill="#C4622D" opacity="0.6"/>
+          <circle cx="50" cy="50" r="6" fill="#FAF3E3" opacity="0.9"/>
+        </svg>
+      </div>
+
+      {/* Botanical Left Plant — pinned to bottom-left screen edge */}
+      <div className="hidden lg:block absolute bottom-0 left-0 -z-10 opacity-80">
+        <svg width="220" height="290" viewBox="0 0 160 220">
+          <path d="M40,160 Q30,210 50,220 L110,220 Q130,210 120,160 Q125,140 80,140 Q35,140 40,160 Z" fill="#C4622D"/>
+          <path d="M80,160 C80,160 80,80 80,60" stroke="#688A52" strokeWidth="3" strokeLinecap="round"/>
+          <ellipse cx="55" cy="90" rx="28" ry="16" fill="#688A52" opacity="0.85" transform="rotate(-25 55 90)"/>
+          <ellipse cx="105" cy="75" rx="25" ry="14" fill="#4A6741" opacity="0.85" transform="rotate(20 105 75)"/>
+          <ellipse cx="65" cy="55" rx="22" ry="13" fill="#688A52" opacity="0.9" transform="rotate(-15 65 55)"/>
+          <ellipse cx="95" cy="45" rx="20" ry="11" fill="#4A6741" opacity="0.8" transform="rotate(25 95 45)"/>
+          <path d="M40 180 Q 80 170, 115 180" stroke="#FAF3E3" strokeWidth="2" fill="none" opacity="0.5"/>
+        </svg>
+      </div>
+
+      {/* Botanical Right Plant — pinned to bottom-right screen edge */}
+      <div className="hidden lg:block absolute bottom-0 right-0 -z-10 opacity-80 -scale-x-100">
+        <svg width="220" height="280" viewBox="0 0 160 220">
+          <path d="M50,170 Q40,210 60,220 L100,220 Q120,210 110,170 Q115,150 80,150 Q45,150 50,170 Z" fill="#D4A44C"/>
+          <path d="M80,170 C80,170 80,90 90,60" stroke="#688A52" strokeWidth="2.5" strokeLinecap="round"/>
+          <path d="M80,170 C80,170 70,100 60,70" stroke="#688A52" strokeWidth="2.5" strokeLinecap="round"/>
+          <ellipse cx="60" cy="110" rx="22" ry="10" fill="#688A52" transform="rotate(-40 60 110)"/>
+          <ellipse cx="105" cy="100" rx="20" ry="9" fill="#4A6741" transform="rotate(30 105 100)"/>
+          <ellipse cx="50" cy="70" rx="18" ry="8" fill="#688A52" transform="rotate(-30 50 70)"/>
+          <ellipse cx="110" cy="65" rx="16" ry="7" fill="#4A6741" transform="rotate(40 110 65)"/>
+        </svg>
+      </div>
+
       <div className="flex-1 flex flex-col items-center pb-32 relative z-10 w-full max-w-5xl mx-auto">
-        
-        {/* Boho Sun Mandala */}
-        <div className="absolute -top-16 left-0 md:left-8 -z-10 animate-[spin_120s_linear_infinite] opacity-60">
-          <svg width="220" height="220" viewBox="0 0 100 100">
-            {Array.from({length: 12}).map((_, i) => (
-              <polygon
-                key={i}
-                points="50,8 47,20 53,20"
-                fill="#D4A44C"
-                transform={`rotate(${i * 30} 50 50)`}
-                opacity="0.7"
-              />
-            ))}
-            <circle cx="50" cy="50" r="28" fill="none" stroke="#D4A44C" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.6"/>
-            <circle cx="50" cy="50" r="22" fill="#D4A44C" opacity="0.8"/>
-            <circle cx="50" cy="50" r="14" fill="#C4622D" opacity="0.6"/>
-            <circle cx="50" cy="50" r="6" fill="#FAF3E3" opacity="0.9"/>
-          </svg>
-        </div>
-
-        {/* Botanical Left Element */}
-        <div className="hidden lg:block absolute bottom-12 -left-12 -z-10 opacity-70">
-          <svg width="200" height="260" viewBox="0 0 160 220">
-            {/* Pot as organic blob */}
-            <path d="M40,160 Q30,210 50,220 L110,220 Q130,210 120,160 Q125,140 80,140 Q35,140 40,160 Z" fill="#C4622D"/>
-            {/* Plant stem and leaves */}
-            <path d="M80,160 C80,160 80,80 80,60" stroke="#688A52" strokeWidth="3" strokeLinecap="round"/>
-            <ellipse cx="55" cy="90" rx="28" ry="16" fill="#688A52" opacity="0.85" transform="rotate(-25 55 90)"/>
-            <ellipse cx="105" cy="75" rx="25" ry="14" fill="#4A6741" opacity="0.85" transform="rotate(20 105 75)"/>
-            <ellipse cx="65" cy="55" rx="22" ry="13" fill="#688A52" opacity="0.9" transform="rotate(-15 65 55)"/>
-            <ellipse cx="95" cy="45" rx="20" ry="11" fill="#4A6741" opacity="0.8" transform="rotate(25 95 45)"/>
-            {/* Wavy decoration on pot */}
-            <path d="M40 180 Q 80 170, 115 180" stroke="#FAF3E3" strokeWidth="2" fill="none" opacity="0.5"/>
-          </svg>
-        </div>
-
-        {/* Botanical Right Element */}
-        <div className="hidden lg:block absolute bottom-24 -right-12 -z-10 opacity-70 transform -scale-x-100 rotate-6">
-          <svg width="180" height="240" viewBox="0 0 160 220">
-            <path d="M50,170 Q40,210 60,220 L100,220 Q120,210 110,170 Q115,150 80,150 Q45,150 50,170 Z" fill="#D4A44C"/>
-            <path d="M80,170 C80,170 80,90 90,60" stroke="#688A52" strokeWidth="2.5" strokeLinecap="round"/>
-            <path d="M80,170 C80,170 70,100 60,70" stroke="#688A52" strokeWidth="2.5" strokeLinecap="round"/>
-            <ellipse cx="60" cy="110" rx="22" ry="10" fill="#688A52" transform="rotate(-40 60 110)"/>
-            <ellipse cx="105" cy="100" rx="20" ry="9" fill="#4A6741" transform="rotate(30 105 100)"/>
-            <ellipse cx="50" cy="70" rx="18" ry="8" fill="#688A52" transform="rotate(-30 50 70)"/>
-            <ellipse cx="110" cy="65" rx="16" ry="7" fill="#4A6741" transform="rotate(40 110 65)"/>
-          </svg>
-        </div>
 
         {/* Hero Text */}
         <h1 className="text-7xl md:text-[110px] lg:text-[130px] font-display text-foreground text-center leading-[0.9] mt-8 mb-6 drop-shadow-sm">

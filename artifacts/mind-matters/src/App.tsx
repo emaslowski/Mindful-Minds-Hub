@@ -32,6 +32,7 @@ import Resources from '@/pages/Resources';
 import Events from '@/pages/Events';
 import CheckIn from '@/pages/CheckIn';
 import Review from '@/pages/Review';
+import Contact from '@/pages/Contact';
 import ListenPodcast from '@/pages/ListenPodcast';
 
 const queryClient = new QueryClient();
@@ -60,9 +61,7 @@ function Router() {
         <Route path="/about" component={AboutUs} />
         <Route path="/resources" component={Resources} />
         <Route path="/events" component={Events} />
-        <Route path="/contact">
-          {() => <BlankTemplate title="Contact Us" subtitle="We'd love to hear from you." />}
-        </Route>
+        <Route path="/contact" component={Contact} />
 
         {/* Check-in */}
         <Route path="/checkin" component={CheckIn} />

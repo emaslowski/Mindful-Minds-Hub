@@ -4,6 +4,19 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useGetTodayPrompt, useCreateJournalEntry, useGetJournalEntries } from "@workspace/api-client-react";
 import { Lock, PenTool, Send, Info } from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "wouter";
+
+function BackButton() {
+  return (
+    <div className="mb-8">
+      <Link href="/grow">
+        <button className="px-6 py-2 rounded-full border border-terracotta text-terracotta font-sans text-sm tracking-wide transition-all hover:bg-terracotta hover:text-white">
+          ← Back to Grow
+        </button>
+      </Link>
+    </div>
+  );
+}
 
 export default function GrowJournal() {
   const { isAuthenticated, login, isLoading: authLoading } = useAuth();
@@ -35,7 +48,9 @@ export default function GrowJournal() {
   if (!isAuthenticated) {
     return (
       <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
-        <div className="flex-1 w-full max-w-2xl mx-auto px-4 mb-24 flex flex-col items-center justify-center text-center z-10">
+        <div className="flex-1 w-full max-w-2xl mx-auto px-4 mb-24 flex flex-col z-10">
+          <BackButton />
+          <div className="flex flex-col items-center justify-center text-center flex-1">
           <div className="bg-amber/10 p-6 rounded-full text-amber mb-8 border border-amber/20">
             <Lock size={64} />
           </div>
@@ -51,6 +66,7 @@ export default function GrowJournal() {
           >
             Log In to Journal
           </button>
+          </div>
         </div>
         <WaveFooter quote="Write it out. Let it go. Grow from it." />
       </div>
@@ -60,7 +76,7 @@ export default function GrowJournal() {
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
       <div className="flex-1 w-full max-w-4xl mx-auto px-4 mb-24 z-10">
-        
+        <BackButton />
         <div className="flex items-center gap-3 mb-10">
           <PenTool className="text-terracotta" size={32} />
           <h1 className="text-5xl md:text-6xl font-display italic text-foreground">

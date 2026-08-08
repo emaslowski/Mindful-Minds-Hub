@@ -1,10 +1,18 @@
 import { WaveFooter } from "@/components/WaveFooter";
 import { Mic, PlayCircle } from "lucide-react";
+import { Link } from "wouter";
 
 export default function ListenPodcast() {
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 mb-24 text-center relative z-10">
+        <div className="absolute top-0 left-0 z-20">
+          <Link href="/listen">
+            <button className="px-6 py-2 rounded-full border border-terracotta text-terracotta font-sans text-sm tracking-wide transition-all hover:bg-terracotta hover:text-white">
+              ← Back to Listen
+            </button>
+          </Link>
+        </div>
         <h1 className="text-5xl md:text-7xl font-display italic text-foreground mb-4 drop-shadow-sm flex justify-center items-center gap-4">
           <Mic className="text-terracotta" size={48} />
           Mind Matters Podcast

@@ -1,5 +1,5 @@
 import { WaveFooter } from "@/components/WaveFooter";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 
 interface BlankTemplateProps {
   title?: string;
@@ -8,6 +8,10 @@ interface BlankTemplateProps {
 
 export default function BlankTemplate({ title, subtitle }: BlankTemplateProps) {
   const params = useParams();
+  const [location] = useLocation();
+
+  // Derive parent section path by stripping the last segment (e.g. /move/strength → /move)
+  const parentPath = location.includes('/') ? location.substring(0, location.lastIndexOf('/')) || '/' : '/';
   
   // Try to derive title from URL params if not provided
   let displayTitle = title || "Coming Soon";
@@ -26,7 +30,7 @@ export default function BlankTemplate({ title, subtitle }: BlankTemplateProps) {
         
         {/* Back Button */}
         <div className="absolute top-0 left-0 md:-left-8 z-20">
-          <Link href="/">
+          <Link href={parentPath}>
             <button className="px-6 py-2 rounded-full border border-terracotta text-terracotta font-sans text-sm tracking-wide transition-all hover:bg-terracotta hover:text-white">
               ← Back
             </button>

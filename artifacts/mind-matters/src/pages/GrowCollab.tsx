@@ -3,6 +3,19 @@ import { WaveFooter } from "@/components/WaveFooter";
 import { useGetCollabPosts, useSubmitCollabPost, useGetCollabComments, useAddCollabComment } from "@workspace/api-client-react";
 import { Users, MessageCircle, Send } from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "wouter";
+
+function BackButton() {
+  return (
+    <div className="mb-8">
+      <Link href="/grow">
+        <button className="px-6 py-2 rounded-full border border-terracotta text-terracotta font-sans text-sm tracking-wide transition-all hover:bg-terracotta hover:text-white">
+          ← Back to Grow
+        </button>
+      </Link>
+    </div>
+  );
+}
 
 // Component for a single post with its comments section
 function PostCard({ post }: { post: any }) {
@@ -140,6 +153,7 @@ export default function GrowCollab() {
         
         {/* Left Column: Header & Form */}
         <div className="w-full lg:w-1/3 flex flex-col">
+          <BackButton />
           <div className="mb-10">
             <h1 className="text-5xl font-display italic text-foreground mb-4 flex items-center gap-3">
               <Users className="text-terracotta" size={36} /> Collab Board

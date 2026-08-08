@@ -8,6 +8,7 @@ import analyticsRouter from "./analytics";
 import checkinRouter from "./checkin";
 import reviewsRouter from "./reviews";
 import eventsRouter from "./events";
+import contactRouter from "./contact";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(analyticsRouter);
 router.use(checkinRouter);
 router.use(reviewsRouter);
 router.use(eventsRouter);
+router.use(contactRouter);
 
 export default router;
