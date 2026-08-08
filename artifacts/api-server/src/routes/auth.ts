@@ -191,6 +191,20 @@ router.get('/auth/user', (req: Request, res: Response) => {
 
 // ─── Google OAuth (primary login for Studio) ──────────────────────────────────
 
+// Temporary debug endpoint — remove once OAuth is confirmed working
+router.get('/auth/google/debug', (req: Request, res: Response) => {
+  const cid = process.env.GOOGLE_CLIENT_ID ?? '';
+  const csec = process.env.GOOGLE_CLIENT_SECRET ?? '';
+  res.json({
+    clientIdLength: cid.length,
+    clientIdStart: cid.slice(0, 6),
+    clientIdEnd: cid.slice(-30),
+    clientIdEndsCorrectly: cid.endsWith('.apps.googleusercontent.com'),
+    clientSecretStart: csec.slice(0, 7),
+    callbackUrl: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers['x-forwarded-host'] || req.headers.host}/api/auth/google/callback`,
+  });
+});
+
 router.get('/auth/google', async (req: Request, res: Response) => {
   const config = await getGoogleOidcConfig();
   const callbackUrl = `${getOrigin(req)}/api/auth/google/callback`;
