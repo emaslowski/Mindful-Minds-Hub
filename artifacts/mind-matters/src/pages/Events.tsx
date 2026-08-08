@@ -8,7 +8,7 @@ export default function Events() {
   const currentMonth = format(new Date(), "MMMM yyyy");
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden bg-[url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20zM20 0h20v20H20V0z\' fill=\'%23688a52\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'/%3E%3C/svg%3E')]">
+    <div className="w-full flex flex-col flex-1 pt-12 relative bg-[url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20zM20 0h20v20H20V0z\' fill=\'%23688a52\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'/%3E%3C/svg%3E')]">
       <div className="flex-1 w-full max-w-6xl mx-auto px-4 mb-24 z-10">
         
         <div className="text-center mb-12">

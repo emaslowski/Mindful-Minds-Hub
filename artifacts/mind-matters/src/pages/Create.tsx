@@ -15,8 +15,17 @@ export default function Create() {
         <Link href="/create/cooking" className="group">
           <div className="w-28 h-28 md:w-32 md:h-32 bg-[#2D3A34] rounded-full border-4 border-[#C4622D] shadow-lg flex flex-col items-center justify-center p-3 text-center transition-transform duration-300 group-hover:rotate-12 group-hover:scale-105"
                style={{ boxShadow: '4px 6px 15px rgba(45,58,52,0.3)' }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="#FAF3E3" strokeWidth="1.5" className="w-8 h-8 mb-1 opacity-80">
-              <path d="M12 2v20 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            <svg viewBox="0 0 26 24" fill="none" className="w-9 h-9 mb-1 opacity-90">
+              {/* Pan */}
+              <ellipse cx="10" cy="14" rx="7.5" ry="5.5" fill="#FAF3E3" fillOpacity="0.15" stroke="#FAF3E3" strokeWidth="1.5"/>
+              {/* Long handle */}
+              <path d="M17.5 14 L25 11" stroke="#FAF3E3" strokeWidth="2.2" strokeLinecap="round"/>
+              {/* Helper handle */}
+              <path d="M4.5 11 L2.5 9" stroke="#FAF3E3" strokeWidth="1.5" strokeLinecap="round"/>
+              {/* Steam */}
+              <path d="M7 8 Q7.5 6.2 7 4.5" stroke="#FAF3E3" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+              <path d="M10 7.5 Q10.5 5.5 10 4" stroke="#FAF3E3" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+              <path d="M13 8 Q13.5 6.2 13 4.5" stroke="#FAF3E3" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
             </svg>
             <span className="text-[#FAF3E3] font-handwritten text-lg md:text-xl leading-tight">
               Cooking<br/>Corner!
