@@ -26,7 +26,7 @@ export default function StudioLogin() {
     mutationFn: (creds: { u: string; p: string }) => studioAuth.login(creds.u, creds.p),
     onSuccess: (data) => {
       queryClient.setQueryData(['studio-user'], data.user);
-      const dest = data.user.role === 'teacher' ? '/studio/teacher' : '/studio/dashboard';
+      const dest = data.user.role === 'teacher' ? '/studio/teacher' : '/studio';
       navigate(dest);
     },
   });
