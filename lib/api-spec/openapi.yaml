@@ -1,22 +1,37 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Mind Matters API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: blog
+    description: Blog post operations
+  - name: Auth
+    description: Browser authentication endpoints
+  - name: journal
+    description: Personal journal and gratitude entries
+  - name: collab
+    description: Collaboration board
+  - name: analytics
+    description: Page view and section analytics
+  - name: checkin
+    description: Student mood check-in
+  - name: reviews
+    description: Site reviews
+  - name: events
+    description: Community events
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +39,750 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Auth
+  /auth/user:
+    get:
+      tags: [Auth]
+      operationId: getCurrentAuthUser
+      summary: Get the currently authenticated user
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      responses:
+        '200':
+          description: Auth status resolved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUserEnvelope'
+  /login:
+    get:
+      tags: [Auth]
+      operationId: beginBrowserLogin
+      summary: Start the browser OIDC login flow
+      parameters:
+        - name: returnTo
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to OIDC authorization endpoint.
+  /callback:
+    get:
+      tags: [Auth]
+      operationId: handleBrowserLoginCallback
+      summary: Complete the browser OIDC login flow
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: iss
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to returnTo path on success.
+  /logout:
+    get:
+      tags: [Auth]
+      operationId: logoutBrowserSession
+      summary: Clear the session and begin OIDC logout
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+        - name: returnTo
+          in: query
+          required: false
+          schema:
+            type: string
+            default: /
+      responses:
+        '302':
+          description: Redirect to OIDC provider logout URL.
+
+  # Blog
+  /blog-posts:
+    get:
+      operationId: getBlogPosts
+      tags: [blog]
+      summary: Get all approved blog posts
+      responses:
+        "200":
+          description: List of approved blog posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlogPost"
+  /blog-posts/{id}:
+    get:
+      operationId: getBlogPost
+      tags: [blog]
+      summary: Get a single approved blog post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: A blog post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+        "404":
+          description: Not found
+  /blog-submissions:
+    post:
+      operationId: submitBlogPost
+      tags: [blog]
+      summary: Submit a blog post for review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogSubmissionInput"
+      responses:
+        "201":
+          description: Submission received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
+        "400":
+          description: Invalid input
+
+  # Journal (auth required)
+  /journal-entries:
+    get:
+      operationId: getJournalEntries
+      tags: [journal]
+      summary: Get the current user's journal entries
+      responses:
+        "200":
+          description: List of journal entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JournalEntry"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createJournalEntry
+      tags: [journal]
+      summary: Create a journal entry (flags concerning content)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntryInput"
+      responses:
+        "201":
+          description: Journal entry saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntry"
+        "401":
+          description: Unauthorized
+
+  # Gratitude journal (auth required)
+  /gratitude-entries:
+    get:
+      operationId: getGratitudeEntries
+      tags: [journal]
+      summary: Get the current user's gratitude entries
+      responses:
+        "200":
+          description: List of gratitude entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GratitudeEntry"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createGratitudeEntry
+      tags: [journal]
+      summary: Add a gratitude entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GratitudeEntryInput"
+      responses:
+        "201":
+          description: Gratitude entry saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GratitudeEntry"
+        "401":
+          description: Unauthorized
+
+  # Today's prompt
+  /today-prompt:
+    get:
+      operationId: getTodayPrompt
+      tags: [journal]
+      summary: Get today's writing prompt
+      responses:
+        "200":
+          description: Today's prompt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodayPrompt"
+
+  # Collaboration board (public)
+  /collab-posts:
+    get:
+      operationId: getCollabPosts
+      tags: [collab]
+      summary: Get approved collaboration board posts
+      responses:
+        "200":
+          description: List of collab posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollabPost"
+    post:
+      operationId: submitCollabPost
+      tags: [collab]
+      summary: Submit a collab post for admin approval
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollabPostInput"
+      responses:
+        "201":
+          description: Post submitted for review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
+        "400":
+          description: Invalid input
+
+  /collab-posts/{id}/comments:
+    get:
+      operationId: getCollabComments
+      tags: [collab]
+      summary: Get comments on a collab post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollabComment"
+    post:
+      operationId: addCollabComment
+      tags: [collab]
+      summary: Add a comment to a collab post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollabCommentInput"
+      responses:
+        "201":
+          description: Comment added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollabComment"
+        "400":
+          description: Invalid input
+
+  # Analytics
+  /analytics/track:
+    post:
+      operationId: trackPageView
+      tags: [analytics]
+      summary: Track a page view or section click
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PageViewInput"
+      responses:
+        "201":
+          description: Tracked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
+  /analytics/summary:
+    get:
+      operationId: getAnalyticsSummary
+      tags: [analytics]
+      summary: Get analytics summary (total visits + top sections)
+      responses:
+        "200":
+          description: Analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummary"
+
+  # Check-in
+  /checkin:
+    post:
+      operationId: submitCheckin
+      tags: [checkin]
+      summary: Submit a mood check-in and get section recommendations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckinInput"
+      responses:
+        "200":
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckinResult"
+
+  # Reviews
+  /reviews:
+    get:
+      operationId: getReviews
+      tags: [reviews]
+      summary: Get site reviews
+      responses:
+        "200":
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+    post:
+      operationId: submitReview
+      tags: [reviews]
+      summary: Submit a site review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "201":
+          description: Review submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid input
+
+  # Events
+  /events:
+    get:
+      operationId: getEvents
+      tags: [events]
+      summary: Get community events
+      responses:
+        "200":
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+
 components:
+  parameters:
+    AuthorizationSessionHeader:
+      name: Authorization
+      in: header
+      required: false
+      schema:
+        type: string
+    SessionCookie:
+      name: sid
+      in: cookie
+      required: false
+      schema:
+        type: string
+
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    # Auth
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id:
+          type: string
+        email:
+          type: ["string", "null"]
+        firstName:
+          type: ["string", "null"]
+        lastName:
+          type: ["string", "null"]
+        profileImageUrl:
+          type: ["string", "null"]
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - $ref: '#/components/schemas/AuthUser'
+            - type: 'null'
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    MobileTokenExchangeRequest:
+      type: object
+      required: [code, code_verifier, redirect_uri, state]
+      properties:
+        code:
+          type: string
+          minLength: 1
+        code_verifier:
+          type: string
+          minLength: 1
+        redirect_uri:
+          type: string
+          minLength: 1
+        state:
+          type: string
+          minLength: 1
+        nonce:
+          type: string
+          minLength: 1
+    MobileTokenExchangeSuccess:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+    LogoutSuccess:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+
+    # Blog
+    BlogPost:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        author:
+          type: string
+        content:
+          type: string
+        excerpt:
+          type: string
+        submittedAt:
+          type: string
+        approvedAt:
+          type: ["string", "null"]
+      required: [id, title, author, content, excerpt, submittedAt, approvedAt]
+    BlogSubmissionInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        author:
+          type: string
+          minLength: 1
+        content:
+          type: string
+          minLength: 10
+      required: [title, author, content]
+
+    # Journal
+    JournalEntry:
+      type: object
+      properties:
+        id:
+          type: number
+        prompt:
+          type: string
+        content:
+          type: string
+        flagged:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, prompt, content, flagged, createdAt]
+    JournalEntryInput:
+      type: object
+      properties:
+        prompt:
+          type: string
+        content:
+          type: string
+          minLength: 1
+      required: [content]
+
+    # Gratitude
+    GratitudeEntry:
+      type: object
+      properties:
+        id:
+          type: number
+        content:
+          type: string
+        entryDate:
+          type: string
+        createdAt:
+          type: string
+      required: [id, content, entryDate, createdAt]
+    GratitudeEntryInput:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+      required: [content]
+
+    # Today's prompt
+    TodayPrompt:
+      type: object
+      properties:
+        prompt:
+          type: string
+        date:
+          type: string
+      required: [prompt, date]
+
+    # Collab board
+    CollabPost:
+      type: object
+      properties:
+        id:
+          type: number
+        authorName:
+          type: string
+        content:
+          type: string
+        commentCount:
+          type: number
+        createdAt:
+          type: string
+      required: [id, authorName, content, commentCount, createdAt]
+    CollabPostInput:
+      type: object
+      properties:
+        authorName:
+          type: string
+          minLength: 1
+        content:
+          type: string
+          minLength: 5
+      required: [authorName, content]
+    CollabComment:
+      type: object
+      properties:
+        id:
+          type: number
+        authorName:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+      required: [id, authorName, content, createdAt]
+    CollabCommentInput:
+      type: object
+      properties:
+        authorName:
+          type: string
+          minLength: 1
+        content:
+          type: string
+          minLength: 1
+      required: [authorName, content]
+
+    # Analytics
+    PageViewInput:
+      type: object
+      properties:
+        path:
+          type: string
+        section:
+          type: ["string", "null"]
+      required: [path]
+    AnalyticsSummary:
+      type: object
+      properties:
+        totalVisits:
+          type: number
+        topSections:
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionStat"
+        recentDailyVisits:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyStat"
+      required: [totalVisits, topSections, recentDailyVisits]
+    SectionStat:
+      type: object
+      properties:
+        section:
+          type: string
+        count:
+          type: number
+      required: [section, count]
+    DailyStat:
+      type: object
+      properties:
+        date:
+          type: string
+        count:
+          type: number
+      required: [date, count]
+
+    # Check-in
+    CheckinInput:
+      type: object
+      properties:
+        mood:
+          type: string
+        challenges:
+          type: array
+          items:
+            type: string
+      required: [mood]
+    CheckinResult:
+      type: object
+      properties:
+        message:
+          type: string
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionRecommendation"
+      required: [message, recommendations]
+    SectionRecommendation:
+      type: object
+      properties:
+        section:
+          type: string
+        path:
+          type: string
+        reason:
+          type: string
+      required: [section, path, reason]
+
+    # Reviews
+    Review:
+      type: object
+      properties:
+        id:
+          type: number
+        rating:
+          type: number
+        helpful:
+          type: boolean
+        comment:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, rating, helpful, createdAt]
+    ReviewInput:
+      type: object
+      properties:
+        rating:
+          type: number
+        helpful:
+          type: boolean
+        comment:
+          type: ["string", "null"]
+      required: [rating, helpful]
+
+    # Events
+    Event:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        eventDate:
+          type: string
+        location:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, title, eventDate, createdAt]
+
+    # Shared
+    SubmissionResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success, message]
