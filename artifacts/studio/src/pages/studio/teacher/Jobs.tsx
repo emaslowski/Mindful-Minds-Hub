@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherJobs } from '@/lib/studioApi';
+import { teacherJobs, type Job } from '@/lib/studioApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,12 +15,99 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Briefcase, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Briefcase, Plus, Pencil, Trash2, KeyRound, CheckCircle2 } from 'lucide-react';
 
-interface Job {
-  id: number;
-  title: string;
-  description?: string | null;
+function JobForm({
+  title, setTitle,
+  description, setDescription,
+  username, setUsername,
+  password, setPassword,
+  confirmPassword, setConfirmPassword,
+  isEdit,
+}: {
+  title: string; setTitle: (v: string) => void;
+  description: string; setDescription: (v: string) => void;
+  username: string; setUsername: (v: string) => void;
+  password: string; setPassword: (v: string) => void;
+  confirmPassword: string; setConfirmPassword: (v: string) => void;
+  isEdit: boolean;
+}) {
+  const passwordMismatch = password && confirmPassword && password !== confirmPassword;
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-1.5">
+        <Label className="text-xs text-[#453329]">Job title *</Label>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="bg-white border-[#d5cabe]"
+          placeholder="e.g. Video Producers"
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-xs text-[#453329]">Description</Label>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="bg-white border-[#d5cabe] resize-none"
+          placeholder="What does this role do?"
+          rows={2}
+        />
+      </div>
+
+      <div className="border-t border-[#d5cabe] pt-3 space-y-3">
+        <p className="text-xs font-medium text-[#453329] flex items-center gap-1.5">
+          <KeyRound className="h-3.5 w-3.5 text-[#c4622d]" />
+          Student Login Credentials
+        </p>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs text-[#453329]">Username</Label>
+          <Input
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
+            className="bg-white border-[#d5cabe] font-mono"
+            placeholder="e.g. videoproducers"
+            autoComplete="off"
+          />
+          <p className="text-xs text-[#8a6a55]">Students type this to log in. Lowercase, no spaces.</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs text-[#453329]">
+            {isEdit ? 'New password (leave blank to keep current)' : 'Password'}
+          </Label>
+          <Input
+            type="text"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="bg-white border-[#d5cabe] font-mono"
+            placeholder={isEdit ? 'Leave blank to keep current' : 'e.g. mindmatters2025'}
+            autoComplete="new-password"
+          />
+        </div>
+
+        {password && (
+          <div className="space-y-1.5">
+            <Label className="text-xs text-[#453329]">Confirm password</Label>
+            <Input
+              type="text"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={`bg-white border-[#d5cabe] font-mono ${passwordMismatch ? 'border-red-400' : ''}`}
+              placeholder="Repeat the password"
+              autoComplete="new-password"
+            />
+            {passwordMismatch && (
+              <p className="text-xs text-red-500">Passwords don't match</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function Jobs() {
@@ -30,8 +117,12 @@ export default function Jobs() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [editJob, setEditJob] = useState<Job | null>(null);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const { data } = useQuery({
     queryKey: ['teacher-jobs'],
@@ -39,25 +130,40 @@ export default function Jobs() {
     enabled: !!user,
   });
 
+  function resetForm() {
+    setTitle(''); setDescription(''); setUsername(''); setPassword(''); setConfirmPassword('');
+  }
+
+  const passwordMismatch = password && confirmPassword && password !== confirmPassword;
+
   const { mutate: create, isPending: creating } = useMutation({
-    mutationFn: () => teacherJobs.create({ title: title.trim(), description: description.trim() || undefined }),
+    mutationFn: () => teacherJobs.create({
+      title: title.trim(),
+      description: description.trim() || undefined,
+      username: username.trim() || undefined,
+      password: password.trim() || undefined,
+    }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['teacher-jobs'] });
       toast({ title: 'Job created' });
       setShowCreate(false);
-      setTitle('');
-      setDescription('');
+      resetForm();
     },
     onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
   });
 
   const { mutate: update, isPending: updating } = useMutation({
-    mutationFn: () =>
-      teacherJobs.update(editJob!.id, { title: title.trim(), description: description.trim() || undefined }),
+    mutationFn: () => teacherJobs.update(editJob!.id, {
+      title: title.trim(),
+      description: description.trim() || undefined,
+      username: username.trim() || undefined,
+      password: password.trim() || undefined,
+    }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['teacher-jobs'] });
       toast({ title: 'Job updated' });
       setEditJob(null);
+      resetForm();
     },
     onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
   });
@@ -72,20 +178,23 @@ export default function Jobs() {
   });
 
   function openCreate() {
-    setTitle('');
-    setDescription('');
+    resetForm();
     setShowCreate(true);
   }
 
   function openEdit(job: Job) {
     setTitle(job.title);
     setDescription(job.description ?? '');
+    setUsername(job.username ?? '');
+    setPassword('');
+    setConfirmPassword('');
     setEditJob(job);
   }
 
   if (isLoading || !user) return null;
 
   const jobs: Job[] = data?.jobs ?? [];
+  const formProps = { title, setTitle, description, setDescription, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword };
 
   return (
     <StudioLayout>
@@ -104,7 +213,7 @@ export default function Jobs() {
         {jobs.length === 0 ? (
           <Card className="bg-[#eee6d8] border-[#d5cabe]">
             <CardContent className="p-10 text-center text-sm text-[#688a52]">
-              No jobs yet. Create roles for your students!
+              No jobs yet. Create roles and set login credentials for each group.
             </CardContent>
           </Card>
         ) : (
@@ -115,10 +224,22 @@ export default function Jobs() {
                   <div className="flex items-start gap-3 min-w-0">
                     <Briefcase className="h-5 w-5 text-[#688a52] flex-shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="font-medium text-[#453329] text-sm truncate">{job.title}</p>
+                      <p className="font-medium text-[#453329] text-sm">{job.title}</p>
                       {job.description && (
                         <p className="text-xs text-[#688a52] mt-0.5 line-clamp-2">{job.description}</p>
                       )}
+                      <div className="flex items-center gap-2 mt-1.5">
+                        {job.username ? (
+                          <span className="text-xs font-mono bg-[#d5cabe] text-[#453329] px-1.5 py-0.5 rounded">
+                            {job.username}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-red-400 italic">No login set</span>
+                        )}
+                        {job.hasPassword && (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#688a52]" title="Password set" />
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
@@ -135,9 +256,7 @@ export default function Jobs() {
                       variant="ghost"
                       className="h-7 w-7 text-red-400 hover:text-red-600"
                       onClick={() => {
-                        if (confirm(`Delete job "${job.title}"? Students assigned to it will be unaffected.`)) {
-                          remove(job.id);
-                        }
+                        if (confirm(`Delete job "${job.title}"?`)) remove(job.id);
                       }}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -151,74 +270,36 @@ export default function Jobs() {
       </StudioPage>
 
       {/* Create dialog */}
-      <Dialog open={showCreate} onOpenChange={setShowCreate}>
+      <Dialog open={showCreate} onOpenChange={(o) => { if (!o) { setShowCreate(false); resetForm(); } }}>
         <DialogContent className="bg-[#f5efe5] border-[#d5cabe]">
           <DialogHeader>
             <DialogTitle className="font-serif text-[#453329]">New Job</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-[#453329]">Job title *</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="bg-white border-[#d5cabe]"
-                placeholder="e.g. Editor, Researcher, Designer"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-[#453329]">Description</Label>
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="bg-white border-[#d5cabe] resize-none"
-                placeholder="What does this role do?"
-                rows={2}
-              />
-            </div>
-            <Button
-              className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
-              onClick={() => create()}
-              disabled={creating || !title.trim()}
-            >
-              {creating ? 'Creating…' : 'Create Job'}
-            </Button>
-          </div>
+          <JobForm {...formProps} isEdit={false} />
+          <Button
+            className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
+            onClick={() => create()}
+            disabled={creating || !title.trim() || !!passwordMismatch}
+          >
+            {creating ? 'Creating…' : 'Create Job'}
+          </Button>
         </DialogContent>
       </Dialog>
 
       {/* Edit dialog */}
-      <Dialog open={!!editJob} onOpenChange={(o) => !o && setEditJob(null)}>
+      <Dialog open={!!editJob} onOpenChange={(o) => { if (!o) { setEditJob(null); resetForm(); } }}>
         <DialogContent className="bg-[#f5efe5] border-[#d5cabe]">
           <DialogHeader>
             <DialogTitle className="font-serif text-[#453329]">Edit Job</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-[#453329]">Job title *</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="bg-white border-[#d5cabe]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-[#453329]">Description</Label>
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="bg-white border-[#d5cabe] resize-none"
-                rows={2}
-              />
-            </div>
-            <Button
-              className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
-              onClick={() => update()}
-              disabled={updating || !title.trim()}
-            >
-              {updating ? 'Saving…' : 'Save Changes'}
-            </Button>
-          </div>
+          <JobForm {...formProps} isEdit={true} />
+          <Button
+            className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
+            onClick={() => update()}
+            disabled={updating || !title.trim() || !!passwordMismatch}
+          >
+            {updating ? 'Saving…' : 'Save Changes'}
+          </Button>
         </DialogContent>
       </Dialog>
     </StudioLayout>

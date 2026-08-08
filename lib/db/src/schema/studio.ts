@@ -39,6 +39,8 @@ export const studioJobsTable = pgTable('studio_jobs', {
   id: serial('id').primaryKey(),
   title: text('title').notNull().unique(),
   description: text('description'),
+  username: text('username').unique(),
+  passwordHash: text('password_hash'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 

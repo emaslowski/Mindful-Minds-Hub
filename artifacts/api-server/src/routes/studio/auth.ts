@@ -16,10 +16,11 @@ import {
   type StudioUserSession,
 } from '../../lib/studioAuth';
 import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
+import { verifyPassword } from '../../lib/password';
 
 const router = Router();
 
-// POST /api/studio/auth/login — teacher username/password login
+// POST /api/studio/auth/login — teacher or group (team) username/password login
 router.post('/studio/auth/login', async (req: Request, res: Response) => {
   const { username, password } = req.body ?? {};
 
@@ -28,40 +29,62 @@ router.post('/studio/auth/login', async (req: Request, res: Response) => {
     return;
   }
 
+  // 1. Check teacher admin credentials
   const adminUsername = process.env.ADMIN_USERNAME;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
-  if (!adminUsername || !adminPassword) {
-    res.status(503).json({ error: 'Teacher login is not configured on this server' });
+  if (adminUsername && adminPassword) {
+    const usernameOk = username.length === adminUsername.length &&
+      crypto.timingSafeEqual(Buffer.from(username), Buffer.from(adminUsername));
+    const passwordOk = password.length === adminPassword.length &&
+      crypto.timingSafeEqual(Buffer.from(password), Buffer.from(adminPassword));
+
+    if (usernameOk && passwordOk) {
+      const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+        .split(',').map((e) => e.trim()).filter(Boolean);
+      const studioUser: StudioUserSession = {
+        id: 'teacher-admin',
+        email: adminEmails[0] ?? adminUsername,
+        displayName: 'Teacher',
+        role: 'teacher',
+        accountStatus: 'active',
+      };
+      const sid = await createStudioSession({ studioUser });
+      setStudioSessionCookie(res, sid);
+      res.json({ user: studioUser });
+      return;
+    }
+  }
+
+  // 2. Check job credentials
+  const [job] = await db
+    .select({
+      id: studioJobsTable.id,
+      title: studioJobsTable.title,
+      username: studioJobsTable.username,
+      passwordHash: studioJobsTable.passwordHash,
+    })
+    .from(studioJobsTable)
+    .where(eq(studioJobsTable.username, username))
+    .limit(1);
+
+  if (job?.passwordHash && verifyPassword(password, job.passwordHash)) {
+    const studioUser: StudioUserSession = {
+      id: `job-${job.id}`,
+      email: null,
+      displayName: job.title,
+      role: 'student',
+      accountStatus: 'active',
+      jobId: job.id,
+      jobTitle: job.title,
+    };
+    const sid = await createStudioSession({ studioUser });
+    setStudioSessionCookie(res, sid);
+    res.json({ user: studioUser });
     return;
   }
 
-  // Timing-safe comparison to prevent enumeration attacks
-  const usernameOk = username.length === adminUsername.length &&
-    crypto.timingSafeEqual(Buffer.from(username), Buffer.from(adminUsername));
-  const passwordOk = password.length === adminPassword.length &&
-    crypto.timingSafeEqual(Buffer.from(password), Buffer.from(adminPassword));
-
-  if (!usernameOk || !passwordOk) {
-    res.status(401).json({ error: 'Invalid username or password' });
-    return;
-  }
-
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '')
-    .split(',').map((e) => e.trim()).filter(Boolean);
-  const teacherEmail = adminEmails[0] ?? adminUsername;
-
-  const studioUser: StudioUserSession = {
-    id: 'teacher-admin',
-    email: teacherEmail,
-    displayName: 'Teacher',
-    role: 'teacher',
-    accountStatus: 'active',
-  };
-
-  const sid = await createStudioSession({ studioUser });
-  setStudioSessionCookie(res, sid);
-  res.json({ user: studioUser });
+  res.status(401).json({ error: 'Invalid username or password' });
 });
 
 // GET /api/studio/auth/me — returns current studio user or null

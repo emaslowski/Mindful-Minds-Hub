@@ -6,6 +6,7 @@ import {
 import { eq } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
+import { hashPassword } from '../../../lib/password';
 
 const router = Router();
 
@@ -16,7 +17,6 @@ router.get('/teacher/teams', requireStudioRole('teacher'), async (_req, res) => 
   res.json({ teams });
 });
 
-// Also expose for students (needed to show team names in their dashboard)
 router.get('/studio/teams', requireStudioRole('student', 'teacher'), async (_req, res) => {
   const teams = await db.select().from(studioTeamsTable).orderBy(studioTeamsTable.name);
   res.json({ teams });
@@ -30,7 +30,7 @@ router.post('/teacher/teams', requireStudioRole('teacher'), async (req: Request,
   }
   const [team] = await db
     .insert(studioTeamsTable)
-    .values({ name: name.trim(), description: description ?? null })
+    .values({ name: name.trim(), description: description?.trim() || null })
     .returning();
   res.status(201).json({ team });
 });
@@ -55,39 +55,92 @@ router.delete('/teacher/teams/:id', requireStudioRole('teacher'), async (req: Re
 // ── Jobs ───────────────────────────────────────────────────────────────────
 
 router.get('/teacher/jobs', requireStudioRole('teacher'), async (_req, res) => {
-  const jobs = await db.select().from(studioJobsTable).orderBy(studioJobsTable.title);
+  const rows = await db
+    .select({
+      id: studioJobsTable.id,
+      title: studioJobsTable.title,
+      description: studioJobsTable.description,
+      username: studioJobsTable.username,
+      hasPassword: studioJobsTable.passwordHash,
+      createdAt: studioJobsTable.createdAt,
+    })
+    .from(studioJobsTable)
+    .orderBy(studioJobsTable.title);
+  const jobs = rows.map(({ hasPassword, ...j }) => ({ ...j, hasPassword: !!hasPassword }));
   res.json({ jobs });
 });
 
-// Also expose for students
 router.get('/studio/jobs', requireStudioRole('student', 'teacher'), async (_req, res) => {
-  const jobs = await db.select().from(studioJobsTable).orderBy(studioJobsTable.title);
+  const jobs = await db
+    .select({
+      id: studioJobsTable.id,
+      title: studioJobsTable.title,
+      description: studioJobsTable.description,
+    })
+    .from(studioJobsTable)
+    .orderBy(studioJobsTable.title);
   res.json({ jobs });
 });
 
 router.post('/teacher/jobs', requireStudioRole('teacher'), async (req: Request, res: Response) => {
-  const { title, description } = req.body as { title?: string; description?: string };
+  const { title, description, username, password } = req.body as {
+    title?: string; description?: string; username?: string; password?: string;
+  };
   if (!title?.trim()) {
     res.status(400).json({ error: 'Job title is required' });
     return;
   }
-  const [job] = await db
+  if (username?.trim() && !password?.trim()) {
+    res.status(400).json({ error: 'A password is required when setting a username' });
+    return;
+  }
+  const [row] = await db
     .insert(studioJobsTable)
-    .values({ title: title.trim(), description: description ?? null })
-    .returning();
-  res.status(201).json({ job });
+    .values({
+      title: title.trim(),
+      description: description?.trim() || null,
+      username: username?.trim() || null,
+      passwordHash: password?.trim() ? hashPassword(password.trim()) : null,
+    })
+    .returning({
+      id: studioJobsTable.id,
+      title: studioJobsTable.title,
+      description: studioJobsTable.description,
+      username: studioJobsTable.username,
+      passwordHash: studioJobsTable.passwordHash,
+      createdAt: studioJobsTable.createdAt,
+    });
+  const { passwordHash, ...job } = row;
+  res.status(201).json({ job: { ...job, hasPassword: !!passwordHash } });
 });
 
 router.patch('/teacher/jobs/:id', requireStudioRole('teacher'), async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { title, description } = req.body as { title?: string; description?: string };
-  const [job] = await db
+  const { title, description, username, password } = req.body as {
+    title?: string; description?: string; username?: string; password?: string;
+  };
+
+  const updates: Record<string, unknown> = {};
+  if (title) updates.title = title.trim();
+  if (description !== undefined) updates.description = description.trim() || null;
+  if (username !== undefined) updates.username = username.trim() || null;
+  if (password?.trim()) updates.passwordHash = hashPassword(password.trim());
+
+  const [row] = await db
     .update(studioJobsTable)
-    .set({ ...(title ? { title: title.trim() } : {}), ...(description !== undefined ? { description } : {}) })
+    .set(updates)
     .where(eq(studioJobsTable.id, id))
-    .returning();
-  if (!job) { res.status(404).json({ error: 'Job not found' }); return; }
-  res.json({ job });
+    .returning({
+      id: studioJobsTable.id,
+      title: studioJobsTable.title,
+      description: studioJobsTable.description,
+      username: studioJobsTable.username,
+      passwordHash: studioJobsTable.passwordHash,
+      createdAt: studioJobsTable.createdAt,
+    });
+  if (!row) { res.status(404).json({ error: 'Job not found' }); return; }
+  const { passwordHash, ...job } = row;
+  res.json({ job: { ...job, hasPassword: !!passwordHash } });
 });
 
 router.delete('/teacher/jobs/:id', requireStudioRole('teacher'), async (req: Request, res: Response) => {

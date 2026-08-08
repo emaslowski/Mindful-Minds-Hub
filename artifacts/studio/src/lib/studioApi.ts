@@ -144,9 +144,9 @@ export const teacherTeams = {
 
 export const teacherJobs = {
   list: () => studioFetch<{ jobs: Job[] }>('/teacher/jobs'),
-  create: (data: { title: string; description?: string }) =>
+  create: (data: { title: string; description?: string; username?: string; password?: string }) =>
     studioFetch('/teacher/jobs', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id: number, data: { title?: string; description?: string }) =>
+  update: (id: number, data: { title?: string; description?: string; username?: string; password?: string }) =>
     studioFetch(`/teacher/jobs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   delete: (id: number) => studioFetch(`/teacher/jobs/${id}`, { method: 'DELETE' }),
 };
@@ -313,8 +313,20 @@ export interface IncomingHandoff {
   previousCycleName?: string | null;
 }
 
-export interface Team { id: number; name: string; description?: string | null; }
-export interface Job { id: number; title: string; description?: string | null; }
+export interface Team {
+  id: number;
+  name: string;
+  description?: string | null;
+  username?: string | null;
+  hasPassword?: boolean;
+}
+export interface Job {
+  id: number;
+  title: string;
+  description?: string | null;
+  username?: string | null;
+  hasPassword?: boolean;
+}
 export interface Cycle { id: number; name: string; startDate?: string | null; endDate?: string | null; isActive: boolean; }
 
 export interface TeacherStudent {

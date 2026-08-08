@@ -3,14 +3,18 @@ import { Camera } from "lucide-react";
 
 export default function AboutUs() {
   const roles = [
-    { title: "Video Producers", color: "bg-amber/20", rotation: "-rotate-2", x: "translate-x-0" },
-    { title: "Artists and Chefs", color: "bg-sage/20", rotation: "rotate-3", x: "md:translate-x-10" },
-    { title: "Researchers & Writers", color: "bg-dusty-rose/20", rotation: "-rotate-1", x: "md:-translate-x-5" },
-    { title: "Editors and Designers", color: "bg-terracotta/20", rotation: "rotate-2", x: "md:translate-x-5" },
-    { title: "Podcasters", color: "bg-amber/20", rotation: "-rotate-3", x: "md:-translate-x-8" },
-    { title: "Wellness Ambassadors", color: "bg-sage/20", rotation: "rotate-1", x: "md:translate-x-12" },
-    { title: "Technology Team", color: "bg-dusty-rose/20", rotation: "-rotate-2", x: "md:translate-x-0" },
-    { title: "Data Team", color: "bg-terracotta/20", rotation: "rotate-3", x: "md:-translate-x-6" },
+    { title: "Video Producers",                       color: "bg-amber/20",      rotation: "-rotate-2", x: "translate-x-0" },
+    { title: "Podcasters",                            color: "bg-sage/20",       rotation: "rotate-3",  x: "md:translate-x-10" },
+    { title: "Editors and Designers",                 color: "bg-dusty-rose/20", rotation: "-rotate-1", x: "md:-translate-x-5" },
+    { title: "Researchers and Content Writers",       color: "bg-terracotta/20", rotation: "rotate-2",  x: "md:translate-x-5" },
+    { title: "Artists and Chefs",                     color: "bg-sage/20",       rotation: "-rotate-3", x: "md:-translate-x-8" },
+    { title: "Wellness Ambassadors and Peer Mentors", color: "bg-amber/20",      rotation: "rotate-1",  x: "md:translate-x-12" },
+    { title: "Technology Team",                       color: "bg-terracotta/20", rotation: "-rotate-2", x: "md:translate-x-0" },
+    { title: "Community Connection Team",             color: "bg-dusty-rose/20", rotation: "rotate-3",  x: "md:-translate-x-6" },
+    { title: "Data Team",                             color: "bg-amber/20",      rotation: "-rotate-1", x: "md:translate-x-8" },
+    { title: "Music/Sound Keepers",                   color: "bg-sage/20",       rotation: "rotate-2",  x: "md:-translate-x-4" },
+    { title: "Social Media and Advertising",          color: "bg-dusty-rose/20", rotation: "-rotate-3", x: "md:translate-x-6" },
+    { title: "Sports Enthusiasts",                    color: "bg-terracotta/20", rotation: "rotate-1",  x: "translate-x-0" },
   ];
 
   return (
