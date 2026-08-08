@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Nunito:wght@300;400;500;600&display=swap');
+
+.mm-container {
+  --mm-bg: #F8F5F0;
+  --mm-text: #4A3B32;
+  --mm-terracotta: #C86B43;
+  --mm-sage: #759263;
+  --mm-rose: #DF9F9A;
+  --mm-amber: #DBB05F;
+  --mm-sand: #E3D6C5;
+  
+  background-color: var(--mm-bg);
+  color: var(--mm-text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100dvh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.mm-font-display {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.mm-noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+.mm-gradient-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: 
+    radial-gradient(circle at 15% 15%, rgba(219, 176, 95, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(117, 146, 99, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 25%, rgba(223, 159, 154, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 20% 80%, rgba(200, 107, 67, 0.08) 0%, transparent 40%);
+  filter: blur(40px);
+}
+
+.mm-arch {
+  border-radius: 9999px 9999px 24px 24px;
+}
+
+/* Subtle floating animations */
+@keyframes mm-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes mm-float-delayed {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.mm-animate-float {
+  animation: mm-float 8s ease-in-out infinite;
+}
+
+.mm-animate-float-delayed {
+  animation: mm-float-delayed 9s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+@keyframes mm-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.mm-animate-spin-slow {
+  animation: mm-spin-slow 60s linear infinite;
+}
+
+/* Custom scrollbar */
+.mm-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.mm-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mm-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--mm-sand);
+  border-radius: 10px;
+}
+.mm-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 59, 50, 0.3);
+}
