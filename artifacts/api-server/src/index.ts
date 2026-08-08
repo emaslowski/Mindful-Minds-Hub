@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { runSeed } from "./lib/seed";
 
 const rawPort = process.env["PORT"];
 
@@ -22,4 +23,7 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+
+  // Run seed asynchronously after startup (creates default jobs, teams, teacher account)
+  runSeed().catch((seedErr) => logger.error({ err: seedErr }, "Seed failed"));
 });

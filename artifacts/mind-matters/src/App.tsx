@@ -35,6 +35,25 @@ import Review from '@/pages/Review';
 import Contact from '@/pages/Contact';
 import ListenPodcast from '@/pages/ListenPodcast';
 
+// ── Studio pages ──────────────────────────────────────────────────────────
+import StudioLogin from '@/pages/studio/Login';
+import StudentDashboard from '@/pages/studio/Dashboard';
+import ProjectList from '@/pages/studio/ProjectList';
+import ProjectWorkspace from '@/pages/studio/ProjectWorkspace';
+import PeerReviewList from '@/pages/studio/PeerReviewList';
+import PeerReviewPage from '@/pages/studio/PeerReviewPage';
+import Portfolio from '@/pages/studio/Portfolio';
+import HandoffNew from '@/pages/studio/HandoffNew';
+import IncomingHandoffs from '@/pages/studio/IncomingHandoffs';
+import CommandCenter from '@/pages/studio/teacher/CommandCenter';
+import ReviewQueue from '@/pages/studio/teacher/ReviewQueue';
+import ProjectReview from '@/pages/studio/teacher/ProjectReview';
+import AllProjects from '@/pages/studio/teacher/AllProjects';
+import Students from '@/pages/studio/teacher/Students';
+import Cycles from '@/pages/studio/teacher/Cycles';
+import Handoffs from '@/pages/studio/teacher/Handoffs';
+import Analytics from '@/pages/studio/teacher/Analytics';
+
 const queryClient = new QueryClient();
 
 function PageTracker() {
@@ -50,7 +69,39 @@ function PageTracker() {
   return null;
 }
 
-function Router() {
+function StudioRouter() {
+  return (
+    <Switch>
+      <Route path="/studio/login" component={StudioLogin} />
+      <Route path="/studio/teacher/review/:id" component={ProjectReview} />
+      <Route path="/studio/teacher/review" component={ReviewQueue} />
+      <Route path="/studio/teacher/projects" component={AllProjects} />
+      <Route path="/studio/teacher/students" component={Students} />
+      <Route path="/studio/teacher/cycles" component={Cycles} />
+      <Route path="/studio/teacher/handoffs" component={Handoffs} />
+      <Route path="/studio/teacher/analytics" component={Analytics} />
+      <Route path="/studio/teacher" component={CommandCenter} />
+      <Route path="/studio/projects/:id" component={ProjectWorkspace} />
+      <Route path="/studio/projects" component={ProjectList} />
+      <Route path="/studio/peer-reviews/:projectId" component={PeerReviewPage} />
+      <Route path="/studio/peer-reviews" component={PeerReviewList} />
+      <Route path="/studio/handoff/new" component={HandoffNew} />
+      <Route path="/studio/handoffs/incoming" component={IncomingHandoffs} />
+      <Route path="/studio/portfolio" component={Portfolio} />
+      <Route path="/studio" component={StudentDashboard} />
+    </Switch>
+  );
+}
+
+function AppRouter() {
+  const [location] = useLocation();
+  if (location.startsWith('/studio')) {
+    return <StudioRouter />;
+  }
+  return <PublicRouter />;
+}
+
+function PublicRouter() {
   return (
     <Layout>
       <PageTracker />
@@ -144,7 +195,7 @@ function App() {
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <RoutedErrorBoundary>
-            <Router />
+            <AppRouter />
           </RoutedErrorBoundary>
         </WouterRouter>
         <Toaster />
