@@ -14,7 +14,7 @@ import {
 import "./HomeVariant.css";
 
 export default function HomeVariant() {
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -23,7 +23,7 @@ export default function HomeVariant() {
   const categories = [
     {
       name: "Learn",
-      icon: <BookOpen strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[var(--mm-sage)]" />,
+      icon: <BookOpen strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[#759263]" />,
       color: "var(--mm-sage)",
       bg: "rgba(117, 146, 99, 0.08)",
       path: "/learn",
@@ -31,7 +31,7 @@ export default function HomeVariant() {
     },
     {
       name: "Create",
-      icon: <Palette strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[var(--mm-terracotta)]" />,
+      icon: <Palette strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[#C86B43]" />,
       color: "var(--mm-terracotta)",
       bg: "rgba(200, 107, 67, 0.08)",
       path: "/create",
@@ -47,7 +47,7 @@ export default function HomeVariant() {
     },
     {
       name: "Move",
-      icon: <Wind strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[var(--mm-amber)]" />,
+      icon: <Wind strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[#DBB05F]" />,
       color: "var(--mm-amber)",
       bg: "rgba(219, 176, 95, 0.08)",
       path: "/move",
@@ -55,7 +55,7 @@ export default function HomeVariant() {
     },
     {
       name: "Listen",
-      icon: <Headphones strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[var(--mm-sage)]" />,
+      icon: <Headphones strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[#759263]" />,
       color: "var(--mm-sage)",
       bg: "rgba(117, 146, 99, 0.08)",
       path: "/listen",
@@ -63,7 +63,7 @@ export default function HomeVariant() {
     },
     {
       name: "Grow",
-      icon: <Sprout strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[var(--mm-terracotta)]" />,
+      icon: <Sprout strokeWidth={1.2} className="w-8 h-8 md:w-10 md:h-10 text-[#C86B43]" />,
       color: "var(--mm-terracotta)",
       bg: "rgba(200, 107, 67, 0.08)",
       path: "/grow",
@@ -97,13 +97,13 @@ export default function HomeVariant() {
       {/* Nav */}
       <nav className="relative z-20 flex items-center justify-between px-6 py-6 md:px-12 md:py-8">
         <div className="flex items-center gap-3">
-          <Heart className="w-6 h-6 text-[var(--mm-terracotta)]" strokeWidth={1.5} />
-          <span className="mm-font-display italic font-semibold text-xl md:text-2xl tracking-wide text-[var(--mm-text)]">
+          <Heart className="w-6 h-6 text-[#C86B43]" strokeWidth={1.5} />
+          <span className="mm-font-display italic font-semibold text-xl md:text-2xl tracking-wide text-[#4A3B32]">
             Mind Matters
           </span>
         </div>
-        <button className="p-2 rounded-full hover:bg-[var(--mm-sand)] transition-colors duration-300">
-          <Menu className="w-6 h-6 text-[var(--mm-text)]" strokeWidth={1.5} />
+        <button className="p-2 rounded-full hover:bg-[#E3D6C5] transition-colors duration-300">
+          <Menu className="w-6 h-6 text-[#4A3B32]" strokeWidth={1.5} />
         </button>
       </nav>
 
@@ -115,22 +115,22 @@ export default function HomeVariant() {
             mounted ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--mm-sand)] bg-white/40 backdrop-blur-md mb-8 mm-animate-float">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E3D6C5] bg-white/40 backdrop-blur-md mb-8 mm-animate-float">
             <span className="w-2 h-2 rounded-full bg-[var(--mm-sage)] animate-pulse"></span>
-            <span className="text-sm font-medium tracking-wide text-[var(--mm-text)]/80">A student-run mental wellness center</span>
+            <span className="text-sm font-medium tracking-wide text-[#4A3B32]/80">A student-run mental wellness center</span>
           </div>
 
-          <h1 className="mm-font-display font-medium text-4xl md:text-6xl lg:text-7xl leading-[1.15] text-[var(--mm-text)] mb-8">
-            <span className="block mb-2">You <span className="italic text-[var(--mm-sage)]">Matter.</span></span>
-            <span className="block mb-2">We <span className="italic text-[var(--mm-amber)]">Matter.</span></span>
-            <span className="block">Your Mind <span className="italic text-[var(--mm-terracotta)]">Matters.</span></span>
+          <h1 className="mm-font-display font-medium text-4xl md:text-6xl lg:text-7xl leading-[1.15] text-[#4A3B32] mb-8">
+            <span className="block mb-2">You <span className="italic text-[#759263]">Matter.</span></span>
+            <span className="block mb-2">We <span className="italic text-[#DBB05F]">Matter.</span></span>
+            <span className="block">Your Mind <span className="italic text-[#C86B43]">Matters.</span></span>
           </h1>
 
-          <p className="text-lg md:text-xl text-[var(--mm-text)]/70 max-w-xl mx-auto font-light leading-relaxed mb-12">
+          <p className="text-lg md:text-xl text-[#4A3B32]/70 max-w-xl mx-auto font-light leading-relaxed mb-12">
             A safe space to learn, create, connect, and grow. Because no matter what you're facing, you are not alone.
           </p>
 
-          <button className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[var(--mm-terracotta)] text-white rounded-full font-medium overflow-hidden transition-all hover:shadow-[0_8px_30px_rgba(200,107,67,0.3)] hover:-translate-y-1">
+          <button className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#C86B43] text-white rounded-full font-medium overflow-hidden transition-all hover:shadow-[0_8px_30px_rgba(200,107,67,0.3)] hover:-translate-y-1">
             <span className="relative z-10">Begin Check-in</span>
             <ArrowRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
@@ -140,17 +140,17 @@ export default function HomeVariant() {
         {/* Categories Grid */}
         <div className="w-full mt-24 md:mt-32">
           <div className="flex items-center justify-between mb-8 px-2 md:px-6">
-            <h2 className="mm-font-display text-2xl md:text-3xl font-medium text-[var(--mm-text)]">Explore your journey</h2>
-            <div className="h-[1px] flex-1 mx-6 bg-gradient-to-r from-[var(--mm-sand)] to-transparent hidden md:block"></div>
+            <h2 className="mm-font-display text-2xl md:text-3xl font-medium text-[#4A3B32]">Explore your journey</h2>
+            <div className="h-[1px] flex-1 mx-6 bg-gradient-to-r from-[#E3D6C5] to-transparent hidden md:block"></div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 px-2 md:px-0">
             {categories.map((cat, idx) => (
               <div 
                 key={idx}
-                className={`relative group mm-arch bg-white/60 backdrop-blur-sm border border-[var(--mm-sand)] p-6 md:p-8 flex flex-col items-center text-center transition-all duration-700 hover:shadow-xl hover:bg-white cursor-pointer transform hover:-translate-y-2`}
+                className={`relative group mm-arch bg-white/60 backdrop-blur-sm border border-[#E3D6C5] p-6 md:p-8 flex flex-col items-center text-center transition-all duration-700 hover:shadow-xl hover:bg-white cursor-pointer transform hover:-translate-y-2`}
                 style={{
-                  transitionDelay: mounted ? \`\${idx * 100}ms\` : '0ms',
+                  transitionDelay: mounted ? `${idx * 100}ms` : '0ms',
                   opacity: mounted ? 1 : 0,
                   transform: mounted ? 'translateY(0)' : 'translateY(20px)'
                 }}
@@ -166,7 +166,7 @@ export default function HomeVariant() {
                   {cat.name}
                 </h3>
                 
-                <p className="text-sm text-[var(--mm-text)]/60 font-medium">
+                <p className="text-sm text-[#4A3B32]/60 font-medium">
                   {cat.desc}
                 </p>
 
