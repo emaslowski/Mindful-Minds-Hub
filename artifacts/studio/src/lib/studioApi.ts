@@ -416,6 +416,7 @@ export const CONTENT_TYPES = [
   'Coping strategy',
   'Wellness activity',
   'Podcast',
+  'Video production',
   'Artwork',
   'Directed drawing activity',
   'Journaling activity',
@@ -426,6 +427,8 @@ export const CONTENT_TYPES = [
   'School resource',
   'Student resource',
   'Research summary',
+  'Music production',
+  'Social media campaign',
 ] as const;
 
 export const DESTINATION_SECTIONS: Record<string, string> = {
@@ -433,6 +436,7 @@ export const DESTINATION_SECTIONS: Record<string, string> = {
   'Coping strategy': 'learn',
   'Wellness activity': 'create',
   'Podcast': 'podcast',
+  'Video production': 'create',
   'Artwork': 'create',
   'Directed drawing activity': 'create',
   'Journaling activity': 'grow',
@@ -443,6 +447,8 @@ export const DESTINATION_SECTIONS: Record<string, string> = {
   'School resource': 'resources',
   'Student resource': 'resources',
   'Research summary': 'learn',
+  'Music production': 'create',
+  'Social media campaign': 'blog',
 };
 
 export const STATUS_COLORS: Record<string, string> = {

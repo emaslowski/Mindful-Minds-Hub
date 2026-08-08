@@ -16,6 +16,16 @@ import { logger } from '../../lib/logger';
 
 const router = Router();
 
+/** True if the loaded project is owned by (or accessible to) this session. */
+function isProjectOwner(
+  project: { jobId?: number | null; assignedStudentId?: string | null; peerReviewerId?: string | null },
+  user: { role: string; jobId?: number | null; id: string },
+): boolean {
+  if (user.role === 'teacher') return true;
+  if (user.jobId != null && project.jobId === user.jobId) return true;
+  return false;
+}
+
 async function sendReadyForReviewEmail(
   projectTitle: string,
   studentDisplayName: string,
@@ -103,7 +113,11 @@ router.get(
       .from(studioProjectsTable)
       .leftJoin(studioTeamsTable, eq(studioProjectsTable.teamId, studioTeamsTable.id))
       .leftJoin(studioClassCyclesTable, eq(studioProjectsTable.currentCycleId, studioClassCyclesTable.id))
-      .where(eq(studioProjectsTable.assignedStudentId, req.studioUser!.id))
+      .where(
+        req.studioUser!.jobId != null
+          ? eq(studioProjectsTable.jobId, req.studioUser!.jobId)
+          : eq(studioProjectsTable.assignedStudentId, req.studioUser!.id),
+      )
       .orderBy(desc(studioProjectsTable.updatedAt));
 
     const projects = await query;
@@ -133,12 +147,8 @@ router.get(
       return;
     }
 
-    // Students can only view their own projects or ones they are peer-reviewing
-    if (
-      req.studioUser!.role === 'student' &&
-      project.assignedStudentId !== req.studioUser!.id &&
-      project.peerReviewerId !== req.studioUser!.id
-    ) {
+    // Students can only view their own projects
+    if (req.studioUser!.role === 'student' && !isProjectOwner(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -164,26 +174,33 @@ router.post(
       return;
     }
 
+    const isJobSession = req.studioUser!.jobId != null;
+
     const [project] = await db
       .insert(studioProjectsTable)
       .values({
         title: title.trim(),
         contentType,
         status: 'Assigned',
-        assignedStudentId: req.studioUser!.id,
+        // Job-group sessions: track ownership via jobId, not assignedStudentId
+        ...(isJobSession
+          ? { jobId: req.studioUser!.jobId }
+          : { assignedStudentId: req.studioUser!.id }),
         teamId: teamId ?? req.studioUser!.teamId ?? null,
         originalCycleId: cycleId ?? req.studioUser!.cycleId ?? null,
         currentCycleId: cycleId ?? req.studioUser!.cycleId ?? null,
       })
       .returning();
 
-    // Record contributor
-    await db.insert(studioProjectContributorsTable).values({
-      projectId: project.id,
-      studentId: req.studioUser!.id,
-      contributionType: 'author',
-      cycleId: project.currentCycleId,
-    });
+    // Record contributor only for individual (non-job) sessions
+    if (!isJobSession) {
+      await db.insert(studioProjectContributorsTable).values({
+        projectId: project.id,
+        studentId: req.studioUser!.id,
+        contributionType: 'author',
+        cycleId: project.currentCycleId,
+      });
+    }
 
     res.status(201).json({ project });
   },
@@ -211,10 +228,7 @@ router.patch(
       return;
     }
 
-    if (
-      req.studioUser!.role === 'student' &&
-      existing.assignedStudentId !== req.studioUser!.id
-    ) {
+    if (req.studioUser!.role === 'student' && !isProjectOwner(existing, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -266,10 +280,7 @@ router.delete(
       return;
     }
 
-    if (
-      req.studioUser!.role === 'student' &&
-      project.assignedStudentId !== req.studioUser!.id
-    ) {
+    if (req.studioUser!.role === 'student' && !isProjectOwner(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -308,7 +319,9 @@ router.post(
       .where(
         and(
           eq(studioProjectsTable.id, id),
-          eq(studioProjectsTable.assignedStudentId, req.studioUser!.id),
+          req.studioUser!.jobId != null
+            ? eq(studioProjectsTable.jobId, req.studioUser!.jobId)
+            : eq(studioProjectsTable.assignedStudentId, req.studioUser!.id),
         ),
       );
 
@@ -343,14 +356,7 @@ router.post(
 
           const teacherEmails = teachers.map((t) => t.email).filter(Boolean);
 
-          // Fetch the student's display name
-          const [studentProfile] = await db
-            .select({ displayName: studioProfilesTable.displayName })
-            .from(studioProfilesTable)
-            .where(eq(studioProfilesTable.userId, req.studioUser!.id))
-            .limit(1);
-
-          const studentName = studentProfile?.displayName ?? 'A student';
+          const studentName = req.studioUser!.displayName ?? 'A student';
 
           await sendReadyForReviewEmail(project.title, studentName, teacherEmails);
         } catch (err) {

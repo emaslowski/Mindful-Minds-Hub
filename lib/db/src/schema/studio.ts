@@ -99,6 +99,8 @@ export const studioProjectsTable = pgTable('studio_projects', {
   assignedStudentId: varchar('assigned_student_id').references(() => usersTable.id),
   peerReviewerId: varchar('peer_reviewer_id').references(() => usersTable.id),
   teamId: integer('team_id').references(() => studioTeamsTable.id),
+  // Job-group ownership: set when a job-group session creates the project (no FK so any string works)
+  jobId: integer('job_id'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
   publishedAt: timestamp('published_at'),

@@ -17,6 +17,12 @@ router.get(
   '/studio/peer-reviews',
   requireStudioRole('student'),
   async (req: Request, res: Response) => {
+    // Job-group sessions don't have individual peer-reviewer assignments
+    if (req.studioUser!.jobId != null) {
+      res.json({ projects: [] });
+      return;
+    }
+
     const projects = await db
       .select()
       .from(studioProjectsTable)

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useLocation, Link } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
+import { ContentWorkspace } from '@/components/studio/ContentWorkspace';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
 import { studioProjects, studioSources, CONTENT_TYPES, type StudioSource } from '@/lib/studioApi';
 import { Button } from '@/components/ui/button';
@@ -180,19 +181,18 @@ export default function ProjectWorkspace() {
                 placeholder="Give your project a title"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-[#453329]">Content</Label>
-              <Textarea
-                value={content}
-                onChange={(e) => { setContent(e.target.value); setIsDirty(true); }}
-                disabled={!canEdit}
-                className="bg-white border-[#d5cabe] min-h-64 font-sans text-sm leading-relaxed resize-y"
-                placeholder="Write your content here…"
-              />
-              <p className="text-xs text-[#688a52]">
-                ✏ This is a draft and will not be visible to the public until your teacher approves and publishes it.
-              </p>
-            </div>
+
+            <ContentWorkspace
+              contentType={project.contentType}
+              content={content}
+              onChange={(val) => { setContent(val); setIsDirty(true); }}
+              disabled={!canEdit}
+            />
+
+            <p className="text-xs text-[#688a52]">
+              ✏ This is a draft and will not be visible to the public until your teacher approves and publishes it.
+            </p>
+
             {canEdit && (
               <Button
                 className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"

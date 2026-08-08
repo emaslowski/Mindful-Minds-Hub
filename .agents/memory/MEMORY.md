@@ -3,3 +3,4 @@
 - [Mind Matters red-flag email](mind-matters-redflag.md) — Journal red-flag scanning keywords + nodemailer alert logic in routes/journal.ts
 - [Mind Matters Google OAuth + roles](mind-matters-google-auth.md) — Google OAuth added alongside Replit OIDC; role in AuthUser; studio_profiles for pre-created students; studioAuth bridges to main session
 - [Mind Matters DB migration](mind-matters-db-migration.md) — drizzle-kit push fails in non-TTY; use generate then psql -f; FK constraints need DO block workaround
+- [Mind Matters Studio job-group sessions](mind-matters-studio-jobs.md) — job sessions use integer jobId for DB queries; actual DB columns are integer not varchar; ContentWorkspace uses ## section text format
