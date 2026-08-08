@@ -9,7 +9,7 @@ export default function Create() {
   ];
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       {/* Top right Cooking Link — Chalkboard Style */}
       <div className="absolute top-4 right-4 md:right-12 z-20">
         <Link href="/create/cooking" className="group">

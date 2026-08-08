@@ -85,7 +85,7 @@ export default function Learn() {
   ];
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       
       {/* Decorative leaf branch left */}
       <div className="absolute top-24 -left-16 opacity-30 pointer-events-none transform -rotate-12">

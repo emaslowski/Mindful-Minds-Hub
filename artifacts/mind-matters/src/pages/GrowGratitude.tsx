@@ -44,7 +44,7 @@ export default function GrowGratitude() {
 
   if (!isAuthenticated) {
     return (
-      <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+      <div className="w-full flex flex-col flex-1 pt-12 relative">
         <div className="flex-1 w-full max-w-2xl mx-auto px-4 mb-24 flex flex-col z-10">
           <BackButton />
           <div className="flex flex-col items-center justify-center text-center flex-1">
@@ -71,7 +71,7 @@ export default function GrowGratitude() {
   }
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 mb-24 z-10">
         <BackButton />
         <div className="text-center mb-12">

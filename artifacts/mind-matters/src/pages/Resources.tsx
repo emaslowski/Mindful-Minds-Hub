@@ -3,7 +3,7 @@ import { Phone, MessageSquare, HeartHandshake, Info, ShieldAlert } from "lucide-
 
 export default function Resources() {
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 mb-24 z-10">
         
         <div className="text-center mb-16">

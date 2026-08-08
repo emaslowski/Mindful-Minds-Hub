@@ -144,7 +144,7 @@ export default function GrowCollab() {
   };
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden bg-[#e8dcc4]/20">
+    <div className="w-full flex flex-col flex-1 pt-12 relative bg-[#e8dcc4]/20">
       
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg width=\\'20\\' height=\\'20\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Ccircle cx=\\'2\\' cy=\\'2\\' r=\\'2\\' fill=\\'%23688a52\\'/%3E%3C/svg%3E')"}}></div>

@@ -25,7 +25,7 @@ export default function BlogPost() {
   const displayPost = isError || (!isLoading && !post) ? fallbackPost : post;
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-4xl mx-auto px-4 mb-24 relative z-10">
         
         <Link href="/connect" className="text-terracotta hover:text-terracotta/80 font-sans font-medium mb-12 inline-block transition-colors">

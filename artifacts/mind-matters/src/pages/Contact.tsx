@@ -41,7 +41,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       {/* Soft background blobs */}
       <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-terracotta/5 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 -left-20 w-72 h-72 rounded-full bg-sage/8 blur-3xl pointer-events-none" />

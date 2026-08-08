@@ -99,7 +99,7 @@ export default function Move() {
     : exercises.filter(ex => ex.category === filter);
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-6xl mx-auto px-4 mb-24 text-center relative z-10">
         
         {/* Decorative elements */}

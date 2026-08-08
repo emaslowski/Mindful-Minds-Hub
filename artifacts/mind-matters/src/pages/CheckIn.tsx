@@ -34,7 +34,7 @@ export default function CheckIn() {
   };
 
   return (
-    <div className="w-full flex flex-col flex-1 pt-12 relative overflow-hidden">
+    <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-4xl mx-auto px-4 mb-24 relative z-10 flex flex-col items-center">
         
         <h1 className="text-5xl md:text-7xl font-display italic text-foreground mb-4 text-center">
