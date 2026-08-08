@@ -93,32 +93,6 @@ export default function Home() {
         </svg>
       </div>
 
-      {/* Botanical Left Plant — pinned to bottom-left screen edge */}
-      <div className="hidden lg:block absolute bottom-0 left-0 -z-10 opacity-80">
-        <svg width="220" height="290" viewBox="0 0 160 220">
-          <path d="M40,160 Q30,210 50,220 L110,220 Q130,210 120,160 Q125,140 80,140 Q35,140 40,160 Z" fill="#C4622D"/>
-          <path d="M80,160 C80,160 80,80 80,60" stroke="#688A52" strokeWidth="3" strokeLinecap="round"/>
-          <ellipse cx="55" cy="90" rx="28" ry="16" fill="#688A52" opacity="0.85" transform="rotate(-25 55 90)"/>
-          <ellipse cx="105" cy="75" rx="25" ry="14" fill="#4A6741" opacity="0.85" transform="rotate(20 105 75)"/>
-          <ellipse cx="65" cy="55" rx="22" ry="13" fill="#688A52" opacity="0.9" transform="rotate(-15 65 55)"/>
-          <ellipse cx="95" cy="45" rx="20" ry="11" fill="#4A6741" opacity="0.8" transform="rotate(25 95 45)"/>
-          <path d="M40 180 Q 80 170, 115 180" stroke="#FAF3E3" strokeWidth="2" fill="none" opacity="0.5"/>
-        </svg>
-      </div>
-
-      {/* Botanical Right Plant — pinned to bottom-right screen edge */}
-      <div className="hidden lg:block absolute bottom-0 right-0 -z-10 opacity-80 -scale-x-100">
-        <svg width="220" height="280" viewBox="0 0 160 220">
-          <path d="M50,170 Q40,210 60,220 L100,220 Q120,210 110,170 Q115,150 80,150 Q45,150 50,170 Z" fill="#D4A44C"/>
-          <path d="M80,170 C80,170 80,90 90,60" stroke="#688A52" strokeWidth="2.5" strokeLinecap="round"/>
-          <path d="M80,170 C80,170 70,100 60,70" stroke="#688A52" strokeWidth="2.5" strokeLinecap="round"/>
-          <ellipse cx="60" cy="110" rx="22" ry="10" fill="#688A52" transform="rotate(-40 60 110)"/>
-          <ellipse cx="105" cy="100" rx="20" ry="9" fill="#4A6741" transform="rotate(30 105 100)"/>
-          <ellipse cx="50" cy="70" rx="18" ry="8" fill="#688A52" transform="rotate(-30 50 70)"/>
-          <ellipse cx="110" cy="65" rx="16" ry="7" fill="#4A6741" transform="rotate(40 110 65)"/>
-        </svg>
-      </div>
-
       <div className="flex-1 flex flex-col items-center pb-32 relative z-10 w-full max-w-5xl mx-auto">
 
         {/* Hero Text */}
@@ -144,9 +118,9 @@ export default function Home() {
       </div>
 
       {/* Embedded footer/wave with cards */}
-      <div className="w-full relative z-20 mt-auto">
+      <div className="w-full relative z-20 mt-auto -mx-0">
         {/* Double wave for earthy layered feel */}
-        <svg viewBox="0 0 1440 300" preserveAspectRatio="none" className="w-full h-[300px] md:h-[350px]">
+        <svg viewBox="0 0 1440 300" preserveAspectRatio="none" className="w-full h-[300px] md:h-[350px] block">
           <path d="M0,150 C240,90 480,220 720,150 C960,80 1200,200 1440,120 L1440,300 L0,300 Z" fill="#688A52" opacity="0.3"/>
           <path d="M0,180 C200,100 400,240 600,170 C800,100 1000,220 1200,150 C1350,100 1420,180 1440,160 L1440,300 L0,300 Z" fill="#688A52"/>
         </svg>
@@ -155,13 +129,8 @@ export default function Home() {
           <div className="flex flex-wrap justify-center gap-6 md:gap-10 max-w-6xl w-full">
             {categories.map((cat, idx) => (
               <Link key={idx} href={cat.path} className="group relative">
-                {/* Tile Background Blob */}
-                <div className="w-28 h-28 md:w-36 md:h-36 bg-background rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl border border-background/50 blob-shape"
-                     style={{
-                       clipPath: idx % 2 === 0 
-                         ? 'polygon(20% 10%, 80% 0%, 100% 30%, 90% 80%, 70% 100%, 30% 90%, 0% 80%, 10% 30%)' 
-                         : 'polygon(30% 0%, 90% 10%, 100% 50%, 80% 90%, 20% 100%, 0% 70%, 10% 20%, 50% 10%)'
-                     }}>
+                {/* Circle button */}
+                <div className="w-28 h-28 md:w-36 md:h-36 bg-background rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl border border-background/50">
                   
                   {/* Line art Icon */}
                   <div className="w-10 h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110 mb-2">

@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 
 const router = Router();
 
-router.post("/api/contact", async (req, res) => {
+router.post("/contact", async (req, res) => {
   const { name, grade, message } = req.body as {
     name?: string;
     grade?: string;
