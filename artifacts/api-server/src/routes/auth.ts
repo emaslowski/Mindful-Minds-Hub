@@ -265,15 +265,10 @@ router.get('/auth/google/callback', async (req: Request, res: Response) => {
 
   const dbUser = await upsertUser(claims as unknown as Record<string, unknown>);
 
-  // Determine role — 403 if not enrolled
+  // Determine role — redirect to login with error if not enrolled
   const role = await determineRoleAndLinkProfile(dbUser.id, dbUser.email);
   if (role === 'none') {
-    res.status(403).send(
-      '<!DOCTYPE html><html><body>' +
-        '<h2>Access denied</h2>' +
-        '<p>Your account is not enrolled. Please contact your teacher to be added.</p>' +
-        '</body></html>',
-    );
+    res.redirect('/studio/login?error=not_enrolled');
     return;
   }
 
