@@ -79,7 +79,7 @@ export default function StudentDashboard() {
               'Completed Projects': <CheckCircle className="h-5 w-5 text-emerald-500" />,
             };
             return (
-              <Link key={label} href={`/studio/projects?status=${encodeURIComponent(statuses[0])}`}>
+              <Link key={label} href={`/studio/projects?statuses=${encodeURIComponent(statuses.join(','))}`}>
                 <Card className="bg-[#eee6d8] border-[#d5cabe] hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 flex items-center gap-3">
                     {icons[label]}

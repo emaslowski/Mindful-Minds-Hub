@@ -26,7 +26,12 @@ export default function ProjectList() {
   const { user, isLoading } = useRequireStudioRole('student');
   const search = useSearch();
   const params = new URLSearchParams(search);
-  const statusFilter = params.get('status');
+  // Support ?statuses=A,B,C (multi) and legacy ?status=A (single)
+  const statusFilter: string[] | null = params.get('statuses')
+    ? params.get('statuses')!.split(',')
+    : params.get('status')
+      ? [params.get('status')!]
+      : null;
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -55,13 +60,13 @@ export default function ProjectList() {
   if (isLoading || !user) return null;
 
   const projects = (data?.projects ?? []).filter((p) =>
-    statusFilter ? p.status === statusFilter : true,
+    statusFilter ? statusFilter.includes(p.status) : true,
   );
 
   return (
     <StudioLayout>
       <StudioPage
-        title={statusFilter ? `Projects: ${statusFilter}` : 'My Projects'}
+        title={statusFilter ? `Projects: ${statusFilter.join(', ')}` : 'My Projects'}
         subtitle={`${projects.length} project${projects.length !== 1 ? 's' : ''}`}
         action={
           <Link href="/studio">
