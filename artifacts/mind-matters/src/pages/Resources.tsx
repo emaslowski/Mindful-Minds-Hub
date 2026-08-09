@@ -133,25 +133,25 @@ export default function Resources() {
                   </div>
                 </a>
                 
-                <div className="flex items-center gap-4 bg-white/60 p-4 rounded-2xl border border-terracotta/30">
-                  <div className="bg-white text-terracotta p-3 rounded-full border-2 border-terracotta">
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdsvjA6H-kGByOdWStEFQ9PCq2OJMK8iolsVXLnNL3fuRBGxw/viewform" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group border border-terracotta/30">
+                  <div className="bg-white text-terracotta p-3 rounded-full border-2 border-terracotta group-hover:scale-110 transition-transform">
                     <Info size={24} />
                   </div>
                   <div>
                     <div className="font-sans font-bold text-lg text-foreground">School Counselor</div>
-                    <div className="font-sans text-sm text-foreground/70">Reach out via email or stop by the office</div>
+                    <div className="font-sans text-sm text-foreground/70">Reach out via our online form</div>
                   </div>
-                </div>
+                </a>
 
-                <div className="flex items-center gap-4 bg-white/60 p-4 rounded-2xl">
-                  <div className="bg-foreground/80 text-white p-3 rounded-full">
+                <a href="https://www.safe2helpil.org/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
+                  <div className="bg-foreground/80 text-white p-3 rounded-full group-hover:scale-110 transition-transform">
                     <ShieldAlert size={24} />
                   </div>
                   <div>
-                    <div className="font-sans font-bold text-lg text-foreground">Safe2Help</div>
-                    <div className="font-sans text-sm text-foreground/70">Anonymous tip line</div>
+                    <div className="font-sans font-bold text-lg text-foreground">Safe2Help Illinois</div>
+                    <div className="font-sans text-sm text-foreground/70">Anonymous tip line — call, text, or chat</div>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
           </div>
