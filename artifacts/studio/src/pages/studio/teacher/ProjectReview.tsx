@@ -14,6 +14,68 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, CheckCircle, RotateCcw, Bookmark, Archive, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// ── Structured content helpers ────────────────────────────────────────────────
+
+function parseSections(text: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  const parts = text.split(/^## /m);
+  for (const part of parts.slice(1)) {
+    const nl = part.indexOf('\n');
+    if (nl === -1) { result[part.trim()] = ''; continue; }
+    result[part.slice(0, nl).trim()] = part.slice(nl + 1).trim();
+  }
+  return result;
+}
+
+function hasStructuredContent(text: string): boolean {
+  return /^## /m.test(text);
+}
+
+function StructuredContentPreview({ content }: { content: string }) {
+  if (!content) {
+    return <p className="text-[#d5cabe] italic text-sm">No content.</p>;
+  }
+
+  if (!hasStructuredContent(content)) {
+    // Fallback: plain text for older projects
+    return (
+      <div className="whitespace-pre-wrap text-sm text-[#453329] leading-relaxed">
+        {content}
+      </div>
+    );
+  }
+
+  const sections = parseSections(content);
+  const entries = Object.entries(sections);
+
+  if (entries.length === 0) {
+    return (
+      <div className="whitespace-pre-wrap text-sm text-[#453329] leading-relaxed">
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {entries.map(([heading, body]) => (
+        <div key={heading} className="rounded-lg border border-[#d5cabe] overflow-hidden">
+          <div className="bg-[#eee6d8] border-b border-[#d5cabe] px-4 py-2">
+            <h3 className="text-sm font-semibold text-[#453329] tracking-wide">{heading}</h3>
+          </div>
+          <div className="bg-white px-4 py-3">
+            {body ? (
+              <p className="text-sm text-[#453329] whitespace-pre-wrap leading-relaxed">{body}</p>
+            ) : (
+              <p className="text-sm text-[#d5cabe] italic">Not filled in.</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const DESTINATION_OPTIONS = [
   { value: 'blog', label: 'Blog / Articles' },
   { value: 'podcast', label: 'Podcast Page' },
@@ -111,11 +173,9 @@ export default function ProjectReview() {
               <TabsContent value="content" className="mt-3">
                 <Card className="bg-[#eee6d8] border-[#d5cabe]">
                   <CardContent className="p-4">
-                    <div className="whitespace-pre-wrap text-sm text-[#453329] bg-white rounded-lg p-4 border border-[#d5cabe] min-h-40 leading-relaxed">
-                      {project.content || <span className="text-[#d5cabe] italic">No content.</span>}
-                    </div>
+                    <StructuredContentPreview content={project.content ?? ''} />
                     {project.notes && (
-                      <div className="mt-3 p-3 bg-white rounded-lg border border-[#d5cabe]">
+                      <div className="mt-4 p-3 bg-white rounded-lg border border-[#d5cabe]">
                         <p className="text-xs font-medium text-[#453329] mb-1">Student notes:</p>
                         <p className="text-xs text-[#688a52] whitespace-pre-wrap">{project.notes}</p>
                       </div>
