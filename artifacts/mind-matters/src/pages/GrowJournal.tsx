@@ -1,10 +1,27 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { WaveFooter } from "@/components/WaveFooter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useGetTodayPrompt, useCreateJournalEntry, useGetJournalEntries } from "@workspace/api-client-react";
-import { Lock, PenTool, Send, Info } from "lucide-react";
+import { Lock, PenTool, Send, Info, Moon } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "wouter";
+
+/**
+ * Returns true if the journal is currently open (7:00 AM – 9:00 PM Eastern Time).
+ * Uses America/New_York so it handles both EST (UTC-5) and EDT (UTC-4) automatically.
+ */
+function isJournalOpen(): boolean {
+  const hour = parseInt(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      hour: "numeric",
+      hour12: false,
+    }).format(new Date()),
+    10,
+  );
+  // Open from 7 (7:00 AM) through 20 (8:59 PM); closed at 21 (9:00 PM) and after
+  return hour >= 7 && hour < 21;
+}
 
 function BackButton() {
   return (
@@ -19,10 +36,11 @@ function BackButton() {
 }
 
 export default function GrowJournal() {
+  const journalOpen = isJournalOpen();
   const { isAuthenticated, login, isLoading: authLoading } = useAuth();
   
-  const { data: promptData } = useGetTodayPrompt({ query: { enabled: isAuthenticated } });
-  const { data: entries, refetch: refetchEntries } = useGetJournalEntries({ query: { enabled: isAuthenticated } });
+  const { data: promptData } = useGetTodayPrompt({ query: { enabled: isAuthenticated && journalOpen } });
+  const { data: entries, refetch: refetchEntries } = useGetJournalEntries({ query: { enabled: isAuthenticated && journalOpen } });
   
   const { mutate: createEntry, isPending } = useCreateJournalEntry();
   
@@ -43,6 +61,32 @@ export default function GrowJournal() {
 
   if (authLoading) {
     return <div className="flex-1 flex items-center justify-center">Loading...</div>;
+  }
+
+  // Journal is closed 9 PM – 7 AM Eastern Time
+  if (!journalOpen) {
+    return (
+      <div className="w-full flex flex-col flex-1 pt-12 relative">
+        <div className="flex-1 w-full max-w-2xl mx-auto px-4 mb-24 flex flex-col z-10">
+          <BackButton />
+          <div className="flex flex-col items-center justify-center text-center flex-1">
+            <div className="bg-sage/10 p-6 rounded-full text-sage mb-8 border border-sage/20">
+              <Moon size={64} />
+            </div>
+            <h1 className="text-5xl md:text-7xl font-display italic text-foreground mb-6">
+              Journal is Closed
+            </h1>
+            <p className="text-xl font-sans text-foreground/70 mb-4 max-w-lg leading-relaxed">
+              The journal is available <strong>7:00 AM – 9:00 PM</strong> Eastern Time.
+            </p>
+            <p className="text-base font-sans text-foreground/50 max-w-md leading-relaxed">
+              Come back during open hours to write, reflect, and grow. Rest well tonight. 🌙
+            </p>
+          </div>
+        </div>
+        <WaveFooter quote="Rest. Reflect. Return tomorrow." />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {

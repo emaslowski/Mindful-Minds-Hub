@@ -118,6 +118,19 @@ async function sendRedFlagAlert(content: string, userId: string, prompt: string)
   });
 }
 
+/** Returns true if the journal is currently open (7 AM – 9 PM America/New_York). */
+function isJournalOpen(): boolean {
+  const hour = parseInt(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      hour: "numeric",
+      hour12: false,
+    }).format(new Date()),
+    10,
+  );
+  return hour >= 7 && hour < 21;
+}
+
 // GET /api/today-prompt
 router.get("/today-prompt", (_req, res) => {
   const dayIndex = new Date().getDay(); // 0=Sun … 6=Sat
@@ -152,6 +165,10 @@ router.get("/journal-entries", async (req, res) => {
 router.post("/journal-entries", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  if (!isJournalOpen()) {
+    res.status(403).json({ error: "The journal is closed. It is available 7:00 AM – 9:00 PM Eastern Time." });
     return;
   }
   const { prompt = "", content } = req.body;
