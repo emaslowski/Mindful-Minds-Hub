@@ -143,7 +143,7 @@ export default function Resources() {
                   </div>
                 </a>
 
-                <a href="https://www.safe2helpil.org/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
+                <a href="https://safe2helpil.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
                   <div className="bg-foreground/80 text-white p-3 rounded-full group-hover:scale-110 transition-transform">
                     <ShieldAlert size={24} />
                   </div>
