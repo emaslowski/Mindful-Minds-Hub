@@ -6,6 +6,7 @@ import {
   studioTeamsTable,
   studioClassCyclesTable,
   studioProfilesTable,
+  studioTeacherReviewsTable,
 } from '@workspace/db/schema';
 import { eq, and, desc, or } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
@@ -338,9 +339,16 @@ router.post(
       return;
     }
 
+    const EDITORS_DESIGNERS_JOB_ID = 269; // Editors and Designers job group
+
     const [updated] = await db
       .update(studioProjectsTable)
-      .set({ status: toStatus as typeof project.status, updatedAt: new Date() })
+      .set({
+        status: toStatus as typeof project.status,
+        updatedAt: new Date(),
+        // Auto-assign E&D as peer reviewer when entering Peer Review stage
+        ...(toStatus === 'Peer Review' && { peerReviewerJobId: EDITORS_DESIGNERS_JOB_ID }),
+      })
       .where(eq(studioProjectsTable.id, id))
       .returning();
 
@@ -366,6 +374,39 @@ router.post(
     }
 
     res.json({ project: updated });
+  },
+);
+
+// GET /api/studio/projects/:id/teacher-feedback — latest teacher review (student-accessible)
+router.get(
+  '/studio/projects/:id/teacher-feedback',
+  requireStudioRole('student', 'teacher'),
+  async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    const [project] = await db
+      .select()
+      .from(studioProjectsTable)
+      .where(eq(studioProjectsTable.id, id));
+
+    if (!project) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+
+    if (req.studioUser!.role === 'student' && !isProjectOwner(project, req.studioUser!)) {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    const [review] = await db
+      .select()
+      .from(studioTeacherReviewsTable)
+      .where(eq(studioTeacherReviewsTable.projectId, id))
+      .orderBy(desc(studioTeacherReviewsTable.reviewedAt))
+      .limit(1);
+
+    res.json({ review: review ?? null });
   },
 );
 

@@ -101,6 +101,8 @@ export const studioProjectsTable = pgTable('studio_projects', {
   teamId: integer('team_id').references(() => studioTeamsTable.id),
   // Job-group ownership: set when a job-group session creates the project (no FK so any string works)
   jobId: integer('job_id'),
+  // Job-group peer reviewer: auto-set to Editors & Designers (269) when entering Peer Review
+  peerReviewerJobId: integer('peer_reviewer_job_id'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
   publishedAt: timestamp('published_at'),

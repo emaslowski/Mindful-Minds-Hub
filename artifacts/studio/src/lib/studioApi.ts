@@ -86,6 +86,10 @@ export const studioProjects = {
       method: 'POST',
       body: JSON.stringify({ toStatus }),
     }),
+  teacherFeedback: (id: number) =>
+    studioFetch<{ review: StudioTeacherReview | null }>(`/studio/projects/${id}/teacher-feedback`),
+  delete: (id: number) =>
+    studioFetch<{ success: boolean }>(`/studio/projects/${id}`, { method: 'DELETE' }),
 };
 
 // ── Sources ────────────────────────────────────────────────────────────────
@@ -239,9 +243,20 @@ export interface StudioProject {
   cycleName?: string | null;
   assignedStudentId?: number | null;
   peerReviewerId?: number | null;
+  jobId?: number | null;
+  peerReviewerJobId?: number | null;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;
+}
+
+export interface StudioTeacherReview {
+  id: number;
+  projectId: number;
+  teacherId: string;
+  decision: 'approve' | 'approve_and_publish' | 'return_for_revision' | 'save_for_later' | 'archive';
+  feedback?: string | null;
+  reviewedAt: string;
 }
 
 export interface StudioSource {

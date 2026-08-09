@@ -9,6 +9,17 @@ import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
 
 const router = Router();
 
+/** Returns true when the requesting student can access the given project. */
+function canAccessProject(
+  project: { jobId?: number | null; assignedStudentId?: string | null; peerReviewerId?: string | null; peerReviewerJobId?: number | null },
+  user: { role: string; jobId?: number | null; id: string },
+): boolean {
+  if (user.role === 'teacher') return true;
+  if (user.jobId != null && project.jobId === user.jobId) return true;
+  if (user.jobId != null && project.peerReviewerJobId === user.jobId) return true;
+  return false;
+}
+
 // GET /api/studio/projects/:id/sources
 router.get(
   '/studio/projects/:id/sources',
@@ -17,7 +28,12 @@ router.get(
     const projectId = Number(req.params.id);
 
     const [project] = await db
-      .select({ assignedStudentId: studioProjectsTable.assignedStudentId, peerReviewerId: studioProjectsTable.peerReviewerId })
+      .select({
+        assignedStudentId: studioProjectsTable.assignedStudentId,
+        peerReviewerId: studioProjectsTable.peerReviewerId,
+        jobId: studioProjectsTable.jobId,
+        peerReviewerJobId: studioProjectsTable.peerReviewerJobId,
+      })
       .from(studioProjectsTable)
       .where(eq(studioProjectsTable.id, projectId));
 
@@ -26,11 +42,7 @@ router.get(
       return;
     }
 
-    if (
-      req.studioUser!.role === 'student' &&
-      project.assignedStudentId !== req.studioUser!.id &&
-      project.peerReviewerId !== req.studioUser!.id
-    ) {
+    if (!canAccessProject(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -65,7 +77,11 @@ router.post(
     }
 
     const [project] = await db
-      .select({ assignedStudentId: studioProjectsTable.assignedStudentId })
+      .select({
+        assignedStudentId: studioProjectsTable.assignedStudentId,
+        jobId: studioProjectsTable.jobId,
+        peerReviewerJobId: studioProjectsTable.peerReviewerJobId,
+      })
       .from(studioProjectsTable)
       .where(eq(studioProjectsTable.id, projectId));
 
@@ -74,10 +90,7 @@ router.post(
       return;
     }
 
-    if (
-      req.studioUser!.role === 'student' &&
-      project.assignedStudentId !== req.studioUser!.id
-    ) {
+    if (!canAccessProject(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -108,7 +121,11 @@ router.delete(
     const sourceId = Number(req.params.sourceId);
 
     const [project] = await db
-      .select({ assignedStudentId: studioProjectsTable.assignedStudentId })
+      .select({
+        assignedStudentId: studioProjectsTable.assignedStudentId,
+        jobId: studioProjectsTable.jobId,
+        peerReviewerJobId: studioProjectsTable.peerReviewerJobId,
+      })
       .from(studioProjectsTable)
       .where(eq(studioProjectsTable.id, projectId));
 
@@ -117,10 +134,7 @@ router.delete(
       return;
     }
 
-    if (
-      req.studioUser!.role === 'student' &&
-      project.assignedStudentId !== req.studioUser!.id
-    ) {
+    if (!canAccessProject(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }

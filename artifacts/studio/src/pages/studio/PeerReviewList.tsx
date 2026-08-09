@@ -22,11 +22,17 @@ export default function PeerReviewList() {
   const pending = projects.filter((p) => p.status === 'Peer Review');
   const done = projects.filter((p) => p.status !== 'Peer Review');
 
+  // E&D job group gets a tailored heading
+  const isEditorGroup = user.jobId === 269;
+  const pageSubtitle = isEditorGroup
+    ? 'Projects submitted by other groups for your editorial review'
+    : 'Projects assigned to you for review';
+
   return (
     <StudioLayout>
       <StudioPage
-        title="Peer Reviews"
-        subtitle="Projects assigned to you for review"
+        title={isEditorGroup ? 'Editorial Review Inbox' : 'Peer Reviews'}
+        subtitle={pageSubtitle}
       >
         {pending.length === 0 && done.length === 0 ? (
           <Card className="bg-[#eee6d8] border-[#d5cabe]">

@@ -1,18 +1,28 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useLocation, Link } from 'wouter';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { ContentWorkspace } from '@/components/studio/ContentWorkspace';
+import { ContentPreview } from '@/components/studio/ContentPreview';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { studioProjects, studioSources, CONTENT_TYPES, type StudioSource } from '@/lib/studioApi';
+import { studioProjects, studioSources, type StudioSource } from '@/lib/studioApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, ExternalLink, ChevronRight, Save, Send, AlertCircle } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Trash2, Plus, ExternalLink, ChevronRight, Save, AlertCircle, BookOpen, Eye, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const WORKFLOW_STEPS = [
@@ -27,6 +37,12 @@ const NEXT_STATUS: Record<string, string> = {
   'Drafting': 'Peer Review',
   'Revision Needed': 'Drafting',
 };
+
+/** Stages where the Preview tab is available */
+const PREVIEW_STAGES = new Set([
+  'Drafting', 'Peer Review', 'Revision Needed',
+  'Ready for Teacher Review', 'Teacher Reviewing', 'Approved', 'Published',
+]);
 
 export default function ProjectWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -47,12 +63,20 @@ export default function ProjectWorkspace() {
     enabled: !!user && !!projectId,
   });
 
+  const project = data?.project;
+
+  // Fetch teacher feedback when project is returned for revision
+  const { data: feedbackData } = useQuery({
+    queryKey: ['teacher-feedback', projectId],
+    queryFn: () => studioProjects.teacherFeedback(projectId),
+    enabled: !!user && !!projectId && project?.status === 'Revision Needed',
+  });
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [notes, setNotes] = useState('');
   const [isDirty, setIsDirty] = useState(false);
-
-  const project = data?.project;
+  const [activeTab, setActiveTab] = useState('content');
 
   useEffect(() => {
     if (project) {
@@ -60,8 +84,10 @@ export default function ProjectWorkspace() {
       setContent(project.content);
       setNotes(project.notes);
       setIsDirty(false);
+      // Auto-switch to Sources when entering Researching stage
+      setActiveTab(project.status === 'Researching' ? 'sources' : 'content');
     }
-  }, [project]);
+  }, [project?.id, project?.status]);
 
   const { mutate: saveProject, isPending: isSaving } = useMutation({
     mutationFn: () => studioProjects.update(projectId, { title, content, notes }),
@@ -83,17 +109,39 @@ export default function ProjectWorkspace() {
     onError: (err) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
   });
 
+  const [, navigate] = useLocation();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const { mutate: deleteProject, isPending: isDeleting } = useMutation({
+    mutationFn: () => studioProjects.delete(projectId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['studio-projects'] });
+      toast({ title: 'Project deleted' });
+      navigate('/studio/projects');
+    },
+    onError: (err) => toast({ title: 'Could not delete', description: err.message, variant: 'destructive' }),
+  });
+
   const canEdit =
     user?.role === 'teacher' ||
     project?.assignedStudentId === user?.id ||
     (user?.jobId != null && project?.jobId === user?.jobId);
+
+  const canDelete =
+    canEdit &&
+    user?.role !== 'teacher' &&
+    ['Assigned', 'Researching', 'Drafting'].includes(project?.status ?? '');
+
   const nextStatus = project ? NEXT_STATUS[project.status] : undefined;
+  const showPreview = project ? PREVIEW_STAGES.has(project.status) : false;
+  const teacherFeedback = feedbackData?.review;
 
   if (authLoading || isLoading || !project) {
     return <div className="flex items-center justify-center h-screen text-[#453329]">Loading…</div>;
   }
 
   const stepIndex = WORKFLOW_STEPS.indexOf(project.status);
+  const sourceCount = sourcesData?.sources?.length ?? 0;
 
   return (
     <StudioLayout>
@@ -103,6 +151,15 @@ export default function ProjectWorkspace() {
         action={
           <div className="flex items-center gap-2">
             <StatusBadge status={project.status} />
+            {canDelete && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="p-1.5 rounded-lg text-[#d5cabe] hover:text-red-500 hover:bg-red-50 transition-colors"
+                title="Delete project"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
             {canEdit && isDirty && (
               <Button
                 size="sm"
@@ -153,9 +210,51 @@ export default function ProjectWorkspace() {
             ))}
           </div>
           {project.status === 'Revision Needed' && (
-            <p className="text-xs text-red-600 mt-2 font-medium">⚠ Revision needed — review the feedback and update your draft.</p>
+            <p className="text-xs text-red-600 mt-2 font-medium">⚠ Revision needed — review your teacher's feedback below and update your draft.</p>
           )}
         </div>
+
+        {/* Teacher feedback banner — shown when returned for revision */}
+        {project.status === 'Revision Needed' && teacherFeedback && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3">
+            <MessageSquare className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-red-700 mb-1">Teacher's Feedback</p>
+              <p className="text-sm text-red-800 leading-relaxed whitespace-pre-wrap">
+                {teacherFeedback.feedback ?? 'Your teacher reviewed this project and sent it back for revision. Please update your content and resubmit.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Researching guidance banner */}
+        {project.status === 'Researching' && (
+          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
+            <BookOpen className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-blue-700 mb-1">Research Stage</p>
+              <p className="text-sm text-blue-800 leading-relaxed">
+                Add your sources in the <strong>Sources</strong> tab below before moving to Drafting. 
+                Document every website, book, or resource you used. Strong sources make your content more trustworthy!
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Peer Review info banner */}
+        {project.status === 'Peer Review' && (
+          <div className="mb-4 bg-orange-50 border border-orange-200 rounded-xl p-4 flex gap-3">
+            <AlertCircle className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-orange-700 mb-1">Under Peer Review</p>
+              <p className="text-sm text-orange-800 leading-relaxed">
+                Your project has been sent to the <strong>Editors & Designers</strong> team for peer review. 
+                They'll check your content and give feedback before it goes to your teacher. 
+                You'll be notified once the review is complete.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Safety reminder */}
         <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 flex gap-2">
@@ -166,10 +265,18 @@ export default function ProjectWorkspace() {
           </span>
         </div>
 
-        <Tabs defaultValue="content">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-[#eee6d8] border border-[#d5cabe]">
             <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="sources">Sources</TabsTrigger>
+            <TabsTrigger value="sources">
+              Sources{sourceCount > 0 ? ` (${sourceCount})` : ''}
+            </TabsTrigger>
+            {showPreview && (
+              <TabsTrigger value="preview" className="flex items-center gap-1">
+                <Eye className="h-3.5 w-3.5" />
+                Preview
+              </TabsTrigger>
+            )}
             <TabsTrigger value="notes">Notes</TabsTrigger>
           </TabsList>
 
@@ -208,8 +315,37 @@ export default function ProjectWorkspace() {
           </TabsContent>
 
           <TabsContent value="sources" className="mt-4">
-            <SourcesPanel projectId={projectId} canEdit={canEdit} sources={sourcesData?.sources ?? []} onRefresh={refetchSources} />
+            {project.status === 'Researching' && (
+              <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
+                📚 <strong>Add every source you research here.</strong> Include websites, books, articles — anything you read to learn about your topic.
+                You need at least one source before moving to Drafting.
+              </div>
+            )}
+            <SourcesPanel
+              projectId={projectId}
+              canEdit={canEdit}
+              sources={sourcesData?.sources ?? []}
+              onRefresh={refetchSources}
+            />
+            {project.status === 'Researching' && canEdit && (sourcesData?.sources?.length ?? 0) > 0 && (
+              <div className="mt-6 pt-4 border-t border-[#d5cabe]">
+                <Button
+                  className="bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-1"
+                  onClick={() => transition('Drafting')}
+                  disabled={isTransitioning}
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                  {isTransitioning ? 'Moving…' : 'Done Researching — Start Drafting'}
+                </Button>
+              </div>
+            )}
           </TabsContent>
+
+          {showPreview && (
+            <TabsContent value="preview" className="mt-4">
+              <ContentPreview title={title} contentType={project.contentType} content={content} />
+            </TabsContent>
+          )}
 
           <TabsContent value="notes" className="mt-4 space-y-4">
             <div className="space-y-1.5">
@@ -235,6 +371,28 @@ export default function ProjectWorkspace() {
           </TabsContent>
         </Tabs>
       </StudioPage>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-semibold">"{title || 'Untitled Project'}"</span> will be
+              permanently removed. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => deleteProject()}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting…' : 'Yes, delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </StudioLayout>
   );
 }

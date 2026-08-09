@@ -1,5 +1,35 @@
 import { WaveFooter } from "@/components/WaveFooter";
-import { Phone, MessageSquare, HeartHandshake, Info, ShieldAlert } from "lucide-react";
+import { Phone, MessageSquare, HeartHandshake, Info, ShieldAlert, ExternalLink, BookOpen, Users, Heart } from "lucide-react";
+
+interface ParentResourceProps {
+  href: string;
+  title: string;
+  description: string;
+  tag?: string;
+  tagColor?: string;
+}
+
+function ParentResource({ href, title, description, tag, tagColor = "bg-sage/20 text-sage" }: ParentResourceProps) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-start justify-between gap-3 bg-white/50 hover:bg-white/90 p-5 rounded-2xl transition-all border border-black/5 hover:shadow-sm group"
+    >
+      <div className="flex-1 min-w-0">
+        {tag && (
+          <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 ${tagColor}`}>
+            {tag}
+          </span>
+        )}
+        <div className="font-sans font-bold text-base text-foreground mb-0.5 leading-snug">{title}</div>
+        <div className="font-sans text-sm text-foreground/60 leading-relaxed">{description}</div>
+      </div>
+      <ExternalLink className="h-4 w-4 text-foreground/30 group-hover:text-terracotta flex-shrink-0 mt-1 transition-colors" />
+    </a>
+  );
+}
 
 export default function Resources() {
   return (
@@ -128,31 +158,95 @@ export default function Resources() {
 
           {/* Parent/Guardian Section */}
           <div className="flex flex-col gap-6">
-            <div className="bg-sage/10 rounded-[3rem] p-8 md:p-10 border border-sage/20 shadow-sm h-full">
-              <h3 className="font-display italic text-4xl text-foreground mb-6 flex items-center gap-3">
+            <div className="bg-sage/10 rounded-[3rem] p-8 md:p-10 border border-sage/20 shadow-sm">
+              <h3 className="font-display italic text-4xl text-foreground mb-2 flex items-center gap-3">
                 For Parents & Guardians
               </h3>
-              <p className="text-foreground/70 font-sans mb-8">
-                Resources and guides for supporting your student's mental wellness journey.
+              <p className="text-foreground/60 font-sans text-sm mb-8">
+                Trusted resources to help you support your student's mental wellness — from everyday conversations to knowing when to seek help.
               </p>
-              
-              <div className="space-y-4">
-                <a href="#" className="block bg-white/50 hover:bg-white/80 p-5 rounded-2xl transition-colors border border-black/5">
-                  <div className="font-sans font-bold text-lg text-foreground mb-1">How to talk to your child</div>
-                  <div className="font-sans text-sm text-foreground/70">Tips for opening up conversations about mental health</div>
-                </a>
-                <a href="#" className="block bg-white/50 hover:bg-white/80 p-5 rounded-2xl transition-colors border border-black/5">
-                  <div className="font-sans font-bold text-lg text-foreground mb-1">Warning signs to watch for</div>
-                  <div className="font-sans text-sm text-foreground/70">Understanding what's normal stress vs what needs help</div>
-                </a>
-                <a href="#" className="block bg-white/50 hover:bg-white/80 p-5 rounded-2xl transition-colors border border-black/5">
-                  <div className="font-sans font-bold text-lg text-foreground mb-1">Support Organizations</div>
-                  <div className="font-sans text-sm text-foreground/70">Local and national groups offering family support</div>
-                </a>
-                <a href="#" className="block bg-white/50 hover:bg-white/80 p-5 rounded-2xl transition-colors border border-black/5">
-                  <div className="font-sans font-bold text-lg text-terracotta mb-1">Contact the School Counselor</div>
-                  <div className="font-sans text-sm text-foreground/70">Partner with us to support your student</div>
-                </a>
+
+              {/* If it's urgent */}
+              <div className="mb-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Phone className="h-4 w-4 text-terracotta" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-terracotta">If it's urgent</span>
+                </div>
+                <div className="space-y-2">
+                  <ParentResource
+                    href="https://988lifeline.org/"
+                    title="988 Suicide & Crisis Lifeline"
+                    description="Call or text 988. Free, confidential support 24/7 — for you or your child."
+                    tag="Crisis line"
+                    tagColor="bg-red-100 text-red-700"
+                  />
+                  <ParentResource
+                    href="https://www.crisistextline.org/"
+                    title="Crisis Text Line"
+                    description="Text HOME to 741741. Free crisis counseling by text, any time of day."
+                    tag="Crisis line"
+                    tagColor="bg-red-100 text-red-700"
+                  />
+                </div>
+              </div>
+
+              {/* Learn & understand */}
+              <div className="mb-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <BookOpen className="h-4 w-4 text-sage" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-sage">Learn & understand</span>
+                </div>
+                <div className="space-y-2">
+                  <ParentResource
+                    href="https://childmind.org/guide/parents-guide-to-getting-good-care/"
+                    title="Child Mind Institute — Parent's Guide"
+                    description="Practical guidance on recognizing warning signs and getting the right care for your child."
+                  />
+                  <ParentResource
+                    href="https://www.nami.org/Support-Education/Family-Members-and-Caregivers"
+                    title="NAMI — Family Members & Caregivers"
+                    description="NAMI's hub for parents: how to have the conversation, what to watch for, and where to turn."
+                  />
+                  <ParentResource
+                    href="https://www.cdc.gov/childrensmentalhealth/parent-resources.html"
+                    title="CDC Children's Mental Health"
+                    description="Research-backed information on children's mental health, signs, and how to find help."
+                  />
+                  <ParentResource
+                    href="https://www.healthychildren.org/English/healthy-living/emotional-wellness/Pages/default.aspx"
+                    title="Healthy Children (AAP)"
+                    description="From the American Academy of Pediatrics — emotional wellness guides for every age."
+                  />
+                </div>
+              </div>
+
+              {/* Community support */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Users className="h-4 w-4 text-dusty-rose" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-dusty-rose">Community & support groups</span>
+                </div>
+                <div className="space-y-2">
+                  <ParentResource
+                    href="https://www.nami.org/Support-Education/Support-Groups/NAMI-Family-Support-Group"
+                    title="NAMI Family Support Group"
+                    description="Free peer-led groups for family members and caregivers of people living with mental illness."
+                    tag="Free"
+                    tagColor="bg-sage/20 text-sage"
+                  />
+                  <ParentResource
+                    href="https://www.mhanational.org/find-support"
+                    title="Mental Health America — Find Support"
+                    description="Locate local mental health resources, support groups, and services near you."
+                  />
+                  <ParentResource
+                    href="https://www.samhsa.gov/find-help/national-helpline"
+                    title="SAMHSA National Helpline"
+                    description="Call 1-800-662-4357. Free, confidential referrals to local treatment facilities and support groups."
+                    tag="Free · 24/7"
+                    tagColor="bg-sage/20 text-sage"
+                  />
+                </div>
               </div>
             </div>
           </div>
