@@ -83,7 +83,10 @@ export default function ProjectWorkspace() {
     onError: (err) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
   });
 
-  const canEdit = user?.role === 'teacher' || project?.assignedStudentId === user?.id;
+  const canEdit =
+    user?.role === 'teacher' ||
+    project?.assignedStudentId === user?.id ||
+    (user?.jobId != null && project?.jobId === user?.jobId);
   const nextStatus = project ? NEXT_STATUS[project.status] : undefined;
 
   if (authLoading || isLoading || !project) {
