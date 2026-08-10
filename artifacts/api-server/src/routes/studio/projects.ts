@@ -88,10 +88,10 @@ const WORKFLOW_TRANSITIONS: Record<string, string[]> = {
   'Archived':                  [],
 };
 
-// GET /api/studio/projects — student's own projects
+// GET /api/studio/projects — student's own projects (teachers use /api/teacher/projects)
 router.get(
   '/studio/projects',
-  requireStudioRole('student', 'teacher'),
+  requireStudioRole('student'),
   async (req: Request, res: Response) => {
     const { status } = req.query as { status?: string };
 

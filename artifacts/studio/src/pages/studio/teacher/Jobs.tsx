@@ -24,6 +24,7 @@ function JobForm({
   password, setPassword,
   confirmPassword, setConfirmPassword,
   isEdit,
+  hasPassword,
 }: {
   title: string; setTitle: (v: string) => void;
   description: string; setDescription: (v: string) => void;
@@ -31,8 +32,10 @@ function JobForm({
   password: string; setPassword: (v: string) => void;
   confirmPassword: string; setConfirmPassword: (v: string) => void;
   isEdit: boolean;
+  hasPassword?: boolean;
 }) {
   const passwordMismatch = password && confirmPassword && password !== confirmPassword;
+  const passwordAlreadySet = isEdit && hasPassword && !password;
 
   return (
     <div className="space-y-3">
@@ -77,14 +80,23 @@ function JobForm({
 
         <div className="space-y-1.5">
           <Label className="text-xs text-[#453329]">
-            {isEdit ? 'New password (leave blank to keep current)' : 'Password'}
+            {isEdit ? 'Password' : 'Password'}
           </Label>
+
+          {/* Show a "password is set" banner when editing a job that already has one */}
+          {passwordAlreadySet && (
+            <div className="flex items-center gap-2 bg-[#eee6d8] border border-[#d5cabe] rounded-lg px-3 py-2">
+              <CheckCircle2 className="h-4 w-4 text-[#688a52] flex-shrink-0" />
+              <span className="text-xs text-[#453329]">Password is set — type a new one below to change it, or leave blank to keep it.</span>
+            </div>
+          )}
+
           <Input
             type="text"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="bg-white border-[#d5cabe] font-mono"
-            placeholder={isEdit ? 'Leave blank to keep current' : 'e.g. mindmatters2025'}
+            placeholder={isEdit ? (hasPassword ? 'Type new password to change' : 'Set a password') : 'e.g. mindmatters2025'}
             autoComplete="new-password"
           />
         </div>
@@ -195,6 +207,7 @@ export default function Jobs() {
 
   const jobs: Job[] = data?.jobs ?? [];
   const formProps = { title, setTitle, description, setDescription, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword };
+  const editHasPassword = editJob?.hasPassword ?? false;
 
   return (
     <StudioLayout>
@@ -275,7 +288,7 @@ export default function Jobs() {
           <DialogHeader>
             <DialogTitle className="font-serif text-[#453329]">New Job</DialogTitle>
           </DialogHeader>
-          <JobForm {...formProps} isEdit={false} />
+          <JobForm {...formProps} isEdit={false} hasPassword={false} />
           <Button
             className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
             onClick={() => create()}
@@ -292,7 +305,7 @@ export default function Jobs() {
           <DialogHeader>
             <DialogTitle className="font-serif text-[#453329]">Edit Job</DialogTitle>
           </DialogHeader>
-          <JobForm {...formProps} isEdit={true} />
+          <JobForm {...formProps} isEdit={true} hasPassword={editHasPassword} />
           <Button
             className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
             onClick={() => update()}
