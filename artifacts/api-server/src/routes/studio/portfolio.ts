@@ -101,15 +101,14 @@ router.post(
       return;
     }
 
+    const projectOwnership = req.studioUser!.jobId != null
+      ? eq(studioProjectsTable.jobId, req.studioUser!.jobId)
+      : eq(studioProjectsTable.assignedStudentId, req.studioUser!.id);
+
     const [project] = await db
       .select()
       .from(studioProjectsTable)
-      .where(
-        and(
-          eq(studioProjectsTable.id, projectId),
-          eq(studioProjectsTable.assignedStudentId, req.studioUser!.id),
-        ),
-      );
+      .where(and(eq(studioProjectsTable.id, projectId), projectOwnership));
 
     if (!project) {
       res.status(404).json({ error: 'Project not found or access denied' });
