@@ -58,7 +58,11 @@ export default function AllProjects() {
   if (isLoading || !user) return null;
 
   const all = data?.projects ?? [];
-  const filtered = statusFilter ? all.filter((p) => p.status === statusFilter) : all;
+  // Archived projects remain available through the explicit Archived filter,
+  // but should not stay in the normal active project list after deletion.
+  const filtered = statusFilter
+    ? all.filter((p) => p.status === statusFilter)
+    : all.filter((p) => p.status !== 'Archived');
 
   return (
     <StudioLayout>
