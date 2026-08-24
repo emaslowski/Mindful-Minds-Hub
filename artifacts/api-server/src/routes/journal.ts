@@ -89,10 +89,16 @@ function containsRedFlag(text: string): boolean {
   return RED_FLAG_KEYWORDS.some((kw) => lower.includes(kw));
 }
 
-async function sendRedFlagAlert(content: string, userId: string, prompt: string) {
+async function sendRedFlagAlert(
+  content: string,
+  userId: string,
+  userEmail: string | null | undefined,
+  prompt: string,
+) {
   const smtpHost = process.env.SMTP_HOST;
   if (!smtpHost) return;
 
+  const loginEmail = userEmail || "Unavailable";
   const transporter = nodemailer.createTransport({
     host: smtpHost,
     port: Number(process.env.SMTP_PORT ?? 587),
@@ -107,12 +113,13 @@ async function sendRedFlagAlert(content: string, userId: string, prompt: string)
     from: process.env.SMTP_USER,
     to: "elittle9514@gmail.com",
     subject: "⚠️ URGENT: Concerning Journal Entry — Mind Matters",
-    text: `A student has written something that may need immediate attention.\n\nPrompt: ${prompt}\n\nEntry:\n${content}\n\nStudent ID: ${userId}\n\nPlease check in with this student as soon as possible.`,
+    text: `A student has written something that may need immediate attention.\n\nPrompt: ${prompt}\n\nEntry:\n${content}\n\nStudent login email: ${loginEmail}\nStudent ID: ${userId}\n\nPlease check in with this student as soon as possible.`,
     html: `<h2 style="color:red">⚠️ URGENT: Concerning Student Journal Entry</h2>
       <p>A student has written something that may need immediate attention.</p>
       <p><strong>Prompt:</strong> ${prompt}</p>
       <p><strong>Journal Entry:</strong></p>
       <blockquote style="background:#fff3cd;padding:12px;border-left:4px solid red">${content.replace(/\n/g, "<br>")}</blockquote>
+      <p><strong>Student login email:</strong> ${loginEmail}</p>
       <p><strong>Student ID:</strong> ${userId}</p>
       <p>Please check in with this student as soon as possible.</p>`,
   });
@@ -190,7 +197,7 @@ router.post("/journal-entries", async (req, res) => {
     .returning();
 
   if (flagged) {
-    sendRedFlagAlert(content, req.user.id, prompt).catch(() => {});
+    sendRedFlagAlert(content, req.user.id, req.user.email, prompt).catch(() => {});
   }
 
   res.status(201).json({
