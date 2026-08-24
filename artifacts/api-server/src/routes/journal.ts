@@ -1,6 +1,7 @@
-import { Router } from "express";
+import { Router, type Request, type Response } from "express";
 import { db } from "@workspace/db";
 import {
+  anonymousAccessAccountsTable,
   journalEntriesTable,
   gratitudeEntriesTable,
 } from "@workspace/db/schema";
@@ -173,14 +174,16 @@ export function containsRedFlag(text: string): boolean {
 
 async function sendRedFlagAlert(
   content: string,
-  userId: string,
-  userEmail: string | null | undefined,
   prompt: string,
+  studentIdentity: string,
 ) {
-  const smtpHost = process.env.SMTP_HOST;
-  if (!smtpHost) return;
+  const smtpHost = process.env.SMTP_HOST ?? "smtp.gmail.com";
+  const teacherEmails = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+  if (teacherEmails.length === 0) return;
 
-  const loginEmail = userEmail || "Unavailable";
   const transporter = nodemailer.createTransport({
     host: smtpHost,
     port: Number(process.env.SMTP_PORT ?? 587),
@@ -193,18 +196,51 @@ async function sendRedFlagAlert(
 
   await transporter.sendMail({
     from: process.env.SMTP_USER,
-    to: "elittle9514@gmail.com",
+    to: teacherEmails.join(", "),
     subject: "⚠️ URGENT: Concerning Journal Entry — Mind Matters",
-    text: `A student has written something that may need immediate attention.\n\nPrompt: ${prompt}\n\nEntry:\n${content}\n\nStudent login email: ${loginEmail}\nStudent ID: ${userId}\n\nPlease check in with this student as soon as possible.`,
+    text: `A student has written something that may need immediate attention.\n\nPrompt: ${prompt}\n\nEntry:\n${content}\n\nStudent identity: ${studentIdentity}\n\nPlease check in with this student as soon as possible.`,
     html: `<h2 style="color:red">⚠️ URGENT: Concerning Student Journal Entry</h2>
       <p>A student has written something that may need immediate attention.</p>
       <p><strong>Prompt:</strong> ${prompt}</p>
       <p><strong>Journal Entry:</strong></p>
       <blockquote style="background:#fff3cd;padding:12px;border-left:4px solid red">${content.replace(/\n/g, "<br>")}</blockquote>
-      <p><strong>Student login email:</strong> ${loginEmail}</p>
-      <p><strong>Student ID:</strong> ${userId}</p>
+      <p><strong>Student identity:</strong> ${studentIdentity}</p>
       <p>Please check in with this student as soon as possible.</p>`,
   });
+}
+
+async function getWellnessUser(
+  req: Request,
+  res: Response,
+): Promise<{ userId: string; identity: string } | null> {
+  const wellnessUser = req.anonymousUser ?? req.user;
+  if (!wellnessUser) {
+    res.status(401).json({ error: "Unauthorized" });
+    return null;
+  }
+
+  const [anonymousAccount] = await db
+    .select({
+      accessCode: anonymousAccessAccountsTable.accessCode,
+      status: anonymousAccessAccountsTable.status,
+    })
+    .from(anonymousAccessAccountsTable)
+    .where(eq(anonymousAccessAccountsTable.userId, wellnessUser.id))
+    .limit(1);
+
+  if (anonymousAccount?.status === "disabled") {
+    res.status(403).json({ error: "This access code is currently disabled. Please ask your teacher for help." });
+    return null;
+  }
+
+  return {
+    userId: wellnessUser.id,
+    identity: anonymousAccount
+      ? `Anonymous access code: ${anonymousAccount.accessCode}`
+      : wellnessUser.email
+        ? `Student login email: ${wellnessUser.email}`
+        : `Student ID: ${wellnessUser.id}`,
+  };
 }
 
 /** Returns true if the journal is currently open (7 AM – 9 PM America/New_York). */
@@ -230,14 +266,12 @@ router.get("/today-prompt", (_req, res) => {
 
 // GET /api/journal-entries
 router.get("/journal-entries", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  const wellnessUser = await getWellnessUser(req, res);
+  if (!wellnessUser) return;
   const entries = await db
     .select()
     .from(journalEntriesTable)
-    .where(eq(journalEntriesTable.userId, req.user.id))
+    .where(eq(journalEntriesTable.userId, wellnessUser.userId))
     .orderBy(journalEntriesTable.createdAt);
   res.json(
     entries.map((e) => ({
@@ -252,10 +286,8 @@ router.get("/journal-entries", async (req, res) => {
 
 // POST /api/journal-entries
 router.post("/journal-entries", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  const wellnessUser = await getWellnessUser(req, res);
+  if (!wellnessUser) return;
   if (!isJournalOpen()) {
     res.status(403).json({ error: "The journal is closed. It is available 7:00 AM – 9:00 PM Eastern Time." });
     return;
@@ -271,7 +303,7 @@ router.post("/journal-entries", async (req, res) => {
   const [entry] = await db
     .insert(journalEntriesTable)
     .values({
-      userId: req.user.id,
+      userId: wellnessUser.userId,
       prompt,
       content: content.trim(),
       flagged,
@@ -279,7 +311,7 @@ router.post("/journal-entries", async (req, res) => {
     .returning();
 
   if (flagged) {
-    sendRedFlagAlert(content, req.user.id, req.user.email, prompt).catch(() => {});
+    sendRedFlagAlert(content, prompt, wellnessUser.identity).catch(() => {});
   }
 
   res.status(201).json({
@@ -293,14 +325,12 @@ router.post("/journal-entries", async (req, res) => {
 
 // GET /api/gratitude-entries
 router.get("/gratitude-entries", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  const wellnessUser = await getWellnessUser(req, res);
+  if (!wellnessUser) return;
   const entries = await db
     .select()
     .from(gratitudeEntriesTable)
-    .where(eq(gratitudeEntriesTable.userId, req.user.id))
+    .where(eq(gratitudeEntriesTable.userId, wellnessUser.userId))
     .orderBy(gratitudeEntriesTable.createdAt);
   res.json(
     entries.map((e) => ({
@@ -314,10 +344,8 @@ router.get("/gratitude-entries", async (req, res) => {
 
 // POST /api/gratitude-entries
 router.post("/gratitude-entries", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  const wellnessUser = await getWellnessUser(req, res);
+  if (!wellnessUser) return;
   const { content } = req.body;
   if (!content || content.trim().length === 0) {
     res.status(400).json({ error: "Content is required" });
@@ -328,7 +356,7 @@ router.post("/gratitude-entries", async (req, res) => {
   const [entry] = await db
     .insert(gratitudeEntriesTable)
     .values({
-      userId: req.user.id,
+      userId: wellnessUser.userId,
       content: content.trim(),
       entryDate,
     })

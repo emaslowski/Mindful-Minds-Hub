@@ -35,6 +35,7 @@ import Review from '@/pages/Review';
 import Contact from '@/pages/Contact';
 import ListenPodcast from '@/pages/ListenPodcast';
 import ListenMeditations from '@/pages/ListenMeditations';
+import AnonymousAccess from '@/pages/AnonymousAccess';
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ function PublicRouter() {
         <Route path="/resources" component={Resources} />
         <Route path="/events" component={Events} />
         <Route path="/contact" component={Contact} />
+        <Route path="/anonymous-access" component={AnonymousAccess} />
 
         {/* Check-in */}
         <Route path="/checkin" component={CheckIn} />

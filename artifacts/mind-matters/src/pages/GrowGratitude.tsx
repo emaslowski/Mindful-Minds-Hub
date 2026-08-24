@@ -19,7 +19,7 @@ function BackButton() {
 }
 
 export default function GrowGratitude() {
-  const { isAuthenticated, login, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { data: entries, refetch: refetchEntries } = useGetGratitudeEntries({ query: { enabled: isAuthenticated } });
   const { mutate: createEntry, isPending } = useCreateGratitudeEntry();
   
@@ -57,12 +57,11 @@ export default function GrowGratitude() {
           <p className="text-xl font-sans text-foreground/70 mb-10 max-w-lg leading-relaxed">
             Keep track of the good things. Log in to start building your personal gratitude collection.
           </p>
-          <button 
-            onClick={login}
-            className="bg-sage hover:bg-sage/90 text-white px-10 py-4 rounded-full font-sans font-bold text-xl tracking-wide transition-all shadow-md hover:-translate-y-1 hover:shadow-lg"
-          >
-            Log In
-          </button>
+          <Link href="/anonymous-access?returnTo=/grow/gratitude">
+            <span className="inline-flex bg-sage hover:bg-sage/90 text-white px-10 py-4 rounded-full font-sans font-bold text-xl tracking-wide transition-all shadow-md hover:-translate-y-1 hover:shadow-lg">
+              Open Your Gratitude Journal
+            </span>
+          </Link>
           </div>
         </div>
         <WaveFooter quote="Gratitude turns what we have into enough." />

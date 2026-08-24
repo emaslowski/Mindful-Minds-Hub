@@ -37,7 +37,7 @@ function BackButton() {
 
 export default function GrowJournal() {
   const journalOpen = isJournalOpen();
-  const { isAuthenticated, login, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   
   const { data: promptData } = useGetTodayPrompt({ query: { enabled: isAuthenticated && journalOpen } });
   const { data: entries, refetch: refetchEntries } = useGetJournalEntries({ query: { enabled: isAuthenticated && journalOpen } });
@@ -104,12 +104,11 @@ export default function GrowJournal() {
           <p className="text-xl font-sans text-foreground/70 mb-10 max-w-lg leading-relaxed">
             The journal is a safe, private place just for you. Log in to write, reflect, and save your entries.
           </p>
-          <button 
-            onClick={login}
-            className="bg-sage hover:bg-sage/90 text-white px-10 py-4 rounded-full font-sans font-bold text-xl tracking-wide transition-all shadow-md hover:-translate-y-1 hover:shadow-lg"
-          >
-            Log In to Journal
-          </button>
+          <Link href="/anonymous-access?returnTo=/grow/journal">
+            <span className="inline-flex bg-sage hover:bg-sage/90 text-white px-10 py-4 rounded-full font-sans font-bold text-xl tracking-wide transition-all shadow-md hover:-translate-y-1 hover:shadow-lg">
+              Open Your Private Journal
+            </span>
+          </Link>
           </div>
         </div>
         <WaveFooter quote="Write it out. Let it go. Grow from it." />

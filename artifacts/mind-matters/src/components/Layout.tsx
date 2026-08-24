@@ -5,7 +5,7 @@ import { LogIn, LogOut, User, CheckCircle, Star } from "lucide-react";
 
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  const { user, isAuthenticated, login, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const links = [
     { href: "/", label: "Home" },
@@ -133,9 +133,9 @@ export function Layout({ children }: { children: ReactNode }) {
               </div>
             ) : (
               <div className="flex items-center gap-3 ml-2 border-l-2 border-border/50 pl-4">
-                <button onClick={login} className="text-sage hover:text-sage/80 font-sans text-sm font-bold flex items-center gap-1 transition-colors">
+                <Link href="/anonymous-access" className="text-sage hover:text-sage/80 font-sans text-sm font-bold flex items-center gap-1 transition-colors">
                   <LogIn size={14} /> Log in
-                </button>
+                </Link>
               </div>
             )}
           </div>

@@ -24,9 +24,12 @@ import { eq } from 'drizzle-orm';
 
 import {
   clearSession,
+  clearAnonymousSession,
   createSession,
   deleteSession,
+  getSession,
   getGoogleOidcConfig,
+  getAnonymousSessionId,
   getOidcConfig,
   getSessionId,
   ISSUER_URL,
@@ -184,7 +187,7 @@ async function determineRoleAndLinkProfile(
 router.get('/auth/user', (req: Request, res: Response) => {
   res.json(
     GetCurrentAuthUserResponse.parse({
-      user: req.isAuthenticated() ? req.user : null,
+      user: req.user ?? req.anonymousUser ?? null,
     }),
   );
 });
@@ -411,14 +414,37 @@ router.get('/callback', async (req: Request, res: Response) => {
 });
 
 router.get('/logout', async (req: Request, res: Response) => {
-  const config = await getOidcConfig();
-  const origin = getOrigin(req);
   const returnTo = getSafeReturnTo(req.query.returnTo);
-  const postLogoutRedirectUrl = new URL(returnTo, `${origin}/`).href;
-
   const sid = getSessionId(req);
+
+  // The primary session owns the app-wide logout action. Anonymous wellness
+  // access has its own endpoint and must not prevent an OAuth user from
+  // logging out when both sessions exist.
+  if (!sid) {
+    const anonymousSid = getAnonymousSessionId(req);
+    if (anonymousSid) {
+      await clearAnonymousSession(res, anonymousSid);
+    }
+    res.redirect(returnTo);
+    return;
+  }
+
+  const anonymousSid = getAnonymousSessionId(req);
+  if (anonymousSid) await clearAnonymousSession(res, anonymousSid);
+
+  const session = sid ? await getSession(sid) : null;
   await clearSession(res, sid);
 
+  // A legacy anonymous session stored in the primary cookie should still use
+  // the local return flow rather than invoking OIDC logout.
+  if (session?.provider === 'anonymous') {
+    res.redirect(returnTo);
+    return;
+  }
+
+  const config = await getOidcConfig();
+  const origin = getOrigin(req);
+  const postLogoutRedirectUrl = new URL(returnTo, `${origin}/`).href;
   const endSessionUrl = oidc.buildEndSessionUrl(config, {
     client_id: process.env.REPL_ID!,
     post_logout_redirect_uri: postLogoutRedirectUrl,

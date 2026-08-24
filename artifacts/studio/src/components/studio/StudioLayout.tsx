@@ -4,7 +4,7 @@ import { useStudioUser, useStudioLogout } from '@/hooks/useStudioAuth';
 import {
   LayoutDashboard, FolderOpen, Users, Star, Send, BookOpen,
   LogOut, Globe, ClipboardCheck, BarChart3, RefreshCw,
-  Briefcase, CalendarDays, ChevronRight, Settings,
+  Briefcase, CalendarDays, ChevronRight, Settings, KeyRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -32,6 +32,7 @@ const TEACHER_NAV: NavItem[] = [
   { href: '/studio/teacher/handoffs', label: 'Handoffs', icon: <RefreshCw className="h-4 w-4" /> },
   { href: '/studio/teacher/analytics', label: 'Impact & Analytics', icon: <BarChart3 className="h-4 w-4" /> },
   { href: '/studio/teacher/settings', label: 'Settings', icon: <Settings className="h-4 w-4" /> },
+  { href: '/studio/teacher/anonymous-access', label: 'Anonymous Access', icon: <KeyRound className="h-4 w-4" /> },
 ];
 
 export function StudioLayout({ children }: { children: React.ReactNode }) {

@@ -27,6 +27,7 @@ import Cycles from '@/pages/studio/teacher/Cycles';
 import Handoffs from '@/pages/studio/teacher/Handoffs';
 import Analytics from '@/pages/studio/teacher/Analytics';
 import Settings from '@/pages/studio/teacher/Settings';
+import AnonymousAccess from '@/pages/studio/teacher/AnonymousAccess';
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ function StudioRouter() {
       <Route path="/studio/teacher/handoffs" component={Handoffs} />
       <Route path="/studio/teacher/analytics" component={Analytics} />
       <Route path="/studio/teacher/settings" component={Settings} />
+      <Route path="/studio/teacher/anonymous-access" component={AnonymousAccess} />
       <Route path="/studio/teacher" component={CommandCenter} />
 
       {/* Catch-all: any unmatched /studio/* goes to login */}

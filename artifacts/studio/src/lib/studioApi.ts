@@ -228,6 +228,29 @@ export const teacherSettings = {
     }),
 };
 
+// ── Teacher: Anonymous wellness access ──────────────────────────────────────
+export const teacherAnonymousAccess = {
+  list: () =>
+    studioFetch<{ requests: AnonymousAccessRequest[]; accounts: AnonymousAccessAccount[] }>(
+      '/teacher/anonymous-access',
+    ),
+  approve: (requestId: number, data: { accessCode: string; password: string }) =>
+    studioFetch<{ account: Pick<AnonymousAccessAccount, 'id' | 'accessCode' | 'status'> }>(
+      `/teacher/anonymous-access/requests/${requestId}/approve`,
+      { method: 'POST', body: JSON.stringify(data) },
+    ),
+  resetPassword: (accountId: number, password: string) =>
+    studioFetch<{ account: Pick<AnonymousAccessAccount, 'id' | 'accessCode'> }>(
+      `/teacher/anonymous-access/accounts/${accountId}/reset-password`,
+      { method: 'POST', body: JSON.stringify({ password }) },
+    ),
+  updateStatus: (accountId: number, status: 'active' | 'disabled') =>
+    studioFetch<{ account: Pick<AnonymousAccessAccount, 'id' | 'accessCode' | 'status'> }>(
+      `/teacher/anonymous-access/accounts/${accountId}`,
+      { method: 'PATCH', body: JSON.stringify({ status }) },
+    ),
+};
+
 // ── Shared (student + teacher) ─────────────────────────────────────────────
 export const studioShared = {
   teams: () => studioFetch<{ teams: Team[] }>('/studio/teams'),
@@ -428,6 +451,23 @@ export interface AnalyticsData {
   statusBreakdown: Array<{ status: string; count: number }>;
   pubByType: Array<{ contentType: string; count: number }>;
   impactSettings: Array<{ id: number; settingKey: string; isVisible: boolean }>;
+}
+
+export interface AnonymousAccessRequest {
+  id: number;
+  requestCode: string;
+  status: 'pending' | 'approved' | 'cancelled';
+  createdAt: string;
+  approvedAt?: string | null;
+}
+
+export interface AnonymousAccessAccount {
+  id: number;
+  requestCode: string;
+  accessCode: string;
+  status: 'active' | 'disabled';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const CONTENT_TYPES = [

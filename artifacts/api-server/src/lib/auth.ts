@@ -8,11 +8,12 @@ import * as client from 'openid-client';
 export const ISSUER_URL = process.env.ISSUER_URL ?? 'https://replit.com/oidc';
 export const GOOGLE_ISSUER_URL = 'https://accounts.google.com';
 export const SESSION_COOKIE = 'sid';
+export const ANONYMOUS_SESSION_COOKIE = 'anonymous_sid';
 export const SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
 
 export interface SessionData {
   user: AuthUser;
-  provider: 'replit' | 'google';
+  provider: 'replit' | 'google' | 'anonymous';
   access_token: string;
   refresh_token?: string;
   expires_at?: number;
@@ -88,10 +89,29 @@ export async function clearSession(res: Response, sid?: string): Promise<void> {
   res.clearCookie(SESSION_COOKIE, { path: '/' });
 }
 
+export async function clearAnonymousSession(res: Response, sid?: string): Promise<void> {
+  if (sid) await deleteSession(sid);
+  res.clearCookie(ANONYMOUS_SESSION_COOKIE, { path: '/' });
+}
+
 export function getSessionId(req: Request): string | undefined {
   const authHeader = req.headers['authorization'];
   if (authHeader?.startsWith('Bearer ')) {
     return authHeader.slice(7);
   }
   return req.cookies?.[SESSION_COOKIE];
+}
+
+export function getAnonymousSessionId(req: Request): string | undefined {
+  return req.cookies?.[ANONYMOUS_SESSION_COOKIE];
+}
+
+export function setAnonymousSessionCookie(res: Response, sid: string): void {
+  res.cookie(ANONYMOUS_SESSION_COOKIE, sid, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: SESSION_TTL,
+  });
 }

@@ -1,9 +1,15 @@
 import type { AuthUser } from '@workspace/api-zod';
+import { db } from '@workspace/db';
+import { anonymousAccessAccountsTable } from '@workspace/db/schema';
+import { eq } from 'drizzle-orm';
 import { type NextFunction, type Request, type Response } from 'express';
 import * as oidc from 'openid-client';
 
 import {
   clearSession,
+  clearAnonymousSession,
+  deleteSession,
+  getAnonymousSessionId,
   getOidcConfig,
   getSession,
   getSessionId,
@@ -19,6 +25,8 @@ declare global {
       isAuthenticated(): this is AuthedRequest;
 
       user?: User | undefined;
+      anonymousUser?: User | undefined;
+      authProvider?: SessionData['provider'];
     }
 
     export interface AuthedRequest {
@@ -33,7 +41,7 @@ async function refreshIfExpired(
 ): Promise<SessionData | null> {
   // Google sessions do not use Replit's token refresh — the session itself
   // is the source of truth (7-day TTL). Skip refresh for Google provider.
-  if (session.provider === 'google') return session;
+  if (session.provider === 'google' || session.provider === 'anonymous') return session;
 
   const now = Math.floor(Date.now() / 1000);
   if (!session.expires_at || now <= session.expires_at) return session;
@@ -64,6 +72,29 @@ export async function authMiddleware(
     return this.user != null;
   } as Request['isAuthenticated'];
 
+  // Anonymous wellness access uses a dedicated identity so it never replaces
+  // Replit/Google authentication. Wellness routes opt into anonymousUser;
+  // generic and Studio routes continue to use the primary user session.
+  const anonymousSid = getAnonymousSessionId(req);
+  if (anonymousSid) {
+    const session = await getSession(anonymousSid);
+    if (session?.provider === 'anonymous' && session.user?.id) {
+      const [account] = await db
+        .select({ status: anonymousAccessAccountsTable.status })
+        .from(anonymousAccessAccountsTable)
+        .where(eq(anonymousAccessAccountsTable.userId, session.user.id))
+        .limit(1);
+
+      if (account?.status === 'active') {
+        req.anonymousUser = session.user;
+      }
+
+      if (account?.status !== 'active') await deleteSession(anonymousSid);
+    }
+
+    if (!req.anonymousUser) await clearAnonymousSession(res);
+  }
+
   const sid = getSessionId(req);
   if (!sid) {
     next();
@@ -85,5 +116,6 @@ export async function authMiddleware(
   }
 
   req.user = refreshed.user;
+  req.authProvider = refreshed.provider;
   next();
 }
