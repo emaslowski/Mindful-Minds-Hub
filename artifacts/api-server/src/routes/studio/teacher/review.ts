@@ -15,6 +15,31 @@ import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
 
 const router = Router();
 
+/**
+ * The current Studio sessions identify the password-based admin with a string,
+ * while older Studio databases require a numeric studio_accounts ID for
+ * teacher_review records. Resolve that legacy ID when it is available.
+ */
+async function getTeacherReviewAuthorId(sessionUserId: string): Promise<string> {
+  if (/^\d+$/.test(sessionUserId)) return sessionUserId;
+
+  try {
+    const result = await db.execute<{ id: number }>(
+      sql`SELECT id FROM studio_accounts
+          WHERE role = 'teacher' AND account_status = 'active'
+          ORDER BY id
+          LIMIT 1`,
+    );
+    const legacyTeacherId = result.rows[0]?.id;
+    if (legacyTeacherId != null) return String(legacyTeacherId);
+  } catch {
+    // Newer databases do not have the legacy studio_accounts table. In that
+    // case, the current session user ID is the correct review author ID.
+  }
+
+  return sessionUserId;
+}
+
 // GET /api/teacher/projects — all projects with full detail for teacher
 router.get('/teacher/projects', requireStudioRole('teacher'), async (req: Request, res: Response) => {
   const { status } = req.query as { status?: string };
@@ -178,10 +203,12 @@ router.post(
 
     if (!project) { res.status(404).json({ error: 'Project not found' }); return; }
 
-    // Record the teacher review (teacherId is the Google user ID string)
+    const teacherId = await getTeacherReviewAuthorId(req.studioUser!.id);
+
+    // Record the teacher review.
     await db.insert(studioTeacherReviewsTable).values({
       projectId: id,
-      teacherId: req.studioUser!.id,
+      teacherId,
       decision: decision as 'approve' | 'approve_and_publish' | 'return_for_revision' | 'save_for_later' | 'archive',
       feedback: feedback ?? null,
     });

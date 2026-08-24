@@ -441,6 +441,10 @@ const CONFIGS: Record<string, WorkspaceConfig> = {
   },
 };
 
+// Blog Writer is a named content option for the seeded Blog Writer group.
+// Keep the existing Blog article type intact for projects already using it.
+CONFIGS['Blog Writer'] = CONFIGS['Blog article'];
+
 // Fallback for any content type not in the map
 const FALLBACK_CONFIG: WorkspaceConfig = {
   jobGroup: 'All Groups',

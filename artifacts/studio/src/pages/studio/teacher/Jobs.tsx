@@ -250,7 +250,7 @@ export default function Jobs() {
                           <span className="text-xs text-red-400 italic">No login set</span>
                         )}
                         {job.hasPassword && (
-                          <CheckCircle2 className="h-3.5 w-3.5 text-[#688a52]" title="Password set" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#688a52]" aria-label="Password set" />
                         )}
                       </div>
                     </div>

@@ -428,6 +428,7 @@ export interface AnalyticsData {
 
 export const CONTENT_TYPES = [
   'Blog article',
+  'Blog Writer',
   'Coping strategy',
   'Wellness activity',
   'Podcast',

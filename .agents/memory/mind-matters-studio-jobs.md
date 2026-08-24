@@ -17,6 +17,16 @@ Job-group sessions set `id: "job-{N}"` (a string) in the session. The `studio_pr
 - Access checks: use `isProjectOwner(project, user)` helper in `projects.ts` which handles both job and individual sessions.
 - Sources access: same pattern in `sources.ts` via `canAccessProject()` helper.
 - Peer reviews: job sessions use `peerReviewerJobId` on the project; `reviewerId` stored as `String(jobId)`.
+- Teacher decisions from the password-based Command Center must resolve the active
+  legacy `studio_accounts` teacher ID before inserting a teacher review; the admin
+  session ID (`teacher-admin`) is not valid for the legacy integer FK.
+
+**Why:** the password-based admin session is intentionally synthetic, while older
+Studio databases still enforce `studio_teacher_reviews.teacher_id` against
+`studio_accounts.id`.
+
+**How to apply:** use the active teacher account as the review author when the
+session ID is not numeric; retain the session ID fallback for newer databases.
 
 ## Workflow Stages (job-group flow)
 
