@@ -128,8 +128,8 @@ export default function Resources() {
                     <HeartHandshake size={24} />
                   </div>
                   <div>
-                    <div className="font-sans font-bold text-lg text-foreground">NAMI</div>
-                    <div className="font-sans text-sm text-foreground/70">1-800-950-NAMI</div>
+                    <div className="font-sans font-bold text-lg text-foreground">NAMI HelpLine</div>
+                    <div className="font-sans text-sm text-foreground/70">Support, information, and local referrals · 1-800-950-NAMI</div>
                   </div>
                 </a>
                 
@@ -143,13 +143,13 @@ export default function Resources() {
                   </div>
                 </a>
 
-                <a href="https://safe2helpil.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
+                <a href="https://www.dhses.ny.gov/see-something-say-something" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
                   <div className="bg-foreground/80 text-white p-3 rounded-full group-hover:scale-110 transition-transform">
                     <ShieldAlert size={24} />
                   </div>
                   <div>
-                    <div className="font-sans font-bold text-lg text-foreground">Safe2Help Illinois</div>
-                    <div className="font-sans text-sm text-foreground/70">Anonymous tip line — call, text, or chat</div>
+                    <div className="font-sans font-bold text-lg text-foreground">New York State SafeNYS</div>
+                    <div className="font-sans text-sm text-foreground/70">Report suspicious activity — call 1-866-SAFENYS</div>
                   </div>
                 </a>
               </div>
@@ -205,7 +205,7 @@ export default function Resources() {
                   <ParentResource
                     href="https://www.nami.org/Support-Education/Family-Members-and-Caregivers"
                     title="NAMI — Family Members & Caregivers"
-                    description="NAMI's hub for parents: how to have the conversation, what to watch for, and where to turn."
+                    description="NAMI (National Alliance on Mental Illness) offers education, support, and local resources for families affected by mental illness."
                   />
                   <ParentResource
                     href="https://www.cdc.gov/childrensmentalhealth/parent-resources.html"
