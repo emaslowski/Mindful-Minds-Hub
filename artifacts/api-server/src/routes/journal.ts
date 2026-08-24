@@ -20,7 +20,8 @@ const DAILY_PROMPTS = [
   "What are three things you want to accomplish this week?",
 ];
 
-// Red-flag keywords for concerning content
+// Red-flag phrases for concerning content. These are intentionally broad:
+// concerning language should prompt a trusted-adult check-in, not a diagnosis.
 const RED_FLAG_KEYWORDS = [
   // Suicidal ideation
   "kill myself",
@@ -60,6 +61,22 @@ const RED_FLAG_KEYWORDS = [
   "burning myself",
   "hitting myself",
   "starving myself",
+  // Thoughts of harming other people
+  "hurt someone",
+  "hurt somebody",
+  "hurt other people",
+  "hurt others",
+  "harm someone",
+  "harm somebody",
+  "harm other people",
+  "harm others",
+  "kill someone",
+  "kill somebody",
+  "kill other people",
+  "kill others",
+  "want to hurt",
+  "want to harm",
+  "want to kill",
   // Abuse / unsafe situation
   "being abused",
   "someone hurts me",
@@ -82,11 +99,76 @@ const RED_FLAG_KEYWORDS = [
   "im so alone",
   "no one would miss me",
   "nobody would miss me",
+  // Self-deprecating language and isolation
+  "i have no friends",
+  "i don't have any friends",
+  "i dont have any friends",
+  "i don't have friends",
+  "i dont have friends",
+  "no friends",
+  "nobody likes me",
+  "no one likes me",
+  "i don't belong",
+  "i dont belong",
+  "i don't fit in",
+  "i dont fit in",
+  "i'm unlovable",
+  "im unlovable",
+  "i am unlovable",
+  "i'm useless",
+  "im useless",
+  "i am useless",
+  "i'm a failure",
+  "im a failure",
+  "i am a failure",
+  "i'm a loser",
+  "im a loser",
+  "i am a loser",
+  "i'm pathetic",
+  "im pathetic",
+  "i am pathetic",
+  "i'm stupid",
+  "im stupid",
+  "i am stupid",
+  "i'm dumb",
+  "im dumb",
+  "i am dumb",
+  "i'm ugly",
+  "im ugly",
+  "i am ugly",
+  "i'm disgusting",
+  "im disgusting",
+  "i am disgusting",
+  "i'm a bad person",
+  "im a bad person",
+  "i am a bad person",
+  "i'm broken",
+  "im broken",
+  "i am broken",
+  "i'm a disappointment",
+  "im a disappointment",
+  "i am a disappointment",
+  "i'm not good enough",
+  "im not good enough",
+  "i am not good enough",
+  "i can't do anything right",
+  "i cant do anything right",
+  "i can never do anything right",
+  "i ruin everything",
+  "i always ruin everything",
+  "i hate my life",
 ];
 
-function containsRedFlag(text: string): boolean {
-  const lower = text.toLowerCase();
-  return RED_FLAG_KEYWORDS.some((kw) => lower.includes(kw));
+const RED_FLAG_PATTERNS = [
+  /\b(?:i|i'm|im|i am|i feel like|i've been feeling like)\s+(?:a\s+|an\s+)?(?:so\s+|really\s+|very\s+|complete(?:ly)?\s+|totally\s+|such\s+a\s+|like\s+a\s+|like\s+an\s+)?(?:failure|loser|burden|disappointment|pathetic|worthless|useless|unlovable|nobody|nothing|bad person|bad at everything)\b/,
+  /\b(?:i|i'm|im|i am|i feel like)\s+(?:not|never)\s+(?:good enough|worth anything|going to be enough|going to matter)\b/,
+  /\b(?:i|i'm|im|i am|i feel)\s+(?:so\s+|really\s+|very\s+|completely\s+|totally\s+)?(?:alone|unwanted|unimportant|unworthy|hated|hateful)\b/,
+];
+
+export function containsRedFlag(text: string): boolean {
+  const lower = text.toLowerCase().replace(/[’]/g, "'");
+  return RED_FLAG_KEYWORDS.some((kw) => lower.includes(kw)) ||
+    RED_FLAG_PATTERNS.some((pattern) => pattern.test(lower));
 }
 
 async function sendRedFlagAlert(
