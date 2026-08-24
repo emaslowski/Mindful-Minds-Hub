@@ -9,15 +9,25 @@ import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
 
 const router = Router();
 
-/** Returns true when the requesting student can access the given project. */
-function canAccessProject(
+/** Returns true when the requesting session can read sources for a project. */
+function canReadProjectSources(
   project: { jobId?: number | null; assignedStudentId?: string | null; peerReviewerId?: string | null; peerReviewerJobId?: number | null },
   user: { role: string; jobId?: number | null; id: string },
 ): boolean {
   if (user.role === 'teacher') return true;
   if (user.jobId != null && project.jobId === user.jobId) return true;
   if (user.jobId != null && project.peerReviewerJobId === user.jobId) return true;
-  return false;
+  return project.assignedStudentId === user.id || project.peerReviewerId === user.id;
+}
+
+/** Returns true when the requesting session owns a project and may change its sources. */
+function canManageProjectSources(
+  project: { jobId?: number | null; assignedStudentId?: string | null },
+  user: { role: string; jobId?: number | null; id: string },
+): boolean {
+  if (user.role === 'teacher') return true;
+  if (user.jobId != null) return project.jobId === user.jobId;
+  return project.assignedStudentId === user.id;
 }
 
 // GET /api/studio/projects/:id/sources
@@ -42,7 +52,7 @@ router.get(
       return;
     }
 
-    if (!canAccessProject(project, req.studioUser!)) {
+    if (!canReadProjectSources(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -90,7 +100,7 @@ router.post(
       return;
     }
 
-    if (!canAccessProject(project, req.studioUser!)) {
+    if (!canManageProjectSources(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -134,7 +144,7 @@ router.delete(
       return;
     }
 
-    if (!canAccessProject(project, req.studioUser!)) {
+    if (!canManageProjectSources(project, req.studioUser!)) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }

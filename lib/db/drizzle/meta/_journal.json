@@ -43,6 +43,27 @@
       "when": 1787611406553,
       "tag": "0005_anonymous-request-student-email",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787613785611,
+      "tag": "0006_studio-peer-reviewer-identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787614297045,
+      "tag": "0007_studio-project-reviewer-identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787614389479,
+      "tag": "0008_studio-project-contributor-identity",
+      "breakpoints": true
     }
   ]
 }

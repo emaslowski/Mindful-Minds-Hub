@@ -83,8 +83,9 @@ export const studioProfilesTable = pgTable('studio_profiles', {
 });
 
 // ── Projects ───────────────────────────────────────────────────────────────
-// assignedStudentId and peerReviewerId are varchar FKs to the Google-auth
-// usersTable (keeping the original column names for route backward compat).
+// assignedStudentId is a Google-auth user ID. Peer-review assignments may also
+// target identities migrated from legacy Studio accounts, so reviewer IDs are
+// stored as text without a user-table FK.
 
 export const studioProjectsTable = pgTable('studio_projects', {
   id: serial('id').primaryKey(),
@@ -97,7 +98,7 @@ export const studioProjectsTable = pgTable('studio_projects', {
   originalCycleId: integer('original_cycle_id').references(() => studioClassCyclesTable.id),
   currentCycleId: integer('current_cycle_id').references(() => studioClassCyclesTable.id),
   assignedStudentId: varchar('assigned_student_id').references(() => usersTable.id),
-  peerReviewerId: varchar('peer_reviewer_id').references(() => usersTable.id),
+  peerReviewerId: varchar('peer_reviewer_id'),
   teamId: integer('team_id').references(() => studioTeamsTable.id),
   // Job-group ownership: set when a job-group session creates the project (no FK so any string works)
   jobId: integer('job_id'),
@@ -116,8 +117,8 @@ export const studioProjectContributorsTable = pgTable(
     id: serial('id').primaryKey(),
     projectId: integer('project_id').notNull()
       .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
-    // keeping 'studentId' column name for route backward compat (varchar → usersTable)
-    studentId: varchar('student_id').notNull().references(() => usersTable.id),
+    // Keep legacy and current contributor identities as stable text values.
+    studentId: varchar('student_id').notNull(),
     contributionType: text('contribution_type').notNull(), // 'author' | 'editor' | 'peer_reviewer' | 'handoff'
     cycleId: integer('cycle_id').references(() => studioClassCyclesTable.id),
     createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -146,8 +147,9 @@ export const studioPeerReviewsTable = pgTable('studio_peer_reviews', {
   id: serial('id').primaryKey(),
   projectId: integer('project_id').notNull()
     .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
-  // keeping 'reviewerId' column name for route backward compat (varchar → usersTable)
-  reviewerId: varchar('reviewer_id').notNull().references(() => usersTable.id),
+  // A review can be authored by an individual user or a shared job-group session.
+  // Keep the stable session identity without a user-table FK so both are valid.
+  reviewerId: varchar('reviewer_id').notNull(),
   checklistInfoClear: boolean('checklist_info_clear'),
   checklistAgeAppropriate: boolean('checklist_age_appropriate'),
   checklistSourcesIncluded: boolean('checklist_sources_included'),

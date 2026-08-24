@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { studioProjects, studioShared, CONTENT_TYPES } from '@/lib/studioApi';
+import { studioProjects, studioPeerReviews, studioShared, CONTENT_TYPES } from '@/lib/studioApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,9 +36,19 @@ export default function StudentDashboard() {
     enabled: !!user,
   });
 
+  const { data: peerReviewData } = useQuery({
+    queryKey: ['studio-peer-review-queue'],
+    queryFn: studioPeerReviews.myQueue,
+    enabled: !!user,
+    refetchOnWindowFocus: true,
+    refetchInterval: 30_000,
+  });
+
   if (isLoading || !user) return <div className="flex items-center justify-center h-screen text-[#453329]">Loading…</div>;
 
   const projects = data?.projects ?? [];
+  const pendingReviewCount = (peerReviewData?.projects ?? []).filter((project) => project.status === 'Peer Review').length;
+  const isEditorGroup = user.jobId === 269;
 
   const countFor = (statuses: string[]) => projects.filter((p) => statuses.includes(p.status)).length;
 
@@ -67,10 +77,36 @@ export default function StudentDashboard() {
           </Dialog>
         }
       >
+        {pendingReviewCount > 0 && (
+          <Card className="bg-[#fff8e6] border-[#d4a44c] mb-6">
+            <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <ClipboardCheck className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-[#453329]">
+                    {pendingReviewCount} project{pendingReviewCount === 1 ? '' : 's'} need{pendingReviewCount === 1 ? 's' : ''} your peer review
+                  </p>
+                  <p className="text-sm text-[#688a52] mt-0.5">
+                    {isEditorGroup
+                      ? 'Projects from other job groups are waiting for the Editors & Designers team.'
+                      : 'Open your review inbox to see the projects assigned to you.'}
+                  </p>
+                </div>
+              </div>
+              <Link href="/studio/peer-reviews">
+                <Button className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full whitespace-nowrap">
+                  Open review inbox
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Status summary cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           {Object.entries(STATUS_GROUPS).map(([label, statuses]) => {
-            const count = countFor(statuses);
+            const isPeerReviewCard = label === 'Peer Reviews';
+            const count = isPeerReviewCard ? pendingReviewCount : countFor(statuses);
             const icons: Record<string, React.ReactNode> = {
               'My Assignments': <FolderOpen className="h-5 w-5 text-[#c4622d]" />,
               'Peer Reviews': <ClipboardCheck className="h-5 w-5 text-orange-500" />,
@@ -79,13 +115,20 @@ export default function StudentDashboard() {
               'Completed Projects': <CheckCircle className="h-5 w-5 text-emerald-500" />,
             };
             return (
-              <Link key={label} href={`/studio/projects?statuses=${encodeURIComponent(statuses.join(','))}`}>
+              <Link
+                key={label}
+                href={isPeerReviewCard
+                  ? '/studio/peer-reviews'
+                  : `/studio/projects?statuses=${encodeURIComponent(statuses.join(','))}`}
+              >
                 <Card className="bg-[#eee6d8] border-[#d5cabe] hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 flex items-center gap-3">
                     {icons[label]}
                     <div>
                       <p className="text-2xl font-bold text-[#453329]">{count}</p>
-                      <p className="text-xs text-[#688a52] font-medium">{label}</p>
+                      <p className="text-xs text-[#688a52] font-medium">
+                        {isPeerReviewCard && isEditorGroup ? 'Reviews to Complete' : label}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

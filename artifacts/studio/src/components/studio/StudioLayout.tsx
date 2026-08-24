@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useStudioUser, useStudioLogout } from '@/hooks/useStudioAuth';
+import { studioPeerReviews } from '@/lib/studioApi';
 import {
   LayoutDashboard, FolderOpen, Users, Star, Send, BookOpen,
   LogOut, Globe, ClipboardCheck, BarChart3, RefreshCw,
@@ -39,9 +41,17 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
   const { data: user } = useStudioUser();
   const { mutate: logout } = useStudioLogout();
   const [location] = useLocation();
+  const { data: peerReviewQueue } = useQuery({
+    queryKey: ['studio-peer-review-queue'],
+    queryFn: studioPeerReviews.myQueue,
+    enabled: user?.role === 'student',
+    refetchOnWindowFocus: true,
+    refetchInterval: user?.role === 'student' ? 30_000 : false,
+  });
 
   const nav = user?.role === 'teacher' ? TEACHER_NAV : STUDENT_NAV;
   const dashboardRoot = user?.role === 'teacher' ? '/studio/teacher' : '/studio';
+  const pendingReviewCount = peerReviewQueue?.projects.filter((project) => project.status === 'Peer Review').length ?? 0;
 
   return (
     <div className="flex h-screen bg-[#f5efe5] overflow-hidden">
@@ -103,7 +113,15 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
                   )}
                 >
                   {item.icon}
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {item.href === '/studio/peer-reviews' && pendingReviewCount > 0 && (
+                    <span
+                      aria-label={`${pendingReviewCount} peer reviews awaiting action`}
+                      className="min-w-5 h-5 px-1.5 rounded-full bg-[#d4a44c] text-[#453329] text-[11px] font-bold flex items-center justify-center"
+                    >
+                      {pendingReviewCount > 99 ? '99+' : pendingReviewCount}
+                    </span>
+                  )}
                 </span>
               </Link>
             );

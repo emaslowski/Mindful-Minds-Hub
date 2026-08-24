@@ -63,6 +63,7 @@ export default function PeerReviewPage() {
     onSuccess: () => {
       toast({ title: 'Review submitted!', description: 'Thank you for your peer review.' });
       queryClient.invalidateQueries({ queryKey: ['peer-review', pid] });
+      queryClient.invalidateQueries({ queryKey: ['studio-peer-review-queue'] });
       queryClient.invalidateQueries({ queryKey: ['studio-projects'] });
     },
     onError: (err) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),

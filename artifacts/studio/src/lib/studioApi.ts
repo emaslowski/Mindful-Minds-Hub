@@ -306,7 +306,7 @@ export interface StudioSource {
 export interface StudioPeerReview {
   id: number;
   projectId: number;
-  reviewerId: number;
+  reviewerId: string;
   checklistInfoClear?: boolean | null;
   checklistAgeAppropriate?: boolean | null;
   checklistSourcesIncluded?: boolean | null;

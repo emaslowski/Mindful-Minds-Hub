@@ -27,6 +27,15 @@ function isProjectOwner(
   return false;
 }
 
+/** True when the session is the project's assigned peer reviewer. Read-only project access uses this separately from ownership. */
+function isAssignedPeerReviewer(
+  project: { peerReviewerId?: string | null; peerReviewerJobId?: number | null },
+  user: { jobId?: number | null; id: string },
+): boolean {
+  return project.peerReviewerId === user.id ||
+    (user.jobId != null && project.peerReviewerJobId === user.jobId);
+}
+
 async function sendReadyForReviewEmail(
   projectTitle: string,
   studentDisplayName: string,
@@ -148,8 +157,14 @@ router.get(
       return;
     }
 
-    // Students can only view their own projects
-    if (req.studioUser!.role === 'student' && !isProjectOwner(project, req.studioUser!)) {
+    // Authors can manage their own projects. Assigned peer reviewers may read
+    // project details to complete their checklist, but remain unable to edit,
+    // delete, or transition the author's project.
+    if (
+      req.studioUser!.role === 'student' &&
+      !isProjectOwner(project, req.studioUser!) &&
+      !isAssignedPeerReviewer(project, req.studioUser!)
+    ) {
       res.status(403).json({ error: 'Access denied' });
       return;
     }
@@ -347,7 +362,10 @@ router.post(
         status: toStatus as typeof project.status,
         updatedAt: new Date(),
         // Auto-assign E&D as peer reviewer when entering Peer Review stage
-        ...(toStatus === 'Peer Review' && { peerReviewerJobId: EDITORS_DESIGNERS_JOB_ID }),
+        ...(toStatus === 'Peer Review' && {
+          peerReviewerId: null,
+          peerReviewerJobId: EDITORS_DESIGNERS_JOB_ID,
+        }),
       })
       .where(eq(studioProjectsTable.id, id))
       .returning();

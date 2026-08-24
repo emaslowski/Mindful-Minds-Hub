@@ -279,10 +279,27 @@ router.post(
       return;
     }
 
-    await db
-      .update(studioProjectsTable)
-      .set({ peerReviewerId: reviewerId, status: 'Peer Review', updatedAt: new Date() })
-      .where(eq(studioProjectsTable.id, id));
+    const [project] = await db.transaction(async (tx) => {
+      // Coordinate reassignment with peer-review submission so the reviewer
+      // identity and project status change together in a defined order.
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(${id})`);
+
+      return tx
+        .update(studioProjectsTable)
+        .set({
+          peerReviewerId: reviewerId,
+          peerReviewerJobId: null,
+          status: 'Peer Review',
+          updatedAt: new Date(),
+        })
+        .where(eq(studioProjectsTable.id, id))
+        .returning({ id: studioProjectsTable.id });
+    });
+
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
 
     res.json({ success: true });
   },
