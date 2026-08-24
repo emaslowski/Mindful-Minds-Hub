@@ -175,6 +175,8 @@ export const teacherReview = {
     studioFetch<TeacherProjectDetail>(`/teacher/projects/${id}`),
   decide: (id: number, data: DecisionData) =>
     studioFetch(`/teacher/projects/${id}/decision`, { method: 'POST', body: JSON.stringify(data) }),
+  delete: (id: number) =>
+    studioFetch<{ success: boolean }>(`/studio/projects/${id}`, { method: 'DELETE' }),
   assignReviewer: (id: number, reviewerId: number) =>
     studioFetch(`/teacher/projects/${id}/assign-reviewer`, {
       method: 'POST',

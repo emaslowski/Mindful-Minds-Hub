@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearch } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
@@ -6,9 +6,20 @@ import { teacherReview } from '@/lib/studioApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, ChevronRight } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { AlertCircle, ChevronRight, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const ALL_STATUSES = [
   'Assigned', 'Researching', 'Drafting', 'Peer Review',
@@ -19,11 +30,29 @@ const ALL_STATUSES = [
 export default function AllProjects() {
   const { user, isLoading } = useRequireStudioRole('teacher');
   const [statusFilter, setStatusFilter] = useState('');
+  const [confirmId, setConfirmId] = useState<number | null>(null);
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data } = useQuery({
     queryKey: ['teacher-all-projects'],
     queryFn: () => teacherReview.allProjects(),
     enabled: !!user,
+  });
+
+  const { mutate: deleteProject, isPending: isDeleting } = useMutation({
+    mutationFn: (id: number) => teacherReview.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teacher-all-projects'] });
+      queryClient.invalidateQueries({ queryKey: ['teacher-review-queue'] });
+      setConfirmId(null);
+      toast({ title: 'Project deleted', description: 'The project was moved to Archived.' });
+    },
+    onError: (err: Error) => {
+      setConfirmId(null);
+      toast({ title: 'Could not delete project', description: err.message, variant: 'destructive' });
+    },
   });
 
   if (isLoading || !user) return null;
@@ -93,13 +122,28 @@ export default function AllProjects() {
                         {formatDistanceToNow(new Date(p.updatedAt), { addSuffix: true })}
                       </td>
                       <td className="px-4 py-3">
-                        {['Ready for Teacher Review', 'Teacher Reviewing'].includes(p.status) && (
-                          <Link href={`/studio/teacher/review/${p.id}`}>
-                            <Button size="sm" className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full text-xs">
-                              Review
-                            </Button>
-                          </Link>
-                        )}
+                        <div className="flex items-center justify-end gap-2">
+                          {['Ready for Teacher Review', 'Teacher Reviewing'].includes(p.status) && (
+                            <Link href={`/studio/teacher/review/${p.id}`}>
+                              <Button size="sm" className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full text-xs">
+                                Review
+                              </Button>
+                            </Link>
+                          )}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-[#d5cabe] hover:text-red-500 hover:bg-red-50"
+                            onClick={() => {
+                              setConfirmId(p.id);
+                              setConfirmTitle(p.title);
+                            }}
+                            title="Delete project"
+                            aria-label={`Delete ${p.title}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -109,6 +153,27 @@ export default function AllProjects() {
           </Card>
         )}
       </StudioPage>
+
+      <AlertDialog open={confirmId !== null} onOpenChange={(open) => !open && setConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-semibold">"{confirmTitle}"</span> will be moved to Archived and removed from active work.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => confirmId !== null && deleteProject(confirmId)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting…' : 'Yes, delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </StudioLayout>
   );
 }
