@@ -18,7 +18,12 @@ function parseSections(text: string): Record<string, string> {
   for (const part of parts.slice(1)) {
     const nl = part.indexOf('\n');
     if (nl === -1) { result[part.trim()] = ''; continue; }
-    result[part.slice(0, nl).trim()] = part.slice(nl + 1).trim();
+    let body = part.slice(nl + 1);
+    // buildContent separates sections with two newlines. Remove only that
+    // structural separator; trimming here would erase a space as the student
+    // types the next word.
+    if (body.endsWith('\n\n')) body = body.slice(0, -2);
+    result[part.slice(0, nl).trim()] = body;
   }
   return result;
 }
