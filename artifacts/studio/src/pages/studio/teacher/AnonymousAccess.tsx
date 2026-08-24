@@ -53,7 +53,7 @@ export default function AnonymousAccess() {
     <StudioLayout>
       <StudioPage
         title="Anonymous Access"
-        subtitle="Issue private wellness codes without collecting student information"
+        subtitle="Review student details before issuing private wellness codes"
       >
         <div className="space-y-6 max-w-5xl">
           {issuedCredential && (
@@ -93,7 +93,7 @@ export default function AnonymousAccess() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-[#688a52] mb-4">
-                Students show you their request ID in person. These requests contain no name, email, or other personal details.
+                Students show you their request ID in person. Review their name and grade before you issue journal access. Older requests may show details as unavailable.
               </p>
               {listLoading ? (
                 <p className="text-sm text-[#688a52]">Loading requests…</p>
@@ -132,6 +132,8 @@ export default function AnonymousAccess() {
                     <thead>
                       <tr className="bg-[#d5cabe] text-[#453329]">
                         <th className="text-left px-4 py-3 font-medium">Request ID</th>
+                        <th className="text-left px-4 py-3 font-medium">Student</th>
+                        <th className="text-left px-4 py-3 font-medium">Grade</th>
                         <th className="text-left px-4 py-3 font-medium">Access code</th>
                         <th className="text-left px-4 py-3 font-medium">Status</th>
                         <th className="text-right px-4 py-3 font-medium">Actions</th>
@@ -170,6 +172,8 @@ function ApprovalCard({
   onIssued: (credential: IssuedCredential) => void;
 }) {
   const { toast } = useToast();
+  const studentName = [request.firstName, request.lastName].filter(Boolean).join(' ') || 'Not provided';
+  const studentGrade = request.grade ?? 'Not provided';
   const [accessCode, setAccessCode] = useState(`MM-${request.requestCode.replace('MM-', '')}`);
   const [password, setPassword] = useState('');
   const { mutate: approve, isPending } = useMutation({
@@ -186,7 +190,12 @@ function ApprovalCard({
     <div className="bg-white/70 rounded-xl border border-[#d5cabe] p-4">
       <div className="flex items-center justify-between gap-3 mb-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-[#8a6a55]">Student request ID</p>
+          <p className="text-xs uppercase tracking-wide text-[#8a6a55]">Student</p>
+          <p className="font-medium text-[#453329]">{studentName}</p>
+          <p className="text-xs text-[#688a52] mt-1">{studentGrade}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs uppercase tracking-wide text-[#8a6a55]">Request ID</p>
           <p className="font-mono font-bold text-[#453329]">{request.requestCode}</p>
         </div>
         <Badge className="bg-[#d4a44c] text-white">Pending</Badge>
@@ -223,9 +232,14 @@ function AccountRow({
   onCredentialIssued: (credential: IssuedCredential) => void;
   onToggleStatus: () => void;
 }) {
+  const studentName = [account.firstName, account.lastName].filter(Boolean).join(' ') || 'Not provided';
+  const studentGrade = account.grade ?? 'Not provided';
+
   return (
     <tr className={tinted ? 'bg-[#f5efe5]' : 'bg-[#eee6d8]'}>
       <td className="px-4 py-3 font-mono text-[#688a52]">{account.requestCode}</td>
+      <td className="px-4 py-3 font-medium text-[#453329]">{studentName}</td>
+      <td className="px-4 py-3 text-[#688a52]">{studentGrade}</td>
       <td className="px-4 py-3 font-mono font-medium text-[#453329]">{account.accessCode}</td>
       <td className="px-4 py-3">
         <Badge className={account.status === 'active' ? 'bg-[#688a52] text-white' : 'bg-[#8a6a55] text-white'}>

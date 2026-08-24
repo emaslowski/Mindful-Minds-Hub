@@ -456,6 +456,9 @@ export interface AnalyticsData {
 export interface AnonymousAccessRequest {
   id: number;
   requestCode: string;
+  firstName: string | null;
+  lastName: string | null;
+  grade: string | null;
   status: 'pending' | 'approved' | 'cancelled';
   createdAt: string;
   approvedAt?: string | null;
@@ -464,6 +467,9 @@ export interface AnonymousAccessRequest {
 export interface AnonymousAccessAccount {
   id: number;
   requestCode: string;
+  firstName: string | null;
+  lastName: string | null;
+  grade: string | null;
   accessCode: string;
   status: 'active' | 'disabled';
   createdAt: string;

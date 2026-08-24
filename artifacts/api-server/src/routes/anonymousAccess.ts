@@ -25,6 +25,21 @@ const MIN_PASSWORD_LENGTH = 8;
 const REQUEST_LIMIT = 5;
 const LOGIN_LIMIT = 10;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const VALID_GRADES = new Set([
+  'Kindergarten',
+  '1st grade',
+  '2nd grade',
+  '3rd grade',
+  '4th grade',
+  '5th grade',
+  '6th grade',
+  '7th grade',
+  '8th grade',
+  '9th grade',
+  '10th grade',
+  '11th grade',
+  '12th grade',
+]);
 const requestRateLimits = new Map<string, { count: number; resetAt: number }>();
 const loginRateLimits = new Map<string, { count: number; resetAt: number }>();
 
@@ -45,6 +60,37 @@ function getTeacherEmails(): string[] {
     .filter(Boolean);
 }
 
+function cleanStudentDetail(value: unknown, label: string): string {
+  if (typeof value !== 'string') throw new Error(`${label} is required`);
+  const cleaned = value.trim().replace(/\s+/g, ' ');
+  if (!cleaned) throw new Error(`${label} is required`);
+  if (cleaned.length > 100) throw new Error(`${label} must be 100 characters or fewer`);
+  return cleaned;
+}
+
+function getStudentDetails(body: unknown): {
+  firstName: string;
+  lastName: string;
+  grade: string;
+} {
+  const values = body && typeof body === 'object' ? body as Record<string, unknown> : {};
+  const firstName = cleanStudentDetail(values.firstName, 'First name');
+  const lastName = cleanStudentDetail(values.lastName, 'Last name');
+  const grade = typeof values.grade === 'string' ? values.grade.trim() : '';
+  if (!VALID_GRADES.has(grade)) throw new Error('Please choose a valid grade');
+  return { firstName, lastName, grade };
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character] ?? character);
+}
+
 function isRateLimited(req: Request, bucket: Map<string, { count: number; resetAt: number }>, limit: number): boolean {
   const now = Date.now();
   const key = req.ip || req.socket.remoteAddress || 'unknown';
@@ -57,12 +103,15 @@ function isRateLimited(req: Request, bucket: Map<string, { count: number; resetA
   return entry.count > limit;
 }
 
-async function sendAccessRequestEmail(req: Request, requestCode: string): Promise<void> {
+async function sendAccessRequestEmail(
+  req: Request,
+  request: { requestCode: string; firstName: string; lastName: string; grade: string },
+): Promise<void> {
   const smtpHost = process.env.SMTP_HOST;
   const teacherEmails = getTeacherEmails();
   if (!smtpHost || teacherEmails.length === 0) {
     req.log.warn(
-      { requestCode, smtpConfigured: Boolean(smtpHost), teacherRecipients: teacherEmails.length },
+      { requestCode: request.requestCode, smtpConfigured: Boolean(smtpHost), teacherRecipients: teacherEmails.length },
       'Anonymous access request created without email notification',
     );
     return;
@@ -81,21 +130,23 @@ async function sendAccessRequestEmail(req: Request, requestCode: string): Promis
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to: teacherEmails.join(', '),
-    subject: 'New anonymous access request — Mind Matters',
+    subject: 'New private journal access request — Mind Matters',
     text: [
-      'A student requested anonymous access to Mind Matters.',
+      'A student requested private access to the Mind Matters journal and gratitude journal.',
       '',
-      `Request ID: ${requestCode}`,
+      `Student: ${request.firstName} ${request.lastName}`,
+      `Grade: ${request.grade}`,
+      `Request ID: ${request.requestCode}`,
       '',
       'Open Mind Matters Studio → Anonymous Access to approve the request and issue a code and password.',
-      'The request includes no student name, email address, or other personal information.',
     ].join('\n'),
     html: `
       <h2 style="color:#453329">New anonymous access request</h2>
-      <p>A student requested anonymous access to Mind Matters.</p>
-      <p><strong>Request ID:</strong> ${requestCode}</p>
+      <p>A student requested private access to the Mind Matters journal and gratitude journal.</p>
+      <p><strong>Student:</strong> ${escapeHtml(request.firstName)} ${escapeHtml(request.lastName)}</p>
+      <p><strong>Grade:</strong> ${escapeHtml(request.grade)}</p>
+      <p><strong>Request ID:</strong> ${escapeHtml(request.requestCode)}</p>
       <p>Open <strong>Mind Matters Studio → Anonymous Access</strong> to approve the request and issue a code and password.</p>
-      <p><em>This request includes no student name, email address, or other personal information.</em></p>
     `,
   });
 }
@@ -117,20 +168,31 @@ function setSessionCookie(res: Response, sid: string): void {
   setAnonymousSessionCookie(res, sid);
 }
 
-// POST /api/anonymous-access/requests — no student information is collected.
+// POST /api/anonymous-access/requests — collects only the details needed for teacher approval.
 router.post('/anonymous-access/requests', async (req: Request, res: Response): Promise<void> => {
   if (isRateLimited(req, requestRateLimits, REQUEST_LIMIT)) {
     res.status(429).json({ error: 'Too many access requests. Please wait before trying again.' });
     return;
   }
 
+  let studentDetails: ReturnType<typeof getStudentDetails>;
+  try {
+    studentDetails = getStudentDetails(req.body);
+  } catch (error) {
+    res.status(400).json({ error: error instanceof Error ? error.message : 'Student details are required' });
+    return;
+  }
+
   const requestCode = await createRequestCode();
   const [request] = await db
     .insert(anonymousAccessRequestsTable)
-    .values({ requestCode })
+    .values({ requestCode, ...studentDetails })
     .returning();
 
-  sendAccessRequestEmail(req, requestCode).catch((error) => {
+  sendAccessRequestEmail(req, {
+    requestCode,
+    ...studentDetails,
+  }).catch((error) => {
     req.log.error({ err: error, requestCode }, 'Unable to send anonymous access request email');
   });
 
@@ -207,6 +269,9 @@ router.get(
         .select({
           id: anonymousAccessRequestsTable.id,
           requestCode: anonymousAccessRequestsTable.requestCode,
+        firstName: anonymousAccessRequestsTable.firstName,
+        lastName: anonymousAccessRequestsTable.lastName,
+        grade: anonymousAccessRequestsTable.grade,
           status: anonymousAccessRequestsTable.status,
           createdAt: anonymousAccessRequestsTable.createdAt,
           approvedAt: anonymousAccessRequestsTable.approvedAt,
@@ -217,6 +282,9 @@ router.get(
         .select({
           id: anonymousAccessAccountsTable.id,
           requestCode: anonymousAccessRequestsTable.requestCode,
+          firstName: anonymousAccessRequestsTable.firstName,
+          lastName: anonymousAccessRequestsTable.lastName,
+          grade: anonymousAccessRequestsTable.grade,
           accessCode: anonymousAccessAccountsTable.accessCode,
           status: anonymousAccessAccountsTable.status,
           createdAt: anonymousAccessAccountsTable.createdAt,

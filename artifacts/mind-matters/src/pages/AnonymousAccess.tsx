@@ -13,18 +13,24 @@ export default function AnonymousAccess() {
   const [requestCode, setRequestCode] = useState<string | null>(null);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [requesting, setRequesting] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [grade, setGrade] = useState('');
   const [accessCode, setAccessCode] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
-  async function requestAccess() {
+  async function requestAccess(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setRequesting(true);
     setRequestError(null);
     try {
       const response = await fetch('/api/anonymous-access/requests', {
         method: 'POST',
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, grade }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error ?? 'Unable to request access right now');
@@ -73,7 +79,7 @@ export default function AnonymousAccess() {
             Your private access
           </h1>
           <p className="font-sans text-lg text-foreground/70 leading-relaxed">
-            Use a code from your teacher to keep your journal private. You do not need Google, an email address, or your name.
+            Use a private code from your teacher to keep your journal and gratitude journal separate from your regular sign-in.
           </p>
         </div>
 
@@ -135,27 +141,63 @@ export default function AnonymousAccess() {
                   <p className="font-mono text-3xl font-bold tracking-widest text-foreground">{requestCode}</p>
                 </div>
                 <p className="font-sans text-sm text-foreground/60">
-                  Nothing about you was collected. Your teacher will approve the request and hand you your sign-in details.
+                  Your teacher will review these details, approve the request, and hand you your private sign-in details.
                 </p>
               </div>
             ) : (
-              <div className="space-y-5">
+              <form className="space-y-4" onSubmit={requestAccess}>
                 <p className="font-sans text-foreground/75 leading-relaxed">
-                  Request a private code without sharing your name, email, or any personal information. You will receive an ID to show your teacher.
+                  Request private journal access by sharing these three details with your teacher: your first name, last name, and grade.
                 </p>
+                <label className="block font-sans text-sm font-bold text-foreground/70">
+                  First name
+                  <input
+                    value={firstName}
+                    onChange={(event) => setFirstName(event.target.value)}
+                    autoComplete="given-name"
+                    required
+                    maxLength={100}
+                    className="mt-2 w-full bg-white/70 border border-card-border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sage/50"
+                  />
+                </label>
+                <label className="block font-sans text-sm font-bold text-foreground/70">
+                  Last name
+                  <input
+                    value={lastName}
+                    onChange={(event) => setLastName(event.target.value)}
+                    autoComplete="family-name"
+                    required
+                    maxLength={100}
+                    className="mt-2 w-full bg-white/70 border border-card-border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sage/50"
+                  />
+                </label>
+                <label className="block font-sans text-sm font-bold text-foreground/70">
+                  Grade
+                  <select
+                    value={grade}
+                    onChange={(event) => setGrade(event.target.value)}
+                    required
+                    className="mt-2 w-full bg-white/70 border border-card-border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sage/50"
+                  >
+                    <option value="">Select your grade</option>
+                    <option>Kindergarten</option>
+                    {Array.from({ length: 12 }, (_, index) => (
+                      <option key={index + 1}>{index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'} grade</option>
+                    ))}
+                  </select>
+                </label>
                 {requestError && <p className="text-sm text-red-700 bg-red-50 rounded-xl p-3">{requestError}</p>}
                 <button
-                  type="button"
-                  onClick={requestAccess}
+                  type="submit"
                   disabled={requesting}
                   className="w-full border border-terracotta text-terracotta hover:bg-terracotta hover:text-white px-6 py-3 rounded-full font-sans font-bold transition-colors disabled:opacity-60"
                 >
                   {requesting ? 'Creating request…' : 'Request anonymous access'}
                 </button>
                 <p className="font-sans text-xs text-foreground/55 text-center">
-                  Your teacher receives an alert when this request is created.
+                  Your teacher receives an alert with these details when this request is created.
                 </p>
-              </div>
+              </form>
             )}
           </section>
         </div>

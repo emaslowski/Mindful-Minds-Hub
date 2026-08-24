@@ -44,3 +44,17 @@ response instead.
 
 **How to apply:** reconcile the generated migration with the development database
 when practical. Until then, use explicit compatible projections for legacy tables.
+
+## Adding details to existing requests
+When evolving a request table that may already contain student submissions,
+introduce newly collected fields as nullable at the database layer and require
+them in the application only for new submissions. Teacher views must label
+missing legacy details clearly instead of failing.
+
+**Why:** PostgreSQL cannot add a `NOT NULL` column with no default to a populated
+table. A migration must preserve historical requests so a deployment does not
+fail or discard records.
+
+**How to apply:** use server validation to enforce new required details, keep the
+schema/migration nullable for legacy records, and verify the migration against a
+fixture that already contains a request.
