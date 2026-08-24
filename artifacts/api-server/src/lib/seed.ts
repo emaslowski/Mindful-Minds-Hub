@@ -2,6 +2,7 @@ import { db } from '@workspace/db';
 import {
   studioJobsTable,
   studioTeamsTable,
+  studioClassCyclesTable,
   studioImpactSettingsTable,
   studioProfilesTable,
 } from '@workspace/db/schema';
@@ -38,6 +39,8 @@ const DEFAULT_TEAMS = [
   'Community Connections',
 ];
 
+const DEFAULT_CYCLES = ['Even', 'Odd'];
+
 const DEFAULT_IMPACT_KEYS = [
   'resources_published',
   'student_creators',
@@ -63,6 +66,14 @@ export async function runSeed(): Promise<void> {
     for (const name of DEFAULT_TEAMS) {
       await db
         .insert(studioTeamsTable)
+        .values({ name })
+        .onConflictDoNothing();
+    }
+
+    // The Studio alternates students between the Even and Odd cycles.
+    for (const name of DEFAULT_CYCLES) {
+      await db
+        .insert(studioClassCyclesTable)
         .values({ name })
         .onConflictDoNothing();
     }

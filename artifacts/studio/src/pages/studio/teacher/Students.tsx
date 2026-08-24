@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherStudents, teacherTeams, teacherJobs, teacherCycles, type CreateStudentData } from '@/lib/studioApi';
+import { teacherStudents, teacherJobs, teacherCycles, type CreateStudentData } from '@/lib/studioApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,6 @@ export default function Students() {
   const [editStudent, setEditStudent] = useState<number | null>(null);
 
   const { data: studentsData } = useQuery({ queryKey: ['teacher-students'], queryFn: teacherStudents.list, enabled: !!user });
-  const { data: teamsData } = useQuery({ queryKey: ['teacher-teams'], queryFn: teacherTeams.list, enabled: !!user });
   const { data: jobsData } = useQuery({ queryKey: ['teacher-jobs'], queryFn: teacherJobs.list, enabled: !!user });
   const { data: cyclesData } = useQuery({ queryKey: ['teacher-cycles'], queryFn: teacherCycles.list, enabled: !!user });
 
@@ -35,14 +34,13 @@ export default function Students() {
   if (isLoading || !user) return null;
 
   const students = studentsData?.students ?? [];
-  const teams = teamsData?.teams ?? [];
   const jobs = jobsData?.jobs ?? [];
   const cycles = cyclesData?.cycles ?? [];
 
   return (
     <StudioLayout>
       <StudioPage
-        title="Students & Teams"
+        title="Students"
         subtitle={`${students.length} student${students.length !== 1 ? 's' : ''}`}
         action={
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
@@ -53,9 +51,9 @@ export default function Students() {
             </DialogTrigger>
             <DialogContent className="bg-[#eee6d8] border-[#d5cabe]">
               <DialogHeader>
-                <DialogTitle className="font-serif text-[#453329]">Add Student Account</DialogTitle>
+                <DialogTitle className="font-serif text-[#453329]">Add Student</DialogTitle>
               </DialogHeader>
-              <AddStudentForm teams={teams} jobs={jobs} cycles={cycles} onSuccess={() => {
+              <AddStudentForm cycles={cycles} onSuccess={() => {
                 setAddOpen(false);
                 queryClient.invalidateQueries({ queryKey: ['teacher-students'] });
               }} />
@@ -76,8 +74,6 @@ export default function Students() {
                 <thead>
                   <tr className="bg-[#d5cabe] text-[#453329]">
                     <th className="text-left px-4 py-3 font-medium">Name</th>
-                    <th className="text-left px-4 py-3 font-medium">Username</th>
-                    <th className="text-left px-4 py-3 font-medium">Team</th>
                     <th className="text-left px-4 py-3 font-medium">Job</th>
                     <th className="text-left px-4 py-3 font-medium">Cycle</th>
                     <th className="text-left px-4 py-3 font-medium">Status</th>
@@ -88,8 +84,6 @@ export default function Students() {
                   {students.map((s, i) => (
                     <tr key={s.id} className={i % 2 === 0 ? 'bg-[#eee6d8]' : 'bg-[#f5efe5]'}>
                       <td className="px-4 py-3 font-medium text-[#453329]">{s.displayName}</td>
-                      <td className="px-4 py-3 text-[#688a52] font-mono text-xs">{s.username}</td>
-                      <td className="px-4 py-3 text-[#688a52]">{s.teamName ?? '—'}</td>
                       <td className="px-4 py-3 text-[#688a52]">{s.jobTitle ?? '—'}</td>
                       <td className="px-4 py-3 text-[#688a52]">{s.cycleName ?? '—'}</td>
                       <td className="px-4 py-3">
@@ -110,7 +104,6 @@ export default function Students() {
                             </DialogHeader>
                             <EditStudentForm
                               student={s}
-                              teams={teams}
                               jobs={jobs}
                               cycles={cycles}
                               onSuccess={() => {
@@ -139,11 +132,10 @@ export default function Students() {
   );
 }
 
-function AddStudentForm({ teams, jobs, cycles, onSuccess }: {
-  teams: any[]; jobs: any[]; cycles: any[]; onSuccess: () => void;
-}) {
+function AddStudentForm({ cycles, onSuccess }: { cycles: any[]; onSuccess: () => void }) {
   const { toast } = useToast();
-  const [form, setForm] = useState<CreateStudentData>({ username: '', password: '', displayName: '', teamId: undefined, jobId: undefined, cycleId: undefined, className: '' });
+  const [form, setForm] = useState<CreateStudentData>({ displayName: '' });
+  const availableCycles = cycles.filter((c) => c.name === 'Even' || c.name === 'Odd');
 
   const { mutate: create, isPending } = useMutation({
     mutationFn: () => teacherStudents.create(form),
@@ -155,47 +147,30 @@ function AddStudentForm({ teams, jobs, cycles, onSuccess }: {
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1 col-span-2"><Label className="text-xs text-[#453329]">Display name *</Label><Input value={form.displayName} onChange={(e) => setForm(f => ({ ...f, displayName: e.target.value }))} className="bg-white border-[#d5cabe] text-sm" placeholder="Alex Smith" /></div>
-        <div className="space-y-1"><Label className="text-xs text-[#453329]">Username *</Label><Input value={form.username} onChange={(e) => setForm(f => ({ ...f, username: e.target.value }))} className="bg-white border-[#d5cabe] text-sm font-mono" placeholder="alexsmith" /></div>
-        <div className="space-y-1"><Label className="text-xs text-[#453329]">Password *</Label><Input type="password" value={form.password} onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))} className="bg-white border-[#d5cabe] text-sm" placeholder="6+ characters" /></div>
-        <div className="space-y-1"><Label className="text-xs text-[#453329]">Team</Label>
-          <Select value={form.teamId?.toString() ?? ''} onValueChange={(v) => setForm(f => ({ ...f, teamId: v ? Number(v) : undefined }))}>
-            <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="No team" /></SelectTrigger>
-            <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id.toString()}>{t.name}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1"><Label className="text-xs text-[#453329]">Job</Label>
-          <Select value={form.jobId?.toString() ?? ''} onValueChange={(v) => setForm(f => ({ ...f, jobId: v ? Number(v) : undefined }))}>
-            <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="No job" /></SelectTrigger>
-            <SelectContent>{jobs.map(j => <SelectItem key={j.id} value={j.id.toString()}>{j.title}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
         <div className="space-y-1 col-span-2"><Label className="text-xs text-[#453329]">Cycle</Label>
           <Select value={form.cycleId?.toString() ?? ''} onValueChange={(v) => setForm(f => ({ ...f, cycleId: v ? Number(v) : undefined }))}>
-            <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="No cycle" /></SelectTrigger>
-            <SelectContent>{cycles.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
+            <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="Choose Even or Odd" /></SelectTrigger>
+            <SelectContent>{availableCycles.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
       </div>
-      <Button className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full" onClick={() => create()} disabled={isPending || !form.username || !form.password || !form.displayName}>
+      <Button className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full" onClick={() => create()} disabled={isPending || !form.displayName.trim()}>
         {isPending ? 'Adding…' : 'Add Student'}
       </Button>
     </div>
   );
 }
 
-function EditStudentForm({ student, teams, jobs, cycles, onSuccess }: { student: any; teams: any[]; jobs: any[]; cycles: any[]; onSuccess: () => void }) {
+function EditStudentForm({ student, jobs, cycles, onSuccess }: { student: any; jobs: any[]; cycles: any[]; onSuccess: () => void }) {
   const { toast } = useToast();
-  const [teamId, setTeamId] = useState(student.teamId?.toString() ?? '');
   const [jobId, setJobId] = useState(student.jobId?.toString() ?? '');
   const [cycleId, setCycleId] = useState(student.cycleId?.toString() ?? '');
-  const [newPassword, setNewPassword] = useState('');
+  const availableCycles = cycles.filter((c) => c.name === 'Even' || c.name === 'Odd');
 
   const { mutate: update, isPending } = useMutation({
     mutationFn: () => teacherStudents.update(student.id, {
-      teamId: teamId ? Number(teamId) : null,
       jobId: jobId ? Number(jobId) : null,
       cycleId: cycleId ? Number(cycleId) : null,
-      ...(newPassword ? { newPassword } : {}),
     }),
     onSuccess,
     onError: (err) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
@@ -204,12 +179,6 @@ function EditStudentForm({ student, teams, jobs, cycles, onSuccess }: { student:
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1"><Label className="text-xs text-[#453329]">Team</Label>
-          <Select value={teamId} onValueChange={setTeamId}>
-            <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="No team" /></SelectTrigger>
-            <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id.toString()}>{t.name}</SelectItem>)}</SelectContent>
-          </Select>
-        </div>
         <div className="space-y-1"><Label className="text-xs text-[#453329]">Job</Label>
           <Select value={jobId} onValueChange={setJobId}>
             <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="No job" /></SelectTrigger>
@@ -219,10 +188,9 @@ function EditStudentForm({ student, teams, jobs, cycles, onSuccess }: { student:
         <div className="space-y-1 col-span-2"><Label className="text-xs text-[#453329]">Cycle</Label>
           <Select value={cycleId} onValueChange={setCycleId}>
             <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="No cycle" /></SelectTrigger>
-            <SelectContent>{cycles.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
+            <SelectContent>{availableCycles.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
-        <div className="space-y-1 col-span-2"><Label className="text-xs text-[#453329]">Reset password (leave blank to keep current)</Label><Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="bg-white border-[#d5cabe] text-sm" placeholder="New password…" /></div>
       </div>
       <Button className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full" onClick={() => update()} disabled={isPending}>
         {isPending ? 'Saving…' : 'Save Changes'}

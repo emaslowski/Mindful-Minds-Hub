@@ -97,7 +97,6 @@ export default function AllProjects() {
                   <tr className="bg-[#d5cabe] text-[#453329]">
                     <th className="text-left px-4 py-3 font-medium">Project</th>
                     <th className="text-left px-4 py-3 font-medium">Student</th>
-                    <th className="text-left px-4 py-3 font-medium">Team</th>
                     <th className="text-left px-4 py-3 font-medium">Type</th>
                     <th className="text-left px-4 py-3 font-medium">Status</th>
                     <th className="text-left px-4 py-3 font-medium">Updated</th>
@@ -119,7 +118,6 @@ export default function AllProjects() {
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-[#688a52]">{p.studentName ?? '—'}</td>
-                      <td className="px-4 py-3 text-[#688a52]">{p.teamName ?? '—'}</td>
                       <td className="px-4 py-3 text-[#688a52] text-xs">{p.contentType}</td>
                       <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
                       <td className="px-4 py-3 text-[#688a52] text-xs">

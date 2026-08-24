@@ -50,3 +50,19 @@ ALTER TABLE studio_projects ADD COLUMN IF NOT EXISTS peer_reviewer_job_id intege
 
 ## ContentWorkspace Format
 Content stored as `## Section\nbody` text. `ContentPreview` component in `artifacts/studio/src/components/studio/ContentPreview.tsx` renders this as a styled site preview.
+
+## Roster and Team Model
+
+**The Rule:** The Studio is jobs-only. Teacher-managed student records are name-only roster entries; students do not receive individual usernames or passwords.
+
+**Why:** The class works through shared job-group credentials, so individual account credentials and team management add unnecessary setup and confusion.
+
+**How to apply:** Keep team navigation, team assignment controls, and team display out of the Studio UI. Preserve existing team data unless the user explicitly asks to remove it. Create roster records from a display name and manage access through job groups.
+
+## Class Cycle Choices
+
+**The Rule:** Student and handoff cycle selectors use only the `Even` and `Odd` class cycles.
+
+**Why:** The class schedule alternates between two groups rather than using named seasonal cycles.
+
+**How to apply:** Keep the Even and Odd cycle records available in the database and filter cycle dropdowns to those two choices.

@@ -27,7 +27,6 @@ const TEACHER_NAV: NavItem[] = [
   { href: '/studio/teacher/review', label: 'Review Submissions', icon: <ClipboardCheck className="h-4 w-4" /> },
   { href: '/studio/teacher/projects', label: 'All Projects', icon: <FolderOpen className="h-4 w-4" /> },
   { href: '/studio/teacher/students', label: 'Students', icon: <Users className="h-4 w-4" /> },
-  { href: '/studio/teacher/teams', label: 'Teams', icon: <Users className="h-4 w-4" /> },
   { href: '/studio/teacher/jobs', label: 'Jobs', icon: <Briefcase className="h-4 w-4" /> },
   { href: '/studio/teacher/cycles', label: 'Class Cycles', icon: <CalendarDays className="h-4 w-4" /> },
   { href: '/studio/teacher/handoffs', label: 'Handoffs', icon: <RefreshCw className="h-4 w-4" /> },
@@ -69,12 +68,6 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
                   <p className="text-xs text-[#d5cabe]">
                     <Briefcase className="inline h-3 w-3 mr-1" />
                     {user.jobTitle}
-                  </p>
-                )}
-                {user.teamName && (
-                  <p className="text-xs text-[#d5cabe]">
-                    <Users className="inline h-3 w-3 mr-1" />
-                    {user.teamName}
                   </p>
                 )}
                 {user.cycleName && (

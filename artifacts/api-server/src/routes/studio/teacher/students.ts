@@ -10,6 +10,7 @@ import {
 import { eq, and, desc } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
+import { randomUUID } from 'node:crypto';
 
 const router = Router();
 
@@ -49,8 +50,9 @@ router.get(
   },
 );
 
-// POST /api/teacher/students — pre-create a student record by email
-// The student doesn't have a Google account yet; they get enrolled by email.
+// POST /api/teacher/students — create a name-only student roster record.
+// Students use their job group's login, so an individual username/password is
+// not needed. A private placeholder email satisfies the profile identity field.
 router.post(
   '/teacher/students',
   requireStudioRole('teacher'),
@@ -63,12 +65,13 @@ router.post(
       cycleId?: number;
     };
 
-    if (!email?.trim()) {
-      res.status(400).json({ error: 'email is required' });
+    if (!displayName?.trim()) {
+      res.status(400).json({ error: 'displayName is required' });
       return;
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedEmail = email?.trim().toLowerCase()
+      || `student-${randomUUID()}@mindmatters.local`;
 
     const [profile] = await db
       .insert(studioProfilesTable)

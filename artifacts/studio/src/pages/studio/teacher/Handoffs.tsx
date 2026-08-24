@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherHandoffs, teacherStudents, teacherCycles } from '@/lib/studioApi';
+import { teacherHandoffs, teacherJobs, teacherCycles } from '@/lib/studioApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Eye, EyeOff, UserPlus } from 'lucide-react';
+import { Briefcase, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Handoffs() {
@@ -19,7 +19,7 @@ export default function Handoffs() {
   const queryClient = useQueryClient();
 
   const { data } = useQuery({ queryKey: ['teacher-handoffs'], queryFn: teacherHandoffs.list, enabled: !!user });
-  const { data: studentsData } = useQuery({ queryKey: ['teacher-students'], queryFn: teacherStudents.list, enabled: !!user });
+  const { data: jobsData } = useQuery({ queryKey: ['teacher-jobs'], queryFn: teacherJobs.list, enabled: !!user });
   const { data: cyclesData } = useQuery({ queryKey: ['teacher-cycles'], queryFn: teacherCycles.list, enabled: !!user });
 
   const { mutate: update } = useMutation({
@@ -30,11 +30,12 @@ export default function Handoffs() {
   });
 
   const { mutate: assign } = useMutation({
-    mutationFn: ({ id, studentId, cycleId }: { id: number; studentId: number; cycleId?: number }) =>
-      teacherHandoffs.assign(id, studentId, cycleId),
+    mutationFn: ({ id, jobId, cycleId }: { id: number; jobId: number; cycleId?: number }) =>
+      teacherHandoffs.assign(id, jobId, cycleId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teacher-handoffs'] });
-      toast({ title: 'Project assigned', description: 'The handoff project has been assigned to the student.' });
+      queryClient.invalidateQueries({ queryKey: ['teacher-all-projects'] });
+      toast({ title: 'Project assigned', description: 'The handoff project has been assigned to the job group.' });
     },
     onError: (err) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
   });
@@ -42,7 +43,7 @@ export default function Handoffs() {
   if (isLoading || !user) return null;
 
   const handoffs = data?.handoffs ?? [];
-  const students = studentsData?.students ?? [];
+  const jobs = jobsData?.jobs ?? [];
   const cycles = cyclesData?.cycles ?? [];
 
   return (
@@ -63,11 +64,11 @@ export default function Handoffs() {
               <HandoffCard
                 key={h.id}
                 handoff={h}
-                students={students}
+                jobs={jobs}
                 cycles={cycles}
                 onToggleVisible={(v) => update({ id: h.id, isVisible: v })}
                 onSaveNotes={(notes) => update({ id: h.id, teacherNotes: notes })}
-                onAssign={(studentId, cycleId) => assign({ id: h.id, studentId, cycleId })}
+                onAssign={(jobId, cycleId) => assign({ id: h.id, jobId, cycleId })}
               />
             ))}
           </div>
@@ -77,15 +78,16 @@ export default function Handoffs() {
   );
 }
 
-function HandoffCard({ handoff, students, cycles, onToggleVisible, onSaveNotes, onAssign }: {
-  handoff: any; students: any[]; cycles: any[];
+function HandoffCard({ handoff, jobs, cycles, onToggleVisible, onSaveNotes, onAssign }: {
+  handoff: any; jobs: any[]; cycles: any[];
   onToggleVisible: (v: boolean) => void;
   onSaveNotes: (n: string) => void;
-  onAssign: (studentId: number, cycleId?: number) => void;
+  onAssign: (jobId: number, cycleId?: number) => void;
 }) {
   const [teacherNotes, setTeacherNotes] = useState(handoff.teacherNotes);
-  const [selectedStudent, setSelectedStudent] = useState('');
+  const [selectedJob, setSelectedJob] = useState('');
   const [selectedCycle, setSelectedCycle] = useState('');
+  const availableCycles = cycles.filter((c) => c.name === 'Even' || c.name === 'Odd');
 
   return (
     <Card className="bg-[#eee6d8] border-[#d5cabe]">
@@ -136,27 +138,27 @@ function HandoffCard({ handoff, students, cycles, onToggleVisible, onSaveNotes, 
         </div>
 
         <div className="border-t border-[#d5cabe] pt-3">
-          <p className="text-xs font-medium text-[#453329] mb-2">Assign to a student</p>
+          <p className="text-xs font-medium text-[#453329] mb-2">Assign to a job group</p>
           <div className="flex gap-2 items-end">
             <div className="flex-1">
-              <Select value={selectedStudent} onValueChange={setSelectedStudent}>
-                <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="Select student…" /></SelectTrigger>
-                <SelectContent>{students.map(s => <SelectItem key={s.id} value={s.id.toString()}>{s.displayName}</SelectItem>)}</SelectContent>
+              <Select value={selectedJob} onValueChange={setSelectedJob}>
+                <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="Select job…" /></SelectTrigger>
+                <SelectContent>{jobs.map(j => <SelectItem key={j.id} value={j.id.toString()}>{j.title}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="flex-1">
               <Select value={selectedCycle} onValueChange={setSelectedCycle}>
                 <SelectTrigger className="bg-white border-[#d5cabe] text-sm"><SelectValue placeholder="Select cycle…" /></SelectTrigger>
-                <SelectContent>{cycles.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
+                <SelectContent>{availableCycles.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <Button
               size="sm"
               className="bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-1"
-              onClick={() => selectedStudent && onAssign(Number(selectedStudent), selectedCycle ? Number(selectedCycle) : undefined)}
-              disabled={!selectedStudent}
+              onClick={() => selectedJob && onAssign(Number(selectedJob), selectedCycle ? Number(selectedCycle) : undefined)}
+              disabled={!selectedJob}
             >
-              <UserPlus className="h-3.5 w-3.5" /> Assign
+              <Briefcase className="h-3.5 w-3.5" /> Assign
             </Button>
           </div>
         </div>

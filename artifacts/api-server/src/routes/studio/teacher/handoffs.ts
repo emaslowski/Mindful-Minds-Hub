@@ -3,6 +3,7 @@ import {
   studioHandoffsTable,
   studioProjectsTable,
   studioClassCyclesTable,
+  studioJobsTable,
 } from '@workspace/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
@@ -59,16 +60,16 @@ router.patch('/teacher/handoffs/:id', requireStudioRole('teacher'), async (req: 
   res.json({ handoff });
 });
 
-// POST /api/teacher/handoffs/:id/assign — assign handoff project to a student
+// POST /api/teacher/handoffs/:id/assign — assign handoff project to a job group
 router.post(
   '/teacher/handoffs/:id/assign',
   requireStudioRole('teacher'),
   async (req: Request, res: Response) => {
     const id = Number(req.params.id);
-    const { studentId, cycleId } = req.body as { studentId?: string; cycleId?: number };
+    const { jobId, cycleId } = req.body as { jobId?: number; cycleId?: number };
 
-    if (!studentId) {
-      res.status(400).json({ error: 'studentId is required' });
+    if (!jobId) {
+      res.status(400).json({ error: 'jobId is required' });
       return;
     }
 
@@ -79,11 +80,23 @@ router.post(
 
     if (!handoff) { res.status(404).json({ error: 'Handoff not found' }); return; }
 
-    // Reassign the project to the new student and update cycle
+    const [job] = await db
+      .select({ id: studioJobsTable.id })
+      .from(studioJobsTable)
+      .where(eq(studioJobsTable.id, jobId));
+
+    if (!job) {
+      res.status(404).json({ error: 'Job not found' });
+      return;
+    }
+
+    // Job groups own Studio projects. Roster profiles are name-only, so they
+    // must not be written into the legacy individual-owner column.
     await db
       .update(studioProjectsTable)
       .set({
-        assignedStudentId: studentId,
+        assignedStudentId: null,
+        jobId,
         currentCycleId: cycleId ?? handoff.nextCycleId ?? null,
         status: 'Assigned',
         updatedAt: new Date(),

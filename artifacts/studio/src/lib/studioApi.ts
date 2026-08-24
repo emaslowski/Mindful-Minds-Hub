@@ -130,7 +130,12 @@ export const teacherStudents = {
   list: () => studioFetch<{ students: TeacherStudent[] }>('/teacher/students'),
   create: (data: CreateStudentData) =>
     studioFetch('/teacher/students', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id: number, data: Partial<CreateStudentData & { accountStatus: string; newPassword: string }>) =>
+  update: (id: number, data: {
+    displayName?: string;
+    jobId?: number | null;
+    cycleId?: number | null;
+    accountStatus?: 'active' | 'disabled';
+  }) =>
     studioFetch(`/teacher/students/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   getProjects: (id: number) =>
     studioFetch<{ projects: StudioProject[] }>(`/teacher/students/${id}/projects`),
@@ -189,10 +194,10 @@ export const teacherHandoffs = {
   list: () => studioFetch<{ handoffs: TeacherHandoff[] }>('/teacher/handoffs'),
   update: (id: number, data: { isVisible?: boolean; teacherNotes?: string; nextCycleId?: number }) =>
     studioFetch(`/teacher/handoffs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-  assign: (id: number, studentId: number, cycleId?: number) =>
+  assign: (id: number, jobId: number, cycleId?: number) =>
     studioFetch(`/teacher/handoffs/${id}/assign`, {
       method: 'POST',
-      body: JSON.stringify({ studentId, cycleId }),
+      body: JSON.stringify({ jobId, cycleId }),
     }),
 };
 
@@ -362,10 +367,7 @@ export interface TeacherStudent {
 }
 
 export interface CreateStudentData {
-  username: string;
-  password: string;
   displayName: string;
-  teamId?: number;
   jobId?: number;
   cycleId?: number;
   className?: string;
