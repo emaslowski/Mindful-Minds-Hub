@@ -36,6 +36,13 @@
       "when": 1787610758346,
       "tag": "0004_anonymous-request-student-details",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1787611406553,
+      "tag": "0005_anonymous-request-student-email",
+      "breakpoints": true
     }
   ]
 }

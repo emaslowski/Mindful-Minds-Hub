@@ -21,6 +21,7 @@ import { requireStudioRole } from '../middlewares/studioAuthMiddleware';
 const router = Router();
 
 const ACCESS_CODE_PATTERN = /^[A-Z0-9-]{4,32}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
 const REQUEST_LIMIT = 5;
 const LOGIN_LIMIT = 10;
@@ -68,17 +69,29 @@ function cleanStudentDetail(value: unknown, label: string): string {
   return cleaned;
 }
 
+function cleanStudentEmail(value: unknown): string {
+  if (typeof value !== 'string') throw new Error('Email address is required');
+  const email = value.trim().toLowerCase();
+  if (!email) throw new Error('Email address is required');
+  if (email.length > 254 || !EMAIL_PATTERN.test(email)) {
+    throw new Error('Please enter a valid email address');
+  }
+  return email;
+}
+
 function getStudentDetails(body: unknown): {
   firstName: string;
   lastName: string;
   grade: string;
+  studentEmail: string;
 } {
   const values = body && typeof body === 'object' ? body as Record<string, unknown> : {};
   const firstName = cleanStudentDetail(values.firstName, 'First name');
   const lastName = cleanStudentDetail(values.lastName, 'Last name');
   const grade = typeof values.grade === 'string' ? values.grade.trim() : '';
   if (!VALID_GRADES.has(grade)) throw new Error('Please choose a valid grade');
-  return { firstName, lastName, grade };
+  const studentEmail = cleanStudentEmail(values.studentEmail);
+  return { firstName, lastName, grade, studentEmail };
 }
 
 function escapeHtml(value: string): string {
@@ -105,7 +118,13 @@ function isRateLimited(req: Request, bucket: Map<string, { count: number; resetA
 
 async function sendAccessRequestEmail(
   req: Request,
-  request: { requestCode: string; firstName: string; lastName: string; grade: string },
+  request: {
+    requestCode: string;
+    firstName: string;
+    lastName: string;
+    grade: string;
+    studentEmail: string;
+  },
 ): Promise<void> {
   const smtpHost = process.env.SMTP_HOST;
   const teacherEmails = getTeacherEmails();
@@ -136,6 +155,7 @@ async function sendAccessRequestEmail(
       '',
       `Student: ${request.firstName} ${request.lastName}`,
       `Grade: ${request.grade}`,
+      `Student email: ${request.studentEmail}`,
       `Request ID: ${request.requestCode}`,
       '',
       'Open Mind Matters Studio → Anonymous Access to approve the request and issue a code and password.',
@@ -145,8 +165,62 @@ async function sendAccessRequestEmail(
       <p>A student requested private access to the Mind Matters journal and gratitude journal.</p>
       <p><strong>Student:</strong> ${escapeHtml(request.firstName)} ${escapeHtml(request.lastName)}</p>
       <p><strong>Grade:</strong> ${escapeHtml(request.grade)}</p>
+      <p><strong>Student email:</strong> <a href="mailto:${escapeHtml(request.studentEmail)}">${escapeHtml(request.studentEmail)}</a></p>
       <p><strong>Request ID:</strong> ${escapeHtml(request.requestCode)}</p>
       <p>Open <strong>Mind Matters Studio → Anonymous Access</strong> to approve the request and issue a code and password.</p>
+    `,
+  });
+}
+
+async function sendCredentialsEmail(
+  req: Request,
+  details: {
+    studentEmail: string;
+    firstName: string;
+    accessCode: string;
+    password: string;
+  },
+): Promise<void> {
+  const smtpHost = process.env.SMTP_HOST;
+  if (!smtpHost) {
+    req.log.warn(
+      { studentEmail: details.studentEmail, smtpConfigured: false },
+      'Anonymous access approved without student credential email',
+    );
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: details.studentEmail,
+    subject: 'Your Mind Matters private access details',
+    text: [
+      `Hi ${details.firstName},`,
+      '',
+      'Your teacher approved your private Mind Matters journal and gratitude journal access.',
+      '',
+      `Access code: ${details.accessCode}`,
+      `Password: ${details.password}`,
+      '',
+      'Keep these details private. Use them on the Mind Matters private access page to open your journal.',
+    ].join('\n'),
+    html: `
+      <h2 style="color:#453329">Your Mind Matters private access details</h2>
+      <p>Hi ${escapeHtml(details.firstName)},</p>
+      <p>Your teacher approved your private Mind Matters journal and gratitude journal access.</p>
+      <p><strong>Access code:</strong> ${escapeHtml(details.accessCode)}</p>
+      <p><strong>Password:</strong> ${escapeHtml(details.password)}</p>
+      <p><em>Keep these details private. Use them on the Mind Matters private access page to open your journal.</em></p>
     `,
   });
 }
@@ -266,12 +340,13 @@ router.get(
   async (_req: Request, res: Response): Promise<void> => {
     const [requests, accounts] = await Promise.all([
       db
-        .select({
+      .select({
           id: anonymousAccessRequestsTable.id,
           requestCode: anonymousAccessRequestsTable.requestCode,
         firstName: anonymousAccessRequestsTable.firstName,
         lastName: anonymousAccessRequestsTable.lastName,
         grade: anonymousAccessRequestsTable.grade,
+        studentEmail: anonymousAccessRequestsTable.studentEmail,
           status: anonymousAccessRequestsTable.status,
           createdAt: anonymousAccessRequestsTable.createdAt,
           approvedAt: anonymousAccessRequestsTable.approvedAt,
@@ -285,6 +360,7 @@ router.get(
           firstName: anonymousAccessRequestsTable.firstName,
           lastName: anonymousAccessRequestsTable.lastName,
           grade: anonymousAccessRequestsTable.grade,
+          studentEmail: anonymousAccessRequestsTable.studentEmail,
           accessCode: anonymousAccessAccountsTable.accessCode,
           status: anonymousAccessAccountsTable.status,
           createdAt: anonymousAccessAccountsTable.createdAt,
@@ -370,12 +446,31 @@ router.post(
       return created;
     });
 
+    let emailSent = false;
+    if (request.studentEmail) {
+      try {
+        await sendCredentialsEmail(req, {
+          studentEmail: request.studentEmail,
+          firstName: request.firstName ?? 'there',
+          accessCode: account.accessCode,
+          password,
+        });
+        emailSent = true;
+      } catch (error) {
+        req.log.error(
+          { err: error, requestCode: request.requestCode, studentEmail: request.studentEmail },
+          'Unable to send anonymous access credentials email',
+        );
+      }
+    }
+
     res.status(201).json({
       account: {
         id: account.id,
         accessCode: account.accessCode,
         status: account.status,
       },
+      emailSent,
     });
   },
 );

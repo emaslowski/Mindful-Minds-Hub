@@ -235,7 +235,10 @@ export const teacherAnonymousAccess = {
       '/teacher/anonymous-access',
     ),
   approve: (requestId: number, data: { accessCode: string; password: string }) =>
-    studioFetch<{ account: Pick<AnonymousAccessAccount, 'id' | 'accessCode' | 'status'> }>(
+    studioFetch<{
+      account: Pick<AnonymousAccessAccount, 'id' | 'accessCode' | 'status'>;
+      emailSent: boolean;
+    }>(
       `/teacher/anonymous-access/requests/${requestId}/approve`,
       { method: 'POST', body: JSON.stringify(data) },
     ),
@@ -459,6 +462,7 @@ export interface AnonymousAccessRequest {
   firstName: string | null;
   lastName: string | null;
   grade: string | null;
+  studentEmail: string | null;
   status: 'pending' | 'approved' | 'cancelled';
   createdAt: string;
   approvedAt?: string | null;
@@ -470,6 +474,7 @@ export interface AnonymousAccessAccount {
   firstName: string | null;
   lastName: string | null;
   grade: string | null;
+  studentEmail: string | null;
   accessCode: string;
   status: 'active' | 'disabled';
   createdAt: string;

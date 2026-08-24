@@ -20,6 +20,7 @@ type IssuedCredential = {
   accessCode: string;
   password: string;
   message: string;
+  emailSent: boolean;
 };
 
 function errorMessage(error: unknown): string {
@@ -62,7 +63,9 @@ export default function AnonymousAccess() {
                 <div className="flex gap-3">
                   <ShieldCheck className="h-6 w-6 text-[#688a52] flex-shrink-0 mt-0.5" />
                   <div>
-                    <h2 className="font-serif text-lg font-semibold text-[#453329]">Give these details to the student now</h2>
+                    <h2 className="font-serif text-lg font-semibold text-[#453329]">
+                      {issuedCredential.emailSent ? 'Credentials emailed to the student' : 'Give these details to the student now'}
+                    </h2>
                     <p className="text-sm text-[#688a52] mt-1">{issuedCredential.message}</p>
                     <div className="grid sm:grid-cols-2 gap-3 mt-4">
                       <div className="bg-white rounded-lg border border-[#d5cabe] p-3">
@@ -93,7 +96,7 @@ export default function AnonymousAccess() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-[#688a52] mb-4">
-                Students show you their request ID in person. Review their name and grade before you issue journal access. Older requests may show details as unavailable.
+                Review the student’s name, grade, and email before you issue journal access. Credentials are emailed automatically after approval. Older requests may show details as unavailable.
               </p>
               {listLoading ? (
                 <p className="text-sm text-[#688a52]">Loading requests…</p>
@@ -134,6 +137,7 @@ export default function AnonymousAccess() {
                         <th className="text-left px-4 py-3 font-medium">Request ID</th>
                         <th className="text-left px-4 py-3 font-medium">Student</th>
                         <th className="text-left px-4 py-3 font-medium">Grade</th>
+                        <th className="text-left px-4 py-3 font-medium">Email</th>
                         <th className="text-left px-4 py-3 font-medium">Access code</th>
                         <th className="text-left px-4 py-3 font-medium">Status</th>
                         <th className="text-right px-4 py-3 font-medium">Actions</th>
@@ -174,6 +178,7 @@ function ApprovalCard({
   const { toast } = useToast();
   const studentName = [request.firstName, request.lastName].filter(Boolean).join(' ') || 'Not provided';
   const studentGrade = request.grade ?? 'Not provided';
+  const studentEmail = request.studentEmail ?? 'Not provided';
   const [accessCode, setAccessCode] = useState(`MM-${request.requestCode.replace('MM-', '')}`);
   const [password, setPassword] = useState('');
   const { mutate: approve, isPending } = useMutation({
@@ -181,7 +186,10 @@ function ApprovalCard({
     onSuccess: (data) => onIssued({
       accessCode: data.account.accessCode,
       password,
-      message: `Request ${request.requestCode} is approved.`,
+      message: data.emailSent
+        ? `Request ${request.requestCode} is approved and the credentials were emailed to ${studentEmail}.`
+        : `Request ${request.requestCode} is approved, but the credential email could not be sent. Use the details below to contact the student.`,
+      emailSent: data.emailSent,
     }),
     onError: (error) => toast({ title: 'Unable to approve request', description: errorMessage(error), variant: 'destructive' }),
   });
@@ -193,6 +201,7 @@ function ApprovalCard({
           <p className="text-xs uppercase tracking-wide text-[#8a6a55]">Student</p>
           <p className="font-medium text-[#453329]">{studentName}</p>
           <p className="text-xs text-[#688a52] mt-1">{studentGrade}</p>
+          <p className="text-xs text-[#688a52] mt-1 break-all">{studentEmail}</p>
         </div>
         <div className="text-right">
           <p className="text-xs uppercase tracking-wide text-[#8a6a55]">Request ID</p>
@@ -234,12 +243,14 @@ function AccountRow({
 }) {
   const studentName = [account.firstName, account.lastName].filter(Boolean).join(' ') || 'Not provided';
   const studentGrade = account.grade ?? 'Not provided';
+  const studentEmail = account.studentEmail ?? 'Not provided';
 
   return (
     <tr className={tinted ? 'bg-[#f5efe5]' : 'bg-[#eee6d8]'}>
       <td className="px-4 py-3 font-mono text-[#688a52]">{account.requestCode}</td>
       <td className="px-4 py-3 font-medium text-[#453329]">{studentName}</td>
       <td className="px-4 py-3 text-[#688a52]">{studentGrade}</td>
+      <td className="px-4 py-3 text-[#688a52] break-all">{studentEmail}</td>
       <td className="px-4 py-3 font-mono font-medium text-[#453329]">{account.accessCode}</td>
       <td className="px-4 py-3">
         <Badge className={account.status === 'active' ? 'bg-[#688a52] text-white' : 'bg-[#8a6a55] text-white'}>
@@ -283,6 +294,7 @@ function ResetPasswordDialog({
         accessCode: account.accessCode,
         password,
         message: `Password reset for ${account.accessCode}.`,
+        emailSent: false,
       });
       setPassword('');
     },

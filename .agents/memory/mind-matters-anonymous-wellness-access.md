@@ -8,3 +8,11 @@ Anonymous wellness credentials are an independently validated secondary identity
 **Why:** A browser can hold anonymous wellness access and an OAuth/Studio session at the same time. Treating the anonymous identity as global masks the authenticated user and breaks normal Studio role resolution. Disabling a code must also invalidate the anonymous session centrally, not only in a page handler.
 
 **How to apply:** Keep anonymous access in its own cookie/session and request field. Wellness routes may explicitly prefer it; global identity and Studio authentication use the primary session. Any app-wide logout should deliberately clear both session types, while anonymous-only logout can stay local.
+
+## Credential delivery
+
+New wellness-access requests collect a student email alongside the approval details, and approval sends the new code and password to that address. This replaces requiring the student to show a request ID in person.
+
+**Why:** The credential handoff needs to work remotely while keeping Student Studio authentication separate.
+
+**How to apply:** Require and validate an email for new requests, retain nullable email fields for legacy requests, and show teachers clear delivery status with a manual fallback if sending fails. Do not reuse this email to create, authorize, or sign into a Studio account.

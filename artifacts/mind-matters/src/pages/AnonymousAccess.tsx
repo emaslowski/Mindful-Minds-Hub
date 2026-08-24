@@ -16,6 +16,7 @@ export default function AnonymousAccess() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [grade, setGrade] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
   const [accessCode, setAccessCode] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export default function AnonymousAccess() {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, grade }),
+        body: JSON.stringify({ firstName, lastName, grade, studentEmail }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error ?? 'Unable to request access right now');
@@ -134,20 +135,20 @@ export default function AnonymousAccess() {
             {requestCode ? (
               <div className="space-y-5">
                 <p className="font-sans text-foreground/75 leading-relaxed">
-                  Your request is ready. Show this ID to your teacher so they can give you a code and password.
+                  Your request is ready. Your teacher will review it and email your access code and password to you.
                 </p>
                 <div className="bg-amber/20 border border-amber/30 rounded-2xl p-5 text-center">
-                  <p className="font-sans text-xs uppercase tracking-widest text-foreground/55 mb-2">Your request ID</p>
-                  <p className="font-mono text-3xl font-bold tracking-widest text-foreground">{requestCode}</p>
+                  <p className="font-sans text-xs uppercase tracking-widest text-foreground/55 mb-2">Request submitted</p>
+                  <p className="font-sans text-lg font-bold text-foreground break-words">{studentEmail}</p>
                 </div>
                 <p className="font-sans text-sm text-foreground/60">
-                  Your teacher will review these details, approve the request, and hand you your private sign-in details.
+                  You do not need to show a request ID. Watch your email for your private sign-in details after approval.
                 </p>
               </div>
             ) : (
               <form className="space-y-4" onSubmit={requestAccess}>
                 <p className="font-sans text-foreground/75 leading-relaxed">
-                  Request private journal access by sharing these three details with your teacher: your first name, last name, and grade.
+                  Request private journal access by sharing your name, grade, and an email address where your teacher can send your access details.
                 </p>
                 <label className="block font-sans text-sm font-bold text-foreground/70">
                   First name
@@ -186,6 +187,19 @@ export default function AnonymousAccess() {
                     ))}
                   </select>
                 </label>
+                <label className="block font-sans text-sm font-bold text-foreground/70">
+                  Email address
+                  <input
+                    type="email"
+                    value={studentEmail}
+                    onChange={(event) => setStudentEmail(event.target.value)}
+                    autoComplete="email"
+                    required
+                    maxLength={254}
+                    placeholder="you@example.com"
+                    className="mt-2 w-full bg-white/70 border border-card-border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sage/50"
+                  />
+                </label>
                 {requestError && <p className="text-sm text-red-700 bg-red-50 rounded-xl p-3">{requestError}</p>}
                 <button
                   type="submit"
@@ -195,7 +209,7 @@ export default function AnonymousAccess() {
                   {requesting ? 'Creating request…' : 'Request anonymous access'}
                 </button>
                 <p className="font-sans text-xs text-foreground/55 text-center">
-                  Your teacher receives an alert with these details when this request is created.
+                  Your teacher receives an alert, and credentials will be emailed after approval.
                 </p>
               </form>
             )}

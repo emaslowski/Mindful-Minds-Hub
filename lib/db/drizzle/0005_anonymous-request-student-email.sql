@@ -1,0 +1,1 @@
+ALTER TABLE "anonymous_access_requests" ADD COLUMN "student_email" varchar(254);
