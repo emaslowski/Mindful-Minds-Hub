@@ -109,7 +109,15 @@ router.get('/teacher/projects/:id', requireStudioRole('teacher'), async (req: Re
     : [];
 
   const safetyFlags = await db
-    .select()
+    // The development database predates the optional resolution columns.
+    // Select only columns present in both schema versions so opening a project
+    // does not fail before the teacher review page can render.
+    .select({
+      id: studioSafetyFlagsTable.id,
+      projectId: studioSafetyFlagsTable.projectId,
+      flagReason: studioSafetyFlagsTable.flagReason,
+      createdAt: studioSafetyFlagsTable.createdAt,
+    })
     .from(studioSafetyFlagsTable)
     .where(eq(studioSafetyFlagsTable.projectId, id));
 

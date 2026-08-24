@@ -75,10 +75,15 @@ export default function AllProjects() {
                   {filtered.map((p, i) => (
                     <tr key={p.id} className={i % 2 === 0 ? 'bg-[#eee6d8]' : 'bg-[#f5efe5]'}>
                       <td className="px-4 py-3 font-medium text-[#453329]">
-                        {p.contentFlagged && (
-                          <AlertCircle className="inline h-3.5 w-3.5 text-amber-500 mr-1" />
-                        )}
-                        {p.title}
+                        <Link
+                          href={`/studio/teacher/review/${p.id}`}
+                          className="hover:text-[#c4622d] hover:underline underline-offset-2"
+                        >
+                          {p.contentFlagged && (
+                            <AlertCircle className="inline h-3.5 w-3.5 text-amber-500 mr-1" />
+                          )}
+                          {p.title}
+                        </Link>
                       </td>
                       <td className="px-4 py-3 text-[#688a52]">{p.studentName ?? '—'}</td>
                       <td className="px-4 py-3 text-[#688a52]">{p.teamName ?? '—'}</td>

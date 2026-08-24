@@ -33,3 +33,14 @@ The `studio_profiles` and `studio_content_types` tables were in drizzle's snapsh
 (migration 0000) but the actual DB only had the older `studio_student_profiles` /
 `studio_accounts` tables from a different migration run. Tables were created manually
 via psql to match the current drizzle schema.
+
+Some Studio tables can also be missing optional columns declared in the current
+Drizzle schema. Avoid `select()` of every table column on a user-facing read path
+until its migration has been applied; select the fields that are required by the
+response instead.
+
+**Why:** a missing optional column causes the entire project-detail query to return
+500, even when the UI only needs the older fields.
+
+**How to apply:** reconcile the generated migration with the development database
+when practical. Until then, use explicit compatible projections for legacy tables.
