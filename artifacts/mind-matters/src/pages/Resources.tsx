@@ -1,5 +1,5 @@
 import { WaveFooter } from "@/components/WaveFooter";
-import { Phone, MessageSquare, HeartHandshake, Info, ShieldAlert, ExternalLink, BookOpen, Users, Heart } from "lucide-react";
+import { Phone, MessageSquare, Info, ShieldAlert, ExternalLink, BookOpen, Users, Heart } from "lucide-react";
 
 interface ParentResourceProps {
   href: string;
@@ -123,16 +123,6 @@ export default function Resources() {
                   </div>
                 </div>
 
-                <a href="tel:1-800-950-NAMI" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
-                  <div className="bg-dusty-rose text-white p-3 rounded-full group-hover:scale-110 transition-transform">
-                    <HeartHandshake size={24} />
-                  </div>
-                  <div>
-                    <div className="font-sans font-bold text-lg text-foreground">NAMI HelpLine</div>
-                    <div className="font-sans text-sm text-foreground/70">Support, information, and local referrals · 1-800-950-NAMI</div>
-                  </div>
-                </a>
-                
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSdsvjA6H-kGByOdWStEFQ9PCq2OJMK8iolsVXLnNL3fuRBGxw/viewform" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group border border-terracotta/30">
                   <div className="bg-white text-terracotta p-3 rounded-full border-2 border-terracotta group-hover:scale-110 transition-transform">
                     <Info size={24} />
@@ -143,13 +133,13 @@ export default function Resources() {
                   </div>
                 </a>
 
-                <a href="https://www.dhses.ny.gov/see-something-say-something" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
+                <a href="https://www.preventsuicideny.org/crisis-text-line-teens/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white/60 hover:bg-white p-4 rounded-2xl transition-colors group">
                   <div className="bg-foreground/80 text-white p-3 rounded-full group-hover:scale-110 transition-transform">
                     <ShieldAlert size={24} />
                   </div>
                   <div>
-                    <div className="font-sans font-bold text-lg text-foreground">New York State SafeNYS</div>
-                    <div className="font-sans text-sm text-foreground/70">Report suspicious activity — call 1-866-SAFENYS</div>
+                    <div className="font-sans font-bold text-lg text-foreground">NYS Crisis Text Line for Teens</div>
+                    <div className="font-sans text-sm text-foreground/70">Text GOT5 to 741741 for free, anonymous, 24/7 support</div>
                   </div>
                 </a>
               </div>
