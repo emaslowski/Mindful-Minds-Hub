@@ -29,6 +29,7 @@ export default function CommandCenter() {
   const { toast } = useToast();
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmModerationItem, setConfirmModerationItem] = useState<ModerationItem | null>(null);
 
   const { data: analytics } = useQuery({
     queryKey: ['teacher-analytics'],
@@ -73,6 +74,20 @@ export default function CommandCenter() {
     },
     onError: (err: Error) => {
       toast({ title: 'Could not authorize content', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  const { mutate: deleteModeration, isPending: isDeletingModeration } = useMutation({
+    mutationFn: ({ type, id }: Pick<ModerationItem, 'type' | 'id'>) =>
+      teacherModeration.delete(type, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teacher-moderation'] });
+      setConfirmModerationItem(null);
+      toast({ title: 'Content deleted', description: 'The item was permanently removed.' });
+    },
+    onError: (err: Error) => {
+      setConfirmModerationItem(null);
+      toast({ title: 'Could not delete content', description: err.message, variant: 'destructive' });
     },
   });
 
@@ -181,6 +196,16 @@ export default function CommandCenter() {
                         <CheckCircle2 className="h-4 w-4 mr-1.5" />
                         Authorize
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full self-start"
+                        onClick={() => setConfirmModerationItem(item)}
+                        disabled={isApproving || isDeletingModeration}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1.5" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 );
@@ -288,6 +313,43 @@ export default function CommandCenter() {
               disabled={isDeleting}
             >
               {isDeleting ? 'Deleting…' : 'Yes, delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={confirmModerationItem !== null}
+        onOpenChange={(open) => !open && setConfirmModerationItem(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this content permanently?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This {confirmModerationItem?.type === 'blog'
+                ? 'blog post'
+                : confirmModerationItem?.type === 'comment'
+                  ? 'comment'
+                  : 'board post'} will be permanently deleted and cannot be restored.
+              {confirmModerationItem?.title && (
+                <span className="block font-semibold mt-2">"{confirmModerationItem.title}"</span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() =>
+                confirmModerationItem &&
+                deleteModeration({
+                  type: confirmModerationItem.type,
+                  id: confirmModerationItem.id,
+                })
+              }
+              disabled={isDeletingModeration}
+            >
+              {isDeletingModeration ? 'Deleting…' : 'Yes, permanently delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

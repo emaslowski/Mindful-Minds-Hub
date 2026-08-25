@@ -223,6 +223,10 @@ export const teacherModeration = {
     studioFetch<{ success: boolean }>(`/teacher/moderation/${type}/${id}/approve`, {
       method: 'POST',
     }),
+  delete: (type: ModerationItemType, id: number) =>
+    studioFetch<{ success: boolean }>(`/teacher/moderation/${type}/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 // ── Teacher: Settings ─────────────────────────────────────────────────────
