@@ -64,6 +64,13 @@
       "when": 1787614389479,
       "tag": "0008_studio-project-contributor-identity",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787673464324,
+      "tag": "0009_collab-comment-approval",
+      "breakpoints": true
     }
   ]
 }

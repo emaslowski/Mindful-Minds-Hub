@@ -211,6 +211,20 @@ export const teacherAnalytics = {
     }),
 };
 
+// ── Teacher: Content moderation ─────────────────────────────────────────────
+export const teacherModeration = {
+  list: () =>
+    studioFetch<{
+      blogPosts: ModerationItem[];
+      collabPosts: ModerationItem[];
+      comments: ModerationItem[];
+    }>('/teacher/moderation'),
+  approve: (type: ModerationItemType, id: number) =>
+    studioFetch<{ success: boolean }>(`/teacher/moderation/${type}/${id}/approve`, {
+      method: 'POST',
+    }),
+};
+
 // ── Teacher: Settings ─────────────────────────────────────────────────────
 export const teacherSettings = {
   get: () =>
@@ -281,6 +295,19 @@ export interface StudioProject {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;
+}
+
+export type ModerationItemType = 'blog' | 'collab-post' | 'comment';
+
+export interface ModerationItem {
+  id: number;
+  type: ModerationItemType;
+  title?: string;
+  author: string;
+  content: string;
+  createdAt: string;
+  postId?: number;
+  postTitle?: string;
 }
 
 export interface StudioTeacherReview {

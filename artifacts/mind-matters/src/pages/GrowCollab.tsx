@@ -25,6 +25,7 @@ function PostCard({ post }: { post: any }) {
   
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [commentSubmitted, setCommentSubmitted] = useState(false);
 
   const handleComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +37,7 @@ function PostCard({ post }: { post: any }) {
         onSuccess: () => {
           setCommentName("");
           setCommentText("");
+          setCommentSubmitted(true);
           refetch();
         }
       }
@@ -109,6 +111,11 @@ function PostCard({ post }: { post: any }) {
                 <Send size={18} />
               </button>
             </div>
+            {commentSubmitted && (
+              <p className="text-xs text-sage font-sans">
+                Thanks! Your comment was sent to a moderator for approval.
+              </p>
+            )}
           </form>
         </div>
       )}

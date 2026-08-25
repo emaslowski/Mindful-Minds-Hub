@@ -5,6 +5,7 @@ import { eq, and, sql } from "drizzle-orm";
 import nodemailer from "nodemailer";
 
 const router = Router();
+const MODERATOR_EMAILS = ["elittle9514@gmail.com", "mindmatters0526@gmail.com"];
 
 async function notifyAdminNewPost(authorName: string, content: string) {
   const smtpHost = process.env.SMTP_HOST;
@@ -22,7 +23,7 @@ async function notifyAdminNewPost(authorName: string, content: string) {
 
   await transporter.sendMail({
     from: process.env.SMTP_USER,
-    to: "elittle9514@gmail.com",
+    to: MODERATOR_EMAILS,
     subject: "📌 New Collaboration Board Post — Awaiting Approval",
     text: `A student submitted a new collaboration board post.\n\nAuthor: ${authorName}\n\nPost:\n${content}\n\nLog into Mind Matters admin to approve or reject.`,
     html: `<h2>📌 New Collaboration Board Post</h2>
@@ -30,7 +31,7 @@ async function notifyAdminNewPost(authorName: string, content: string) {
       <p><strong>Author:</strong> ${authorName}</p>
       <p><strong>Post:</strong></p>
       <blockquote style="background:#f5f5f5;padding:12px;border-left:4px solid #688A52">${content.replace(/\n/g, "<br>")}</blockquote>
-      <p>To approve: run <code>UPDATE collab_posts SET approved=true WHERE id=&lt;id&gt;</code> in the database, or use your admin panel.</p>`,
+      <p>Log into Mind Matters Command Center to authorize or leave this post pending.</p>`,
   });
 }
 
@@ -42,7 +43,7 @@ router.get("/collab-posts", async (_req, res) => {
       authorName: collabPostsTable.authorName,
       content: collabPostsTable.content,
       createdAt: collabPostsTable.createdAt,
-      commentCount: sql<number>`(SELECT COUNT(*) FROM collab_comments WHERE post_id = ${collabPostsTable.id})::int`,
+      commentCount: sql<number>`(SELECT COUNT(*) FROM collab_comments WHERE post_id = ${collabPostsTable.id} AND approved = true)::int`,
     })
     .from(collabPostsTable)
     .where(eq(collabPostsTable.approved, true))
@@ -83,10 +84,20 @@ router.post("/collab-posts", async (req, res) => {
 // GET /api/collab-posts/:id/comments
 router.get("/collab-posts/:id/comments", async (req, res) => {
   const postId = Number(req.params.id);
+  const [post] = await db
+    .select({ id: collabPostsTable.id })
+    .from(collabPostsTable)
+    .where(and(eq(collabPostsTable.id, postId), eq(collabPostsTable.approved, true)));
+
+  if (!post) {
+    res.status(404).json({ error: "Post not found" });
+    return;
+  }
+
   const comments = await db
     .select()
     .from(collabCommentsTable)
-    .where(eq(collabCommentsTable.postId, postId))
+    .where(and(eq(collabCommentsTable.postId, postId), eq(collabCommentsTable.approved, true)))
     .orderBy(collabCommentsTable.createdAt);
 
   res.json(
@@ -108,21 +119,63 @@ router.post("/collab-posts/:id/comments", async (req, res) => {
     return;
   }
 
+  const [post] = await db
+    .select({ id: collabPostsTable.id })
+    .from(collabPostsTable)
+    .where(and(eq(collabPostsTable.id, postId), eq(collabPostsTable.approved, true)));
+
+  if (!post) {
+    res.status(404).json({ error: "Post not found" });
+    return;
+  }
+
   const [comment] = await db
     .insert(collabCommentsTable)
     .values({
       postId,
       authorName: authorName.trim(),
       content: content.trim(),
+      approved: false,
     })
     .returning();
+
+  notifyAdminNewComment(authorName, content, postId).catch(() => {});
 
   res.status(201).json({
     id: comment.id,
     authorName: comment.authorName,
     content: comment.content,
     createdAt: comment.createdAt.toISOString(),
+    message: "Your comment was sent for moderator approval.",
   });
 });
+
+async function notifyAdminNewComment(authorName: string, content: string, postId: number) {
+  const smtpHost = process.env.SMTP_HOST;
+  if (!smtpHost) return;
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: MODERATOR_EMAILS,
+    subject: "💬 New Collaboration Board Comment — Awaiting Approval",
+    text: `A student submitted a new collaboration board comment for post #${postId}.\n\nAuthor: ${authorName}\n\nComment:\n${content}\n\nLog into Mind Matters Command Center to authorize it.`,
+    html: `<h2>💬 New Collaboration Board Comment</h2>
+      <p>A student submitted a comment for the collaboration board. Please review it.</p>
+      <p><strong>Author:</strong> ${authorName}</p>
+      <p><strong>Comment:</strong></p>
+      <blockquote style="background:#f5f5f5;padding:12px;border-left:4px solid #688A52">${content.replace(/\n/g, "<br>")}</blockquote>
+      <p>Log into Mind Matters Command Center to authorize or leave this comment pending.</p>`,
+  });
+}
 
 export default router;

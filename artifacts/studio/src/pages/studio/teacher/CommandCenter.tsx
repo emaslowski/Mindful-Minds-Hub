@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherReview, teacherAnalytics } from '@/lib/studioApi';
+import { teacherReview, teacherAnalytics, teacherModeration, type ModerationItem } from '@/lib/studioApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Users, FolderOpen, ClipboardCheck, Star,
-  RefreshCw, AlertCircle, ChevronRight, Trash2,
+  RefreshCw, AlertCircle, ChevronRight, Trash2, CheckCircle2, FileText, MessageSquare,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
@@ -42,6 +42,13 @@ export default function CommandCenter() {
     enabled: !!user,
   });
 
+  const { data: moderationData } = useQuery({
+    queryKey: ['teacher-moderation'],
+    queryFn: () => teacherModeration.list(),
+    enabled: !!user,
+    refetchOnWindowFocus: true,
+  });
+
   const { mutate: deleteProject, isPending: isDeleting } = useMutation({
     mutationFn: (id: number) => teacherReview.delete(id),
     onSuccess: () => {
@@ -57,10 +64,32 @@ export default function CommandCenter() {
     },
   });
 
+  const { mutate: approveModeration, isPending: isApproving } = useMutation({
+    mutationFn: ({ type, id }: Pick<ModerationItem, 'type' | 'id'>) =>
+      teacherModeration.approve(type, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teacher-moderation'] });
+      toast({ title: 'Content authorized', description: 'It is now visible to the public.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Could not authorize content', description: err.message, variant: 'destructive' });
+    },
+  });
+
   if (isLoading || !user) return null;
 
   const s = analytics?.summary;
   const queue = queueData?.projects ?? [];
+  const authorizationQueue = [
+    ...(moderationData?.blogPosts ?? []),
+    ...(moderationData?.collabPosts ?? []),
+    ...(moderationData?.comments ?? []),
+  ];
+  const moderationLabels = {
+    blog: { label: 'Blog post', icon: <FileText className="h-4 w-4 text-[#c4622d]" /> },
+    'collab-post': { label: 'Board post', icon: <MessageSquare className="h-4 w-4 text-[#688a52]" /> },
+    comment: { label: 'Comment', icon: <MessageSquare className="h-4 w-4 text-[#d4a44c]" /> },
+  };
 
   const summaryCards = [
     { label: 'Active Students', value: s?.activeStudents ?? 0, icon: <Users className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/students' },
@@ -90,6 +119,75 @@ export default function CommandCenter() {
             </Link>
           ))}
         </div>
+
+        {/* Public content moderation */}
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-[#453329]">Awaiting Authorization</h2>
+            <p className="text-xs text-[#688a52] mt-0.5">
+              Blog posts, collaboration board posts, and comments stay private until you approve them.
+            </p>
+          </div>
+          <span className="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-[#c4622d] text-white text-xs font-bold">
+            {authorizationQueue.length}
+          </span>
+        </div>
+
+        {authorizationQueue.length === 0 ? (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8">
+            <CardContent className="p-6 flex items-center gap-3 text-sm text-[#688a52]">
+              <CheckCircle2 className="h-5 w-5 text-[#688a52]" />
+              No blog posts, board posts, or comments are waiting for authorization.
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8 overflow-hidden">
+            <div className="divide-y divide-[#d5cabe]">
+              {authorizationQueue.map((item) => {
+                const metadata = moderationLabels[item.type];
+                const contentPreview = item.content.length > 280
+                  ? `${item.content.slice(0, 280)}…`
+                  : item.content;
+                return (
+                  <div key={`${item.type}-${item.id}`} className="p-4 bg-[#eee6d8]">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#453329]">
+                            {metadata.icon}
+                            {metadata.label}
+                          </span>
+                          <span className="text-xs text-[#688a52]">by {item.author}</span>
+                          <span className="text-xs text-[#688a52]">
+                            {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                          </span>
+                        </div>
+                        {item.title && (
+                          <p className="font-medium text-[#453329] mt-2">{item.title}</p>
+                        )}
+                        {item.type === 'comment' && item.postTitle && (
+                          <p className="text-xs text-[#688a52] mt-1">
+                            Comment on: {item.postTitle.length > 100 ? `${item.postTitle.slice(0, 100)}…` : item.postTitle}
+                          </p>
+                        )}
+                        <p className="text-sm text-[#453329] whitespace-pre-wrap mt-2">{contentPreview}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-[#688a52] hover:bg-[#557a43] text-white rounded-full self-start"
+                        onClick={() => approveModeration({ type: item.type, id: item.id })}
+                        disabled={isApproving}
+                      >
+                        <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                        Authorize
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
 
         {/* Awaiting approval table */}
         <div className="flex items-center justify-between mb-3">

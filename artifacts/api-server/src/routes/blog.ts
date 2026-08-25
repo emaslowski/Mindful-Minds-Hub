@@ -5,6 +5,7 @@ import nodemailer from "nodemailer";
 import { SubmitBlogPostBody } from "@workspace/api-zod";
 
 const router = Router();
+const MODERATOR_EMAILS = ["elittle9514@gmail.com", "mindmatters0526@gmail.com"];
 
 function getTransporter() {
   // Use environment variables for email config
@@ -110,13 +111,11 @@ router.post("/blog-submissions", async (req, res) => {
 
     // Send email notification to admin
     const transporter = getTransporter();
-    const adminEmail = "elittle9514@gmail.com";
-
     if (transporter) {
       try {
         await transporter.sendMail({
           from: process.env.SMTP_USER,
-          to: adminEmail,
+          to: MODERATOR_EMAILS,
           subject: `[Mind Matters] New Blog Post Submission: "${title}"`,
           html: `
             <h2>New Blog Post Submission</h2>
@@ -125,7 +124,7 @@ router.post("/blog-submissions", async (req, res) => {
             <hr />
             <p>${content.replace(/\n/g, "<br />")}</p>
             <hr />
-            <p><em>To approve this post, log into the database and set approved = true for this entry.</em></p>
+            <p><em>Log into Mind Matters Command Center to authorize or leave this post pending.</em></p>
           `,
         });
       } catch (emailErr) {

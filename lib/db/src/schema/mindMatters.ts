@@ -32,13 +32,15 @@ export const collabPostsTable = pgTable("collab_posts", {
   approvedAt: timestamp("approved_at"),
 });
 
-// Collaboration board comments (public)
+// Collaboration board comments (moderator approval required)
 export const collabCommentsTable = pgTable("collab_comments", {
   id: serial("id").primaryKey(),
   postId: integer("post_id").notNull().references(() => collabPostsTable.id),
   authorName: text("author_name").notNull(),
   content: text("content").notNull(),
+  approved: boolean("approved").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  approvedAt: timestamp("approved_at"),
 });
 
 // Reviews
