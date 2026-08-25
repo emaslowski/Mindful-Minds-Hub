@@ -100,6 +100,7 @@ export default function CommandCenter() {
     ...(moderationData?.collabPosts ?? []),
     ...(moderationData?.comments ?? []),
   ];
+  const approvedBoardPosts = moderationData?.approvedCollabPosts ?? [];
   const moderationLabels = {
     blog: { label: 'Blog post', icon: <FileText className="h-4 w-4 text-[#c4622d]" /> },
     'collab-post': { label: 'Board post', icon: <MessageSquare className="h-4 w-4 text-[#688a52]" /> },
@@ -210,6 +211,64 @@ export default function CommandCenter() {
                   </div>
                 );
               })}
+            </div>
+          </Card>
+        )}
+
+        {/* Approved collaboration board posts */}
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-[#453329]">Published Collaboration Posts</h2>
+            <p className="text-xs text-[#688a52] mt-0.5">
+              Approved board posts stay public until you permanently delete them.
+            </p>
+          </div>
+          <span className="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-[#688a52] text-white text-xs font-bold">
+            {approvedBoardPosts.length}
+          </span>
+        </div>
+
+        {approvedBoardPosts.length === 0 ? (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8">
+            <CardContent className="p-6 flex items-center gap-3 text-sm text-[#688a52]">
+              <MessageSquare className="h-5 w-5 text-[#688a52]" />
+              No approved collaboration posts are currently published.
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8 overflow-hidden">
+            <div className="divide-y divide-[#d5cabe]">
+              {approvedBoardPosts.map((item) => (
+                <div key={`approved-${item.id}`} className="p-4 bg-[#eee6d8]">
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#453329]">
+                          <MessageSquare className="h-4 w-4 text-[#688a52]" />
+                          Board post
+                        </span>
+                        <span className="text-xs text-[#688a52]">by {item.author}</span>
+                        <span className="text-xs text-[#688a52]">
+                          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-[#453329] whitespace-pre-wrap mt-2">
+                        {item.content}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full self-start"
+                      onClick={() => setConfirmModerationItem(item)}
+                      disabled={isApproving || isDeletingModeration}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1.5" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </Card>
         )}

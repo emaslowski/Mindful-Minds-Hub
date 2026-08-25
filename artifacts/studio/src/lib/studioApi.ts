@@ -217,6 +217,7 @@ export const teacherModeration = {
     studioFetch<{
       blogPosts: ModerationItem[];
       collabPosts: ModerationItem[];
+      approvedCollabPosts: ModerationItem[];
       comments: ModerationItem[];
     }>('/teacher/moderation'),
   approve: (type: ModerationItemType, id: number) =>

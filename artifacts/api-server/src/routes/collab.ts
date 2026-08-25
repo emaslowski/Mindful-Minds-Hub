@@ -8,38 +8,101 @@ import { logger } from "../lib/logger";
 const router = Router();
 const MODERATOR_EMAIL = "mindmatters0526@gmail.com";
 
-async function notifyAdminNewPost(authorName: string, content: string) {
+function createModeratorTransport() {
   const smtpHost = process.env.SMTP_HOST ?? "smtp.gmail.com";
   const smtpPort = Number(process.env.SMTP_PORT ?? 587);
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    requireTLS: smtpPort === 587,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  if (!smtpUser || !smtpPass) {
+    logger.error(
+      { recipient: MODERATOR_EMAIL },
+      "Collaboration moderation email was not sent because SMTP credentials are missing",
+    );
+    return null;
+  }
+
+  return {
+    smtpUser,
+    transporter: nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      requireTLS: smtpPort === 587,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    }),
+  };
+}
+
+async function sendModeratorEmail({
+  subject,
+  text,
+  html,
+  notificationType,
+}: {
+  subject: string;
+  text: string;
+  html: string;
+  notificationType: "post" | "comment";
+}) {
+  const mailer = createModeratorTransport();
+  if (!mailer) return;
 
   try {
-    const info = await transporter.sendMail({
-      from: process.env.SMTP_USER,
+    const info = await mailer.transporter.sendMail({
+      from: { name: "Mind Matters", address: mailer.smtpUser },
+      replyTo: mailer.smtpUser,
       to: MODERATOR_EMAIL,
-      subject: "📌 New Collaboration Board Post — Awaiting Approval",
-      text: `A student submitted a new collaboration board post.\n\nAuthor: ${authorName}\n\nPost:\n${content}\n\nLog into Mind Matters admin to approve or reject.`,
-      html: `<h2>📌 New Collaboration Board Post</h2>
+      subject,
+      text,
+      html,
+    });
+
+    if (info.rejected.includes(MODERATOR_EMAIL)) {
+      logger.error(
+        {
+          accepted: info.accepted,
+          rejected: info.rejected,
+          response: info.response,
+          recipient: MODERATOR_EMAIL,
+        },
+        `Collaboration ${notificationType} approval email was rejected`,
+      );
+      return;
+    }
+
+    logger.info(
+      {
+        accepted: info.accepted,
+        messageId: info.messageId,
+        recipient: MODERATOR_EMAIL,
+        response: info.response,
+      },
+      `Collaboration ${notificationType} approval email accepted by SMTP`,
+    );
+  } catch (error) {
+    logger.error(
+      { err: error, recipient: MODERATOR_EMAIL },
+      `Failed to send collaboration ${notificationType} approval email`,
+    );
+  }
+}
+
+async function notifyAdminNewPost(authorName: string, content: string) {
+  await sendModeratorEmail({
+    notificationType: "post",
+    subject: "New Collaboration Board Post — Awaiting Approval",
+    text: `A student submitted a new collaboration board post.\n\nAuthor: ${authorName}\n\nPost:\n${content}\n\nLog into Mind Matters Command Center to authorize or leave this post pending.`,
+    html: `<h2>New Collaboration Board Post</h2>
         <p>A student submitted a post for the collaboration board. Please review it.</p>
         <p><strong>Author:</strong> ${authorName}</p>
         <p><strong>Post:</strong></p>
         <blockquote style="background:#f5f5f5;padding:12px;border-left:4px solid #688A52">${content.replace(/\n/g, "<br>")}</blockquote>
         <p>Log into Mind Matters Command Center to authorize or leave this post pending.</p>`,
-    });
-    logger.info({ messageId: info.messageId, recipient: MODERATOR_EMAIL }, "Collaboration post approval email sent");
-  } catch (error) {
-    logger.error({ err: error, recipient: MODERATOR_EMAIL }, "Failed to send collaboration post approval email");
-  }
+  });
 }
 
 // GET /api/collab-posts
@@ -50,10 +113,20 @@ router.get("/collab-posts", async (_req, res) => {
       authorName: collabPostsTable.authorName,
       content: collabPostsTable.content,
       createdAt: collabPostsTable.createdAt,
-      commentCount: sql<number>`(SELECT COUNT(*) FROM collab_comments WHERE post_id = ${collabPostsTable.id} AND approved = true)::int`,
+      commentCount: sql<number>`COUNT(${collabCommentsTable.id})::int`,
     })
     .from(collabPostsTable)
+    .leftJoin(
+      collabCommentsTable,
+      eq(collabCommentsTable.postId, collabPostsTable.id),
+    )
     .where(eq(collabPostsTable.approved, true))
+    .groupBy(
+      collabPostsTable.id,
+      collabPostsTable.authorName,
+      collabPostsTable.content,
+      collabPostsTable.createdAt,
+    )
     .orderBy(collabPostsTable.createdAt);
 
   res.json(
@@ -146,7 +219,7 @@ router.post("/collab-posts/:id/comments", async (req, res) => {
     })
     .returning();
 
-  notifyAdminNewComment(authorName, content, postId).catch(() => {});
+  await notifyAdminNewComment(authorName, content, postId);
 
   res.status(201).json({
     id: comment.id,
@@ -158,37 +231,17 @@ router.post("/collab-posts/:id/comments", async (req, res) => {
 });
 
 async function notifyAdminNewComment(authorName: string, content: string, postId: number) {
-  const smtpHost = process.env.SMTP_HOST ?? "smtp.gmail.com";
-  const smtpPort = Number(process.env.SMTP_PORT ?? 587);
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    requireTLS: smtpPort === 587,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: MODERATOR_EMAIL,
-      subject: "💬 New Collaboration Board Comment — Awaiting Approval",
-      text: `A student submitted a new collaboration board comment for post #${postId}.\n\nAuthor: ${authorName}\n\nComment:\n${content}\n\nLog into Mind Matters Command Center to authorize it.`,
-      html: `<h2>💬 New Collaboration Board Comment</h2>
+  await sendModeratorEmail({
+    notificationType: "comment",
+    subject: "New Collaboration Board Comment — Awaiting Approval",
+    text: `A student submitted a new collaboration board comment for post #${postId}.\n\nAuthor: ${authorName}\n\nComment:\n${content}\n\nLog into Mind Matters Command Center to authorize it.`,
+    html: `<h2>New Collaboration Board Comment</h2>
         <p>A student submitted a comment for the collaboration board. Please review it.</p>
         <p><strong>Author:</strong> ${authorName}</p>
         <p><strong>Comment:</strong></p>
         <blockquote style="background:#f5f5f5;padding:12px;border-left:4px solid #688A52">${content.replace(/\n/g, "<br>")}</blockquote>
         <p>Log into Mind Matters Command Center to authorize or leave this comment pending.</p>`,
-    });
-    logger.info({ messageId: info.messageId, recipient: MODERATOR_EMAIL }, "Collaboration comment approval email sent");
-  } catch (error) {
-    logger.error({ err: error, recipient: MODERATOR_EMAIL }, "Failed to send collaboration comment approval email");
-  }
+  });
 }
 
 export default router;

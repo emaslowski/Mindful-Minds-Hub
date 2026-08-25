@@ -18,9 +18,15 @@ function BackButton() {
 }
 
 // Component for a single post with its comments section
-function PostCard({ post }: { post: any }) {
+function PostCard({ post, onCommentSubmitted }: { post: any; onCommentSubmitted: () => void }) {
   const [expanded, setExpanded] = useState(false);
-  const { data: comments, refetch } = useGetCollabComments(post.id, { query: { enabled: expanded } });
+  const { data: comments, refetch } = useGetCollabComments(post.id, {
+    query: {
+      enabled: expanded,
+      refetchInterval: expanded ? 30_000 : false,
+      refetchOnWindowFocus: true,
+    },
+  });
   const { mutate: addComment, isPending } = useAddCollabComment();
   
   const [commentName, setCommentName] = useState("");
@@ -39,6 +45,7 @@ function PostCard({ post }: { post: any }) {
           setCommentText("");
           setCommentSubmitted(true);
           refetch();
+          onCommentSubmitted();
         }
       }
     );
@@ -81,8 +88,8 @@ function PostCard({ post }: { post: any }) {
                 <p className="font-sans text-sm text-foreground/80">{c.content}</p>
               </div>
             )) : (
-              <div className="text-center font-sans text-sm text-foreground/50 italic py-2">
-                No comments yet. Be the first!
+                <div className="text-center font-sans text-sm text-foreground/50 italic py-2">
+                  No approved comments yet. Comments appear here after a moderator authorizes them.
               </div>
             )}
           </div>
@@ -124,7 +131,12 @@ function PostCard({ post }: { post: any }) {
 }
 
 export default function GrowCollab() {
-  const { data: posts, refetch } = useGetCollabPosts();
+  const { data: posts, refetch } = useGetCollabPosts({
+    query: {
+      refetchInterval: 30_000,
+      refetchOnWindowFocus: true,
+    },
+  });
   const { mutate: submitPost, isPending } = useSubmitCollabPost();
   
   const [authorName, setAuthorName] = useState("");
@@ -215,7 +227,7 @@ export default function GrowCollab() {
             {posts && posts.length > 0 ? (
               posts.map((post) => (
                 <div key={post.id} className="break-inside-avoid">
-                  <PostCard post={post} />
+                  <PostCard post={post} onCommentSubmitted={() => refetch()} />
                 </div>
               ))
             ) : (

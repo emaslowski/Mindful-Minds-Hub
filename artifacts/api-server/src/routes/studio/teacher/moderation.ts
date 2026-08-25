@@ -14,7 +14,7 @@ router.get(
   '/teacher/moderation',
   requireStudioRole('teacher'),
   async (_req: Request, res: Response) => {
-    const [blogPosts, collabPosts, comments] = await Promise.all([
+    const [blogPosts, collabPosts, approvedCollabPosts, comments] = await Promise.all([
       db
         .select({
           id: blogPostsTable.id,
@@ -35,6 +35,16 @@ router.get(
         })
         .from(collabPostsTable)
         .where(eq(collabPostsTable.approved, false))
+        .orderBy(desc(collabPostsTable.createdAt)),
+      db
+        .select({
+          id: collabPostsTable.id,
+          author: collabPostsTable.authorName,
+          content: collabPostsTable.content,
+          createdAt: collabPostsTable.createdAt,
+        })
+        .from(collabPostsTable)
+        .where(eq(collabPostsTable.approved, true))
         .orderBy(desc(collabPostsTable.createdAt)),
       db
         .select({
@@ -61,6 +71,11 @@ router.get(
         createdAt: post.createdAt.toISOString(),
       })),
       collabPosts: collabPosts.map((post) => ({
+        ...post,
+        type: 'collab-post' as const,
+        createdAt: post.createdAt.toISOString(),
+      })),
+      approvedCollabPosts: approvedCollabPosts.map((post) => ({
         ...post,
         type: 'collab-post' as const,
         createdAt: post.createdAt.toISOString(),
@@ -157,16 +172,16 @@ router.delete(
     } else if (type === 'collab-post') {
       const deleted = await db.transaction(async (tx) => {
         // The approval route holds the same lock. Once it is acquired, this
-        // transaction sees a stable pending/approved state before touching
-        // any child comments.
+        // transaction sees a stable post state before touching any child
+        // comments, whether the post is pending or already approved.
         await tx.execute(sql`SELECT pg_advisory_xact_lock(${id})`);
 
-        const [pendingPost] = await tx
+        const [post] = await tx
           .select({ id: collabPostsTable.id })
           .from(collabPostsTable)
-          .where(and(eq(collabPostsTable.id, id), eq(collabPostsTable.approved, false)));
+          .where(eq(collabPostsTable.id, id));
 
-        if (!pendingPost) return [];
+        if (!post) return [];
 
         await tx
           .delete(collabCommentsTable)
@@ -174,12 +189,12 @@ router.delete(
 
         return tx
           .delete(collabPostsTable)
-          .where(and(eq(collabPostsTable.id, id), eq(collabPostsTable.approved, false)))
+          .where(eq(collabPostsTable.id, id))
           .returning({ id: collabPostsTable.id });
       });
 
       if (deleted.length === 0) {
-        res.status(404).json({ error: 'Pending board post not found' });
+        res.status(404).json({ error: 'Board post not found' });
         return;
       }
     } else {

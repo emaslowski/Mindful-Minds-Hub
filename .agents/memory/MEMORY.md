@@ -6,5 +6,6 @@
 - [Mind Matters Studio job-group sessions](mind-matters-studio-jobs.md) — job sessions use integer jobId for DB queries; actual DB columns are integer not varchar; ContentWorkspace uses ## section text format
 - [Mind Matters peer-review identities](mind-matters-peer-review-identities.md) — peer reviews support both individual users and shared job-group sessions as stable text identities
 - [Mind Matters moderation concurrency](mind-matters-moderation-concurrency.md) — approval and deletion of a board post must share one per-post transaction lock
+- [Mind Matters collaboration counts](mind-matters-collaboration-counts.md) — show pending activity in counts while withholding unapproved comment text
 - [Mind Matters anonymous wellness access](mind-matters-anonymous-wellness-access.md) — anonymous journal access is a dedicated, secondary identity that must not replace OAuth or Studio sessions
 - [Durable verification scripts](durable-verification-scripts.md) — use fixed, cleaned test identifiers in the CodeExecution sandbox; runtime time and random APIs are unavailable
