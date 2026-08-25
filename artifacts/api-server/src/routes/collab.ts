@@ -5,7 +5,7 @@ import { eq, and, sql } from "drizzle-orm";
 import nodemailer from "nodemailer";
 
 const router = Router();
-const MODERATOR_EMAILS = ["elittle9514@gmail.com", "mindmatters0526@gmail.com"];
+const MODERATOR_EMAIL = "mindmatters0526@gmail.com";
 
 async function notifyAdminNewPost(authorName: string, content: string) {
   const smtpHost = process.env.SMTP_HOST;
@@ -23,7 +23,7 @@ async function notifyAdminNewPost(authorName: string, content: string) {
 
   await transporter.sendMail({
     from: process.env.SMTP_USER,
-    to: MODERATOR_EMAILS,
+    to: MODERATOR_EMAIL,
     subject: "📌 New Collaboration Board Post — Awaiting Approval",
     text: `A student submitted a new collaboration board post.\n\nAuthor: ${authorName}\n\nPost:\n${content}\n\nLog into Mind Matters admin to approve or reject.`,
     html: `<h2>📌 New Collaboration Board Post</h2>
@@ -166,7 +166,7 @@ async function notifyAdminNewComment(authorName: string, content: string, postId
 
   await transporter.sendMail({
     from: process.env.SMTP_USER,
-    to: MODERATOR_EMAILS,
+    to: MODERATOR_EMAIL,
     subject: "💬 New Collaboration Board Comment — Awaiting Approval",
     text: `A student submitted a new collaboration board comment for post #${postId}.\n\nAuthor: ${authorName}\n\nComment:\n${content}\n\nLog into Mind Matters Command Center to authorize it.`,
     html: `<h2>💬 New Collaboration Board Comment</h2>
