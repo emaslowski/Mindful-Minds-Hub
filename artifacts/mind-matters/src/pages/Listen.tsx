@@ -99,7 +99,7 @@ export default function Listen() {
                   <Mic size={32} />
                 </div>
                 <h2 className="text-3xl md:text-5xl font-display italic text-foreground">
-                  Mind Matters Podcast
+                  Middle School Matters Podcast
                 </h2>
               </div>
               <p className="text-lg font-sans text-foreground/80 mt-4 max-w-lg leading-relaxed">

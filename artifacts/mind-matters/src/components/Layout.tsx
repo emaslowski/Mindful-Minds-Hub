@@ -10,7 +10,6 @@ export function Layout({ children }: { children: ReactNode }) {
   const links = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About Us" },
-    { href: "/resources", label: "Resources" },
     { href: "/events", label: "Events" },
     { href: "/contact", label: "Contact Us" },
   ];
@@ -82,8 +81,10 @@ export function Layout({ children }: { children: ReactNode }) {
               <circle cx="68" cy="54" r="5" fill="#E8A090" opacity="0.35"/>
             </svg>
           </div>
-          <div className="flex items-center font-display font-semibold text-3xl md:text-4xl text-foreground tracking-wide italic mt-1">
-            <span className="text-terracotta">M</span>ind <span className="text-terracotta ml-2">M</span>atters
+          <div className="flex items-center font-display font-semibold text-2xl md:text-3xl text-foreground tracking-wide italic mt-1">
+            <span className="text-terracotta">M</span>iddle&nbsp;
+            <span className="text-terracotta">S</span>chool&nbsp;
+            <span className="text-terracotta">M</span>atters
           </div>
         </Link>
 

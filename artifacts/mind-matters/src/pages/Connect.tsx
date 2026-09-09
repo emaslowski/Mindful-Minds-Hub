@@ -200,7 +200,7 @@ export default function Connect() {
                 <div className="flex items-center gap-1.5 mb-3">
                   <Star size={12} className="text-amber fill-amber" />
                   <span className="font-sans text-xs font-bold text-amber uppercase tracking-widest">
-                    Mind Matters Student Team
+                    Middle School Matters Student Team
                   </span>
                 </div>
                 <h3 className="font-display italic font-semibold text-2xl text-foreground mb-3 leading-tight">

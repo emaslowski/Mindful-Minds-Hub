@@ -180,7 +180,7 @@ export default function Contact() {
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Ask a question, share an idea, or tell us how we can make Mind Matters better..."
+                placeholder="Ask a question, share an idea, or tell us how we can make Middle School Matters better..."
                 required
                 rows={6}
                 className="bg-white/70 border border-black/10 rounded-2xl px-5 py-3.5 font-sans text-base focus:outline-none focus:ring-2 focus:ring-terracotta/40 transition resize-none placeholder:text-foreground/30 placeholder:font-handwritten placeholder:text-xl leading-relaxed"

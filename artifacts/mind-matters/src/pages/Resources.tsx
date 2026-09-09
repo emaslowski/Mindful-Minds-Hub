@@ -85,7 +85,7 @@ export default function Resources() {
             Resources & Help
           </h1>
           <h2 className="text-3xl md:text-5xl font-sans font-bold text-terracotta tracking-wide uppercase">
-            You are not alone. Help is always available.
+            Help and support are always available.
           </h2>
         </div>
 

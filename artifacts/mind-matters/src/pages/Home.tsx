@@ -4,16 +4,6 @@ import { ImpactStats } from "@/components/ImpactStats";
 export default function Home() {
   const categories = [
     {
-      name: "Learn",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full text-sage">
-          <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 2.5 2.5 0 0 1-.98-4.5 2.5 2.5 0 0 1 1.5-4.1 2.5 2.5 0 0 1 4.9-3.76V4.5A2.5 2.5 0 0 1 9.5 2z" />
-          <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 2.5 2.5 0 0 0 .98-4.5 2.5 2.5 0 0 0-1.5-4.1 2.5 2.5 0 0 0-4.9-3.76V4.5A2.5 2.5 0 0 0 14.5 2z" />
-        </svg>
-      ),
-      path: "/learn"
-    },
-    {
       name: "Create",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full text-terracotta">
@@ -203,23 +193,18 @@ export default function Home() {
 
       {/* Hero Text */}
       <div className="flex-1 flex flex-col items-center pb-12 relative z-10 w-full max-w-5xl mx-auto">
-        <h1 className="text-7xl md:text-[110px] lg:text-[130px] font-display text-foreground text-center leading-[0.9] mt-8 mb-6 drop-shadow-sm">
-          <span className="italic block mb-2">Mind</span> 
+        <h1 className="text-6xl md:text-[96px] lg:text-[112px] font-display text-foreground text-center leading-[0.9] mt-8 mb-6 drop-shadow-sm">
+          <span className="italic block mb-2">Middle School</span>
           <span>Matters</span>
         </h1>
         
         <p className="font-handwritten text-3xl md:text-5xl text-foreground/80 text-center max-w-2xl mb-12">
-          Discover how to make your mind a nice place to be.
+          A hub for 5th grade wellness and connection.
         </p>
         
-        <h2 className="font-display italic font-bold text-2xl md:text-4xl text-terracotta mb-6 text-center px-4 max-w-3xl leading-snug">
-          You Matter. We Matter. Your Mind Matters.
-        </h2>
-        
-        <p className="font-sans font-medium text-lg md:text-xl text-foreground/70 text-center tracking-wide max-w-xl mx-auto border-t border-b border-terracotta/20 py-4 mb-8">
-          A student-run mental wellness center.
-          <br />
-          <span className="italic opacity-80 block mt-1">You are not alone.</span>
+        <p className="font-sans font-medium text-lg md:text-xl text-foreground/75 text-center leading-relaxed max-w-4xl mx-auto border-t border-b border-terracotta/20 py-5 px-4 mb-8">
+          <span className="font-bold text-terracotta">Our Goal:</span>{" "}
+          To create a student-run website that builds a stronger, kinder, and more connected middle school community by sharing helpful resources, ideas, and student voices.
         </p>
       </div>
 

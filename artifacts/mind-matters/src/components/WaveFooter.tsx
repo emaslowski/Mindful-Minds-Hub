@@ -2,7 +2,7 @@ interface WaveFooterProps {
   quote?: string;
 }
 
-export function WaveFooter({ quote = "You Matter. We Matter. Your Mind Matters." }: WaveFooterProps) {
+export function WaveFooter({ quote = "A hub for 5th grade wellness and connection." }: WaveFooterProps) {
   return (
     <div className="relative z-20 mt-auto" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
       {/* Double wave */}

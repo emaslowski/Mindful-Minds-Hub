@@ -37,7 +37,7 @@ export default function Review() {
           Was this site helpful?
         </h1>
         <p className="text-xl md:text-2xl text-sage font-sans text-center mb-12">
-          We want to make Mind Matters the best it can be. Let us know how we're doing!
+          We want to make Middle School Matters the best it can be. Let us know how we're doing!
         </p>
 
         {!submitted ? (
@@ -127,7 +127,7 @@ export default function Review() {
             </div>
             <h2 className="text-4xl font-display italic text-foreground mb-4">Thank You!</h2>
             <p className="text-xl font-sans text-foreground/80">
-              Your feedback is super important to us and helps make Mind Matters better for everyone.
+              Your feedback is super important to us and helps make Middle School Matters better for everyone.
             </p>
             <button 
               onClick={() => { setSubmitted(false); setRating(0); setHelpful(null); setComment(""); }}

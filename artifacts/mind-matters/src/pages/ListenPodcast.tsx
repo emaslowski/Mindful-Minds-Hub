@@ -20,7 +20,7 @@ export default function ListenPodcast() {
         </div>
         <h1 className="text-5xl md:text-7xl font-display italic text-foreground mb-4 drop-shadow-sm flex justify-center items-center gap-4">
           <Mic className="text-terracotta" size={48} />
-          Mind Matters Podcast
+          Middle School Matters Podcast
         </h1>
         <p className="text-xl md:text-2xl text-sage font-handwritten mb-16 max-w-2xl mx-auto">
           Student-run episodes dropping soon. Tune in for real conversations about middle school life.
