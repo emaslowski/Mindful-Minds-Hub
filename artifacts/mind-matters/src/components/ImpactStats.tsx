@@ -37,9 +37,9 @@ export function ImpactStats() {
             <div
               key={key}
               data-testid={`stat-${key}`}
-              className="group bg-card border border-card-border rounded-2xl px-8 py-6 flex flex-col items-center min-w-[150px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/40"
+             className="group bg-card border-2 border-primary/25 rounded-2xl px-8 py-6 flex flex-col items-center min-w-[150px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/70 hover:bg-primary/10"
             >
-              <Icon aria-hidden="true" className="h-8 w-8 mb-2 text-accent transition-transform duration-300 group-hover:scale-110" />
+               <Icon aria-hidden="true" className="h-8 w-8 mb-2 text-primary transition-transform duration-300 group-hover:scale-110" />
               <span className="font-display font-bold text-4xl text-terracotta">
                 {value.toLocaleString()}
               </span>
