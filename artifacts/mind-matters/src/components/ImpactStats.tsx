@@ -1,10 +1,11 @@
 import { useGetImpactStats } from "@workspace/api-client-react";
+import { BookOpen, Users, RefreshCw, Sprout, Star } from "lucide-react";
 
-const STAT_LABELS: Record<string, { label: string; emoji: string }> = {
-  resources_published: { label: "Resources Published", emoji: "📚" },
-  student_creators: { label: "Student Creators", emoji: "✨" },
-  projects_continued: { label: "Projects Continued", emoji: "🔄" },
-  class_cycles: { label: "Class Cycles", emoji: "🌱" },
+const STAT_LABELS: Record<string, { label: string; icon: typeof BookOpen }> = {
+  resources_published: { label: "Resources Published", icon: BookOpen },
+  student_creators: { label: "Student Creators", icon: Users },
+  projects_continued: { label: "Projects Continued", icon: RefreshCw },
+  class_cycles: { label: "Class Cycles", icon: Sprout },
 };
 
 export function ImpactStats() {
@@ -30,13 +31,15 @@ export function ImpactStats() {
 
       <div className="flex flex-wrap justify-center gap-6">
         {entries.map(([key, value]) => {
-          const meta = STAT_LABELS[key] ?? { label: key.replace(/_/g, " "), emoji: "⭐" };
+          const meta = STAT_LABELS[key] ?? { label: key.replace(/_/g, " "), icon: Star };
+          const Icon = meta.icon;
           return (
             <div
               key={key}
-              className="bg-card border border-card-border rounded-[2rem] px-8 py-6 flex flex-col items-center min-w-[150px] shadow-sm"
+              data-testid={`stat-${key}`}
+              className="group bg-card border border-card-border rounded-2xl px-8 py-6 flex flex-col items-center min-w-[150px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/40"
             >
-              <span className="text-4xl mb-2">{meta.emoji}</span>
+              <Icon aria-hidden="true" className="h-8 w-8 mb-2 text-accent transition-transform duration-300 group-hover:scale-110" />
               <span className="font-display font-bold text-4xl text-terracotta">
                 {value.toLocaleString()}
               </span>

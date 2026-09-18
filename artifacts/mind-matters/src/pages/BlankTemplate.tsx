@@ -1,5 +1,6 @@
 import { WaveFooter } from "@/components/WaveFooter";
 import { useParams, Link, useLocation } from "wouter";
+import { Sparkles } from "lucide-react";
 
 interface BlankTemplateProps {
   title?: string;
@@ -69,7 +70,7 @@ export default function BlankTemplate({ title, subtitle }: BlankTemplateProps) {
               </div>
 
               <div className="w-16 h-16 rounded-full bg-sage/20 flex items-center justify-center mb-6 text-3xl text-sage">
-                ✨
+                <Sparkles aria-hidden="true" className="h-8 w-8" />
               </div>
               <h3 className="font-display italic text-2xl text-foreground mb-3">Quiet Space</h3>
               <p className="text-foreground/70 font-sans text-sm max-w-[200px] text-center leading-relaxed">

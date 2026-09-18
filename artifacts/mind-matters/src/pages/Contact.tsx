@@ -120,7 +120,7 @@ export default function Contact() {
           <div className="bg-sage/10 border border-sage/30 rounded-3xl p-10 text-center shadow-sm">
             <CheckCircle className="text-sage mx-auto mb-4" size={56} />
             <h2 className="font-display italic text-3xl text-foreground mb-3">
-              Message sent! 🌿
+              Message sent successfully.
             </h2>
             <p className="font-sans text-foreground/70 text-lg mb-8 max-w-sm mx-auto leading-relaxed">
               Thanks for reaching out. We'll get back to you soon!

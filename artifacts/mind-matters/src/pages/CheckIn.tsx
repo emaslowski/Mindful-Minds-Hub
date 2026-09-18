@@ -1,20 +1,21 @@
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
 import { useSubmitCheckin } from "@workspace/api-client-react";
 import { SectionRecommendation } from "@workspace/api-client-react/src/generated/api.schemas";
+import { CircleAlert, Frown, CloudRain, Flame, Waves, HeartCrack, Smile, Moon } from "lucide-react";
 
-type Mood = { id: string; label: string; icon: string; color: string };
+type Mood = { id: string; label: string; icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>; color: string };
 
 const MOODS: Mood[] = [
-  { id: "anxious", label: "Anxious", icon: "😬", color: "bg-dusty-rose/20 text-foreground" },
-  { id: "stressed", label: "Stressed", icon: "😫", color: "bg-terracotta/20 text-foreground" },
-  { id: "sad", label: "Sad", icon: "😢", color: "bg-sage/20 text-foreground" },
-  { id: "angry", label: "Angry", icon: "😠", color: "bg-red-500/20 text-foreground" },
-  { id: "overwhelmed", label: "Overwhelmed", icon: "😵‍💫", color: "bg-amber/20 text-foreground" },
-  { id: "lonely", label: "Lonely", icon: "🥺", color: "bg-dusty-rose/20 text-foreground" },
-  { id: "happy", label: "Happy", icon: "😊", color: "bg-sage/30 text-foreground" },
-  { id: "tired", label: "Tired", icon: "🥱", color: "bg-amber/30 text-foreground" },
+  { id: "anxious", label: "Anxious", icon: CircleAlert, color: "bg-dusty-rose/20 text-foreground" },
+  { id: "stressed", label: "Stressed", icon: Frown, color: "bg-terracotta/20 text-foreground" },
+  { id: "sad", label: "Sad", icon: CloudRain, color: "bg-sage/20 text-foreground" },
+  { id: "angry", label: "Angry", icon: Flame, color: "bg-red-500/20 text-foreground" },
+  { id: "overwhelmed", label: "Overwhelmed", icon: Waves, color: "bg-amber/20 text-foreground" },
+  { id: "lonely", label: "Lonely", icon: HeartCrack, color: "bg-dusty-rose/20 text-foreground" },
+  { id: "happy", label: "Happy", icon: Smile, color: "bg-sage/30 text-foreground" },
+  { id: "tired", label: "Tired", icon: Moon, color: "bg-amber/30 text-foreground" },
 ];
 
 export default function CheckIn() {
@@ -126,7 +127,7 @@ export default function CheckIn() {
                 `}
                 style={{ borderRadius: '60% 40% 50% 50% / 50% 50% 60% 40%' }} // organic blob shape
               >
-                <span className="text-4xl md:text-5xl">{mood.icon}</span>
+                <mood.icon aria-hidden="true" className="h-10 w-10 md:h-12 md:w-12 text-primary" />
                 <span className="font-display font-bold text-xl md:text-2xl tracking-wide">{mood.label}</span>
               </button>
             ))}

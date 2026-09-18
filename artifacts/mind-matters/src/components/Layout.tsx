@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
-import { LogIn, LogOut, User, CheckCircle, Star } from "lucide-react";
+import { LogIn, LogOut, User, CheckCircle, Star, PenLine } from "lucide-react";
 
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -15,7 +15,7 @@ export function Layout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
+    <div className="min-h-[100dvh] flex flex-col relative overflow-hidden bg-background">
       {/* Top Right Botanical Branch SVG */}
       <div className="absolute top-0 right-0 w-64 h-64 pointer-events-none opacity-30 z-0">
         <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,8 +46,8 @@ export function Layout({ children }: { children: ReactNode }) {
       <header className="w-full max-w-6xl mx-auto px-6 pt-8 pb-4 flex flex-col md:flex-row items-center justify-between z-10 gap-6">
         
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 md:mb-0 hover:opacity-80 transition-opacity duration-300 group">
-          <div className="relative w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <Link data-testid="link-home-logo" href="/" className="flex items-center gap-3 md:mb-0 hover:opacity-90 transition-opacity duration-300 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full">
+          <div className="relative w-12 h-12 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
             {/* Cartoon smiling brain */}
             <svg viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
               {/* Left hemisphere */}
@@ -82,7 +82,7 @@ export function Layout({ children }: { children: ReactNode }) {
             </svg>
           </div>
           <div className="flex items-center font-display font-semibold text-2xl md:text-3xl text-foreground tracking-wide italic mt-1">
-            <span className="text-terracotta">M</span>iddle&nbsp;
+             <span className="text-terracotta">M</span>iddle&nbsp;
             <span className="text-terracotta">S</span>chool&nbsp;
             <span className="text-terracotta">M</span>atters
           </div>
@@ -97,7 +97,8 @@ export function Layout({ children }: { children: ReactNode }) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="group relative font-display italic text-xl md:text-2xl text-foreground hover:text-terracotta transition-colors duration-300"
+                   data-testid={`link-nav-${link.label.toLowerCase().replaceAll(" ", "-")}`}
+                   className="group relative font-display italic text-xl md:text-2xl text-foreground hover:text-terracotta transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
                 >
                   <span>{link.label}</span>
                   {/* Botanical wavy underline on hover or active */}
@@ -112,15 +113,15 @@ export function Layout({ children }: { children: ReactNode }) {
           </nav>
           
           <div className="flex flex-wrap justify-center items-center gap-3">
-            <Link href="/checkin" className="flex items-center gap-2 bg-amber/20 hover:bg-amber/30 text-amber-foreground px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-colors">
+             <Link data-testid="link-check-in" href="/checkin" className="flex items-center gap-2 bg-accent/20 hover:bg-accent/40 text-accent-foreground px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <CheckCircle size={16} /> Check In
             </Link>
-            <Link href="/review" className="flex items-center gap-2 bg-sage/20 hover:bg-sage/30 text-sage-foreground px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-colors">
+             <Link data-testid="link-review" href="/review" className="flex items-center gap-2 bg-secondary/20 hover:bg-secondary/30 text-secondary-foreground px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <Star size={16} /> Review
             </Link>
             {/* Full-page nav to the separate Studio artifact */}
-            <a href="/studio/" className="flex items-center gap-2 bg-terracotta/15 hover:bg-terracotta/25 text-terracotta px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-colors">
-              ✏️ Student Studio
+             <a data-testid="link-student-studio" href="/studio/" className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 text-primary px-4 py-1.5 rounded-full font-sans font-bold text-sm tracking-wide transition-all duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <PenLine size={16} aria-hidden="true" /> Student Studio
             </a>
             
             {isAuthenticated ? (

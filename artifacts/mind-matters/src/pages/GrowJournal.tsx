@@ -80,7 +80,7 @@ export default function GrowJournal() {
               The journal is available <strong>7:00 AM – 9:00 PM</strong> Eastern Time.
             </p>
             <p className="text-base font-sans text-foreground/50 max-w-md leading-relaxed">
-              Come back during open hours to write, reflect, and grow. Rest well tonight. 🌙
+              Come back during open hours to write, reflect, and grow. Rest well tonight.
             </p>
           </div>
         </div>

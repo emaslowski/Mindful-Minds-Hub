@@ -63,7 +63,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="w-full flex flex-col min-h-[calc(100vh-100px)] pt-12 md:pt-24 relative">
+    <div className="w-full flex flex-col min-h-[calc(100dvh-100px)] pt-12 md:pt-24 relative">
 
       {/* ── Full-bleed decoration layer — breaks out of max-w container ── */}
       <div className="absolute inset-0 pointer-events-none -z-10" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
@@ -213,7 +213,7 @@ export default function Home() {
         <div className="flex flex-wrap justify-center gap-6 md:gap-10 max-w-6xl w-full">
           {categories.map((cat, idx) => (
             <Link key={idx} href={cat.path} className="group relative">
-              <div className="w-28 h-28 md:w-36 md:h-36 bg-[#E8DFC8] rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl border border-[#D4C9A8]">
+              <div data-testid={`link-category-${cat.name.toLowerCase()}`} className="w-28 h-28 md:w-36 md:h-36 bg-card rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 border border-card-border">
                 <div className="w-10 h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110 mb-2">
                   {cat.icon}
                 </div>
