@@ -39,7 +39,7 @@ const panelClass =
 const optionClass =
   "w-full rounded-2xl border border-primary/25 bg-background/80 px-4 py-3 text-left font-sans text-sm font-semibold text-foreground transition-colors hover:border-primary hover:bg-accent/25 focus-visible:ring-2 focus-visible:ring-ring";
 
-function GardeningSection() {
+export function GardeningSection() {
   const [completed, setCompleted] = useState<number[]>([]);
 
   function toggleStep(index: number) {
@@ -52,7 +52,7 @@ function GardeningSection() {
     <article className={`${panelClass} border-secondary/50 bg-secondary/10`} aria-labelledby="gardening-title">
       <div className="mb-4 flex items-center gap-3 text-secondary">
         <Sprout aria-hidden="true" className="h-8 w-8" />
-        <h3 id="gardening-title" className="font-display text-3xl font-bold">Gardening</h3>
+         <h1 id="gardening-title" className="font-display text-3xl font-bold">Gardening</h1>
       </div>
       <p className="mb-5 text-foreground/85">Start small: grow a seed and watch what happens. Ask an adult before using tools or planting outside.</p>
       <p className="mb-3 font-bold text-foreground">Your seed-starting checklist</p>
@@ -82,7 +82,7 @@ function GardeningSection() {
   );
 }
 
-function LanguageSection() {
+export function LanguageSection() {
   const [selected, setSelected] = useState(0);
   const greeting = greetings[selected];
 
@@ -90,7 +90,7 @@ function LanguageSection() {
     <article className={`${panelClass} border-primary/45 bg-primary/10`} aria-labelledby="language-title">
       <div className="mb-4 flex items-center gap-3 text-primary">
         <Languages aria-hidden="true" className="h-8 w-8" />
-        <h3 id="language-title" className="font-display text-3xl font-bold">Language Corner</h3>
+         <h1 id="language-title" className="font-display text-3xl font-bold">Language Corner</h1>
       </div>
       <p className="mb-5 text-foreground/85">A new way to greet someone can be the start of a connection. Pick a language to learn a greeting.</p>
       <div className="flex flex-wrap gap-2" aria-label="Choose a language">
@@ -116,7 +116,7 @@ function LanguageSection() {
   );
 }
 
-function GamesSection() {
+export function GamesSection() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [choice, setChoice] = useState<number | null>(null);
   const question = questions[questionIndex];
@@ -131,7 +131,7 @@ function GamesSection() {
     <article className={`${panelClass} border-accent bg-accent/15`} aria-labelledby="games-title">
       <div className="mb-4 flex items-center gap-3 text-primary">
         <Puzzle aria-hidden="true" className="h-8 w-8" />
-        <h3 id="games-title" className="font-display text-3xl font-bold">Games</h3>
+         <h1 id="games-title" className="font-display text-3xl font-bold">Games</h1>
       </div>
       <p className="mb-5 text-foreground/85">Play a quick kindness quiz. Choose what you would do, then try the next question!</p>
       <p className="mb-2 text-sm font-bold uppercase tracking-wider text-primary">Question {questionIndex + 1} of {questions.length}</p>
@@ -164,21 +164,5 @@ function GamesSection() {
         </div>
       )}
     </article>
-  );
-}
-
-export function HomeActivitySections() {
-  return (
-    <section aria-labelledby="home-activities-title" className="relative z-10 mx-auto w-full max-w-6xl px-4 py-12 md:px-8 md:py-16">
-      <div className="mb-8 text-center">
-        <p className="font-handwritten text-2xl text-primary">A little something new to try</p>
-        <h2 id="home-activities-title" className="font-display text-4xl font-bold text-foreground md:text-5xl">Explore together</h2>
-      </div>
-      <div className="grid gap-6 lg:grid-cols-3">
-        <GardeningSection />
-        <LanguageSection />
-        <GamesSection />
-      </div>
-    </section>
   );
 }

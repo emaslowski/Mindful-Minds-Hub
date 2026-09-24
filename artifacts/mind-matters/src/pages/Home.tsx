@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { ImpactStats } from "@/components/ImpactStats";
-import { HomeActivitySections } from "@/components/HomeActivitySections";
+import { Languages, Puzzle, Sprout } from "lucide-react";
 
 export default function Home() {
   const categories = [
@@ -60,6 +60,21 @@ export default function Home() {
         </svg>
       ),
       path: "/grow"
+    },
+    {
+      name: "Gardening",
+      icon: <Sprout className="w-full h-full text-sage" strokeWidth={1.5} />,
+      path: "/gardening"
+    },
+    {
+      name: "Language Corner",
+      icon: <Languages className="w-full h-full text-terracotta" strokeWidth={1.5} />,
+      path: "/language-corner"
+    },
+    {
+      name: "Games",
+      icon: <Puzzle className="w-full h-full text-amber" strokeWidth={1.5} />,
+      path: "/games"
     },
   ];
 
@@ -212,13 +227,13 @@ export default function Home() {
       {/* Category buttons — above the hills */}
       <div className="w-full flex justify-center px-4 md:px-12 pb-10 relative z-10">
         <div className="flex flex-wrap justify-center gap-6 md:gap-10 max-w-6xl w-full">
-          {categories.map((cat, idx) => (
-            <Link key={idx} href={cat.path} className="group relative">
+           {categories.map((cat) => (
+             <Link key={cat.path} href={cat.path} className="group relative">
               <div data-testid={`link-category-${cat.name.toLowerCase()}`} className="w-28 h-28 md:w-36 md:h-36 bg-card rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl group-hover:bg-primary/15 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 border-2 border-primary/25 group-hover:border-primary/70">
                 <div className="w-10 h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110 mb-2">
                   {cat.icon}
                 </div>
-                <div className="font-display italic text-lg md:text-xl text-foreground font-semibold text-center">
+                 <div className={`font-display italic text-foreground font-semibold text-center leading-tight ${cat.name === "Language Corner" ? "text-sm md:text-base" : "text-lg md:text-xl"}`}>
                   {cat.name}
                 </div>
               </div>
@@ -226,8 +241,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-
-      <HomeActivitySections />
 
       {/* Our Impact */}
       <ImpactStats />

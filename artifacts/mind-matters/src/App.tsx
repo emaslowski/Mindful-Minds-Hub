@@ -14,6 +14,7 @@ import { useTrackPageView } from '@workspace/api-client-react';
 
 import { Layout } from '@/components/Layout';
 import Home from '@/pages/Home';
+import { GardeningPage, LanguageCornerPage, GamesPage } from '@/pages/ActivityPages';
 import Learn from '@/pages/Learn';
 import Create from '@/pages/Create';
 import Cooking from '@/pages/Cooking';
@@ -57,6 +58,9 @@ function PublicRouter() {
       <PageTracker />
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/gardening" component={GardeningPage} />
+        <Route path="/language-corner" component={LanguageCornerPage} />
+        <Route path="/games" component={GamesPage} />
 
         {/* Top Nav */}
         <Route path="/about" component={AboutUs} />
