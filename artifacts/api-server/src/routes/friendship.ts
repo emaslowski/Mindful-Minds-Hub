@@ -6,7 +6,6 @@ import {
   anonymousAccessRequestsTable,
   friendshipProfilesTable,
   studioProfilesTable,
-  usersTable,
 } from "@workspace/db/schema";
 import {
   GetFriendshipProfileResponse,
@@ -71,6 +70,8 @@ function matchingUserId(req: Request): string {
 
 router.get("/friendship/profile", async (req, res): Promise<void> => {
   const [profile] = await db.select({
+    firstName: friendshipProfilesTable.firstName,
+    lastInitial: friendshipProfilesTable.lastInitial,
     interests: friendshipProfilesTable.interests,
     qualities: friendshipProfilesTable.qualities,
     approvalStatus: friendshipProfilesTable.approvalStatus,
@@ -78,6 +79,8 @@ router.get("/friendship/profile", async (req, res): Promise<void> => {
   res.json(GetFriendshipProfileResponse.parse({
     optedIn: Boolean(profile),
     approvalStatus: profile?.approvalStatus ?? "none",
+    firstName: profile?.firstName ?? null,
+    lastInitial: profile?.lastInitial ?? null,
     interests: profile?.interests ?? [],
     qualities: profile?.qualities ?? [],
   }));
@@ -92,21 +95,36 @@ router.put("/friendship/profile", async (req, res): Promise<void> => {
     return;
   }
   const { interests, qualities } = parsed.data;
+  const firstName = parsed.data.firstName.trim().normalize("NFC").replace(/\s+/g, " ");
+  const lastInitial = parsed.data.lastInitial.trim().normalize("NFC").toUpperCase();
+  if (!/^\p{L}(?:[\p{L}' -]*\p{L})?$/u.test(firstName) ||
+      !/^\p{L}$/u.test(lastInitial) ||
+      firstName.length > 30) {
+    res.status(400).json({ error: "Enter your first name and one letter for your last initial" });
+    return;
+  }
   const [profile] = await db.insert(friendshipProfilesTable)
-    .values({ userId: matchingUserId(req), interests, qualities })
+    .values({ userId: matchingUserId(req), firstName, lastInitial, interests, qualities })
     .onConflictDoUpdate({
       target: friendshipProfilesTable.userId,
-      // Editing an approved profile keeps access. A rejected student can
-      // request another review; pending students remain hidden until approval.
+      // Trait edits keep approval. Changing the public name needs new teacher
+      // review; rejected and incomplete legacy profiles can resubmit.
       set: {
+        firstName,
+        lastInitial,
         interests,
         qualities,
-        approvalStatus: sql`CASE WHEN ${friendshipProfilesTable.approvalStatus} = 'approved' THEN 'approved' ELSE 'pending' END`,
+        approvalStatus: sql`CASE WHEN ${friendshipProfilesTable.approvalStatus} = 'approved'
+          AND ${friendshipProfilesTable.firstName} = ${firstName}
+          AND ${friendshipProfilesTable.lastInitial} = ${lastInitial}
+          THEN 'approved' ELSE 'pending' END`,
         updatedAt: new Date(),
       },
     })
     .returning({ approvalStatus: friendshipProfilesTable.approvalStatus });
-  res.json(SaveFriendshipProfileResponse.parse({ optedIn: true, approvalStatus: profile.approvalStatus, interests, qualities }));
+  res.json(SaveFriendshipProfileResponse.parse({
+    optedIn: true, approvalStatus: profile.approvalStatus, firstName, lastInitial, interests, qualities,
+  }));
 });
 
 router.delete("/friendship/profile", async (req, res): Promise<void> => {
@@ -116,19 +134,21 @@ router.delete("/friendship/profile", async (req, res): Promise<void> => {
 
 router.get("/friendship/matches", async (req, res): Promise<void> => {
   const [mine] = await db.select({
+    firstName: friendshipProfilesTable.firstName,
+    lastInitial: friendshipProfilesTable.lastInitial,
     interests: friendshipProfilesTable.interests,
     qualities: friendshipProfilesTable.qualities,
     approvalStatus: friendshipProfilesTable.approvalStatus,
   }).from(friendshipProfilesTable).where(eq(friendshipProfilesTable.userId, matchingUserId(req)));
   // No browsing before teacher approval, even by calling the endpoint directly.
-  if (mine?.approvalStatus !== "approved") {
+  if (mine?.approvalStatus !== "approved" || !mine.firstName || !mine.lastInitial) {
     res.json(GetFriendshipMatchesResponse.parse([]));
     return;
   }
 
   const candidates = await db.select({
-    firstName: usersTable.firstName,
-    journalFirstName: anonymousAccessRequestsTable.firstName,
+    firstName: friendshipProfilesTable.firstName,
+    lastInitial: friendshipProfilesTable.lastInitial,
     interests: friendshipProfilesTable.interests,
     qualities: friendshipProfilesTable.qualities,
   })
@@ -142,11 +162,11 @@ router.get("/friendship/matches", async (req, res): Promise<void> => {
       eq(anonymousAccessAccountsTable.userId, friendshipProfilesTable.userId),
       eq(anonymousAccessAccountsTable.status, "active"),
     ))
-    .leftJoin(anonymousAccessRequestsTable, eq(anonymousAccessRequestsTable.id, anonymousAccessAccountsTable.requestId))
-    .innerJoin(usersTable, eq(usersTable.id, friendshipProfilesTable.userId))
     .where(and(
       ne(friendshipProfilesTable.userId, matchingUserId(req)),
       eq(friendshipProfilesTable.approvalStatus, "approved"),
+      isNotNull(friendshipProfilesTable.firstName),
+      isNotNull(friendshipProfilesTable.lastInitial),
       or(isNotNull(studioProfilesTable.id), isNotNull(anonymousAccessAccountsTable.id)),
     ));
 
@@ -156,7 +176,7 @@ router.get("/friendship/matches", async (req, res): Promise<void> => {
     const sharedInterests = candidate.interests.filter((item) => interests.has(item));
     const sharedQualities = candidate.qualities.filter((item) => qualities.has(item));
     return {
-      displayName: (candidate.firstName || candidate.journalFirstName)?.trim().split(/\s+/)[0].slice(0, 30) || "A classmate",
+      displayName: `${candidate.firstName} ${candidate.lastInitial}.`,
       sharedInterests,
       sharedQualities,
       rank: sharedInterests.length * 2 + sharedQualities.length,
@@ -178,6 +198,8 @@ router.get("/teacher/friendship/requests", requireStudioRole("teacher"), async (
     journalFirstName: anonymousAccessRequestsTable.firstName,
     journalLastName: anonymousAccessRequestsTable.lastName,
     journalRequestCode: anonymousAccessRequestsTable.requestCode,
+    matchFirstName: friendshipProfilesTable.firstName,
+    matchLastInitial: friendshipProfilesTable.lastInitial,
     interests: friendshipProfilesTable.interests,
     qualities: friendshipProfilesTable.qualities,
     requestedAt: friendshipProfilesTable.updatedAt,
@@ -195,6 +217,8 @@ router.get("/teacher/friendship/requests", requireStudioRole("teacher"), async (
     .leftJoin(anonymousAccessRequestsTable, eq(anonymousAccessRequestsTable.id, anonymousAccessAccountsTable.requestId))
     .where(and(
       eq(friendshipProfilesTable.approvalStatus, "pending"),
+      isNotNull(friendshipProfilesTable.firstName),
+      isNotNull(friendshipProfilesTable.lastInitial),
       or(isNotNull(studioProfilesTable.id), isNotNull(anonymousAccessAccountsTable.id)),
     ))
     .orderBy(desc(friendshipProfilesTable.updatedAt));
@@ -204,6 +228,8 @@ router.get("/teacher/friendship/requests", requireStudioRole("teacher"), async (
     displayName: request.journalRequestCode
       ? `${[request.journalFirstName, request.journalLastName].filter(Boolean).join(" ") || "Student"} (Journal account · ${request.journalRequestCode})`
       : request.displayName?.trim() || request.enrolledEmail,
+    matchName: request.matchFirstName && request.matchLastInitial
+      ? `${request.matchFirstName} ${request.matchLastInitial}.` : null,
     requestedAt: request.requestedAt.toISOString(),
   }))));
 });
@@ -223,6 +249,8 @@ router.post("/teacher/friendship/requests/:userId/decision", requireStudioRole("
     .where(and(
       eq(friendshipProfilesTable.userId, userId),
       eq(friendshipProfilesTable.approvalStatus, "pending"),
+      isNotNull(friendshipProfilesTable.firstName),
+      isNotNull(friendshipProfilesTable.lastInitial),
       or(
         sql`EXISTS (SELECT 1 FROM studio_profiles sp WHERE sp.user_id = ${friendshipProfilesTable.userId} AND sp.role = 'student' AND sp.account_status = 'active')`,
         sql`EXISTS (SELECT 1 FROM anonymous_access_accounts aa WHERE aa.user_id = ${friendshipProfilesTable.userId} AND aa.status = 'active')`,

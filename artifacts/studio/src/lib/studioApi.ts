@@ -277,6 +277,7 @@ export const teacherAnonymousAccess = {
 export interface FriendshipJoinRequest {
   userId: string;
   displayName: string;
+  matchName: string | null;
   interests: string[];
   qualities: string[];
   requestedAt: string;

@@ -615,8 +615,16 @@ components:
   schemas:
     FriendshipProfileInput:
       type: object
-      required: [interests, qualities]
+      required: [firstName, lastInitial, interests, qualities]
       properties:
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 30
+        lastInitial:
+          type: string
+          minLength: 1
+          maxLength: 1
         interests:
           type: array
           minItems: 1
@@ -635,13 +643,17 @@ components:
             enum: [Creative, Curious, Kind, Playful, Thoughtful, Adventurous]
     FriendshipProfile:
       type: object
-      required: [optedIn, approvalStatus, interests, qualities]
+      required: [optedIn, approvalStatus, firstName, lastInitial, interests, qualities]
       properties:
         optedIn:
           type: boolean
         approvalStatus:
           type: string
           enum: [none, pending, approved, rejected]
+        firstName:
+          type: ["string", "null"]
+        lastInitial:
+          type: ["string", "null"]
         interests:
           type: array
           items:
@@ -666,12 +678,14 @@ components:
             type: string
     FriendshipJoinRequest:
       type: object
-      required: [userId, displayName, interests, qualities, requestedAt]
+      required: [userId, displayName, matchName, interests, qualities, requestedAt]
       properties:
         userId:
           type: string
         displayName:
           type: string
+        matchName:
+          type: ["string", "null"]
         interests:
           type: array
           items:

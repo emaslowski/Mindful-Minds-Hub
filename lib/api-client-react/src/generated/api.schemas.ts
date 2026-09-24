@@ -33,6 +33,16 @@ export const FriendshipProfileInputQualitiesItem = {
 
 export interface FriendshipProfileInput {
   /**
+     * @minLength 1
+     * @maxLength 30
+     */
+  firstName: string;
+  /**
+     * @minLength 1
+     * @maxLength 1
+     */
+  lastInitial: string;
+  /**
      * @minItems 1
      * @maxItems 5
      */
@@ -57,6 +67,10 @@ export const FriendshipProfileApprovalStatus = {
 export interface FriendshipProfile {
   optedIn: boolean;
   approvalStatus: FriendshipProfileApprovalStatus;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastInitial: string | null;
   interests: string[];
   qualities: string[];
 }
@@ -70,6 +84,8 @@ export interface FriendshipMatch {
 export interface FriendshipJoinRequest {
   userId: string;
   displayName: string;
+  /** @nullable */
+  matchName: string | null;
   interests: string[];
   qualities: string[];
   requestedAt: string;

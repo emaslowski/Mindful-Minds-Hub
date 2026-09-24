@@ -280,6 +280,8 @@ export const AddCollabCommentResponse = zod.object({
 export const GetFriendshipProfileResponse = zod.object({
   "optedIn": zod.boolean(),
   "approvalStatus": zod.enum(['none', 'pending', 'approved', 'rejected']),
+  "firstName": zod.string().nullable(),
+  "lastInitial": zod.string().nullable(),
   "interests": zod.array(zod.string()),
   "qualities": zod.array(zod.string())
 })
@@ -288,6 +290,10 @@ export const GetFriendshipProfileResponse = zod.object({
 /**
  * @summary Opt in or update my friendship profile
  */
+export const saveFriendshipProfileBodyFirstNameMax = 30;
+
+export const saveFriendshipProfileBodyLastInitialMax = 1;
+
 export const saveFriendshipProfileBodyInterestsMax = 5;
 
 export const saveFriendshipProfileBodyQualitiesMax = 4;
@@ -295,6 +301,8 @@ export const saveFriendshipProfileBodyQualitiesMax = 4;
 
 
 export const SaveFriendshipProfileBody = zod.object({
+  "firstName": zod.string().min(1).max(saveFriendshipProfileBodyFirstNameMax),
+  "lastInitial": zod.string().min(1).max(saveFriendshipProfileBodyLastInitialMax),
   "interests": zod.array(zod.enum(['Art', 'Books', 'Cooking', 'Gardening', 'Games', 'Music', 'Nature', 'Sports'])).min(1).max(saveFriendshipProfileBodyInterestsMax),
   "qualities": zod.array(zod.enum(['Creative', 'Curious', 'Kind', 'Playful', 'Thoughtful', 'Adventurous'])).min(1).max(saveFriendshipProfileBodyQualitiesMax)
 })
@@ -302,6 +310,8 @@ export const SaveFriendshipProfileBody = zod.object({
 export const SaveFriendshipProfileResponse = zod.object({
   "optedIn": zod.boolean(),
   "approvalStatus": zod.enum(['none', 'pending', 'approved', 'rejected']),
+  "firstName": zod.string().nullable(),
+  "lastInitial": zod.string().nullable(),
   "interests": zod.array(zod.string()),
   "qualities": zod.array(zod.string())
 })
@@ -330,6 +340,7 @@ export const GetFriendshipMatchesResponse = zod.array(GetFriendshipMatchesRespon
 export const GetFriendshipJoinRequestsResponseItem = zod.object({
   "userId": zod.string(),
   "displayName": zod.string(),
+  "matchName": zod.string().nullable(),
   "interests": zod.array(zod.string()),
   "qualities": zod.array(zod.string()),
   "requestedAt": zod.string()

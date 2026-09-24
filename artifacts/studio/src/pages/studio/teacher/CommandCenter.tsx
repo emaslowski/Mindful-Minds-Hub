@@ -270,6 +270,9 @@ export default function CommandCenter() {
                     <HeartHandshake className="h-5 w-5 shrink-0 text-[#688a52]" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-[#453329]">{request.displayName}</p>
+                      {request.matchName && (
+                        <p className="text-sm text-[#453329]">Classmates will see: {request.matchName}</p>
+                      )}
                       <p className="text-xs text-[#688a52]">
                         Requested {formatDistanceToNow(new Date(request.requestedAt), { addSuffix: true })}
                       </p>

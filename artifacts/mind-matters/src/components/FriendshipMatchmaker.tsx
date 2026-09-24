@@ -29,6 +29,8 @@ export function FriendshipMatchmaker() {
   const { user, isLoading: authLoading, login } = useAuth();
   const student = user?.role === "student" || user?.accountType === "journal" || user?.journalAccountActive === true;
   const queryClient = useQueryClient();
+  const [firstName, setFirstName] = useState("");
+  const [lastInitial, setLastInitial] = useState("");
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);
   const [selectedQualities, setSelectedQualities] = useState<Quality[]>([]);
   const [notice, setNotice] = useState("");
@@ -36,23 +38,42 @@ export function FriendshipMatchmaker() {
     query: { enabled: student, retry: false, refetchInterval: 15_000, refetchOnWindowFocus: true },
   });
   const matchesQuery = useGetFriendshipMatches({
-    query: { enabled: student && profileQuery.data?.approvalStatus === "approved", staleTime: 30_000, retry: false },
+    query: {
+      enabled: student && profileQuery.data?.approvalStatus === "approved"
+        && !!profileQuery.data.firstName && !!profileQuery.data.lastInitial,
+      staleTime: 30_000, retry: false,
+    },
   });
   const save = useSaveFriendshipProfile();
   const remove = useDeleteFriendshipProfile();
 
   useEffect(() => {
     if (!profileQuery.data) return;
+    setFirstName(profileQuery.data.firstName ?? "");
+    setLastInitial(profileQuery.data.lastInitial ?? "");
     setSelectedInterests(profileQuery.data.interests.filter((item): item is Interest =>
       interests.includes(item as Interest)));
     setSelectedQualities(profileQuery.data.qualities.filter((item): item is Quality =>
       qualities.includes(item as Quality)));
   }, [profileQuery.data]);
 
+  const validName = /^\p{L}(?:[\p{L}' -]*\p{L})?$/u.test(firstName.trim())
+    && firstName.trim().length <= 30
+    && /^\p{L}$/u.test(lastInitial.trim().normalize("NFC").toUpperCase());
+  const nameChanged = firstName.trim() !== (profileQuery.data?.firstName ?? "")
+    || lastInitial.trim().toUpperCase() !== (profileQuery.data?.lastInitial ?? "");
+
   async function saveProfile() {
     setNotice("");
     try {
-      const updated = await save.mutateAsync({ data: { interests: selectedInterests, qualities: selectedQualities } });
+      const updated = await save.mutateAsync({
+        data: {
+          firstName: firstName.trim(),
+          lastInitial: lastInitial.trim().toUpperCase(),
+          interests: selectedInterests,
+          qualities: selectedQualities,
+        },
+      });
       queryClient.setQueryData(getGetFriendshipProfileQueryKey(), updated);
       await queryClient.invalidateQueries({ queryKey: getGetFriendshipMatchesQueryKey() });
       setNotice(updated.approvalStatus === "approved"
@@ -67,8 +88,12 @@ export function FriendshipMatchmaker() {
     setNotice("");
     try {
       await remove.mutateAsync();
-      queryClient.setQueryData(getGetFriendshipProfileQueryKey(), { optedIn: false, approvalStatus: "none", interests: [], qualities: [] });
+      queryClient.setQueryData(getGetFriendshipProfileQueryKey(), {
+        optedIn: false, approvalStatus: "none", firstName: null, lastInitial: null, interests: [], qualities: [],
+      });
       queryClient.removeQueries({ queryKey: getGetFriendshipMatchesQueryKey() });
+      setFirstName("");
+      setLastInitial("");
       setSelectedInterests([]);
       setSelectedQualities([]);
       setNotice("Your friendship profile was removed. You won't appear in matches.");
@@ -89,7 +114,7 @@ export function FriendshipMatchmaker() {
           Joining is your choice. Your teacher must approve your request before you can see matches or appear in them.
         </p>
         <p className="mt-2 text-center text-sm text-foreground/70">
-          Once approved, classmates may see your first name and the things you share. Journal entries stay private.
+          Once approved, classmates may see your first name, last initial, and the things you share. Journal entries stay private.
           No private messages or contact details here. If you want to meet someone, ask a teacher to help you say hello.
         </p>
 
@@ -111,6 +136,41 @@ export function FriendshipMatchmaker() {
           <p className="mt-8 text-center text-primary" role="alert">We couldn't load your profile. Make sure your student or Journal account is active, then try again.</p>
         ) : (
           <div className="mx-auto mt-8 max-w-3xl text-left">
+            <div className="mb-6 rounded-2xl bg-background/80 p-5">
+              <h3 className="mb-1 font-display text-2xl font-bold">Your match name</h3>
+              <p className="mb-4 text-sm text-foreground/75">
+                Classmates will see your first name and last initial, like Maya R. Changing your name later needs another teacher review.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-[1fr_9rem]">
+                <label className="text-sm font-semibold text-foreground">
+                  First name
+                  <input
+                    type="text"
+                    autoComplete="given-name"
+                    maxLength={30}
+                    value={firstName}
+                    onChange={(event) => setFirstName(event.target.value)}
+                    data-testid="friendship-first-name"
+                    className="mt-1 block w-full rounded-xl border border-sage/40 bg-background px-4 py-2 text-base font-normal text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                </label>
+                <label className="text-sm font-semibold text-foreground">
+                  Last initial
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    maxLength={1}
+                    value={lastInitial}
+                    onChange={(event) => setLastInitial(event.target.value)}
+                    data-testid="friendship-last-initial"
+                    className="mt-1 block w-full rounded-xl border border-sage/40 bg-background px-4 py-2 text-base font-normal text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                </label>
+              </div>
+              {!validName && (firstName || lastInitial) && (
+                <p className="mt-2 text-sm text-primary">Use letters for your first name and one letter for your last initial.</p>
+              )}
+            </div>
             <div className="grid gap-6 md:grid-cols-2">
               <fieldset className="rounded-2xl bg-background/80 p-5">
                 <legend className="sr-only">Interests</legend>
@@ -152,12 +212,14 @@ export function FriendshipMatchmaker() {
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <button
                 type="button"
-                disabled={selectedInterests.length === 0 || selectedQualities.length === 0 || save.isPending || remove.isPending}
+                disabled={!validName || selectedInterests.length === 0 || selectedQualities.length === 0 || save.isPending || remove.isPending}
                 onClick={saveProfile}
                 className="rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground hover:bg-primary/85 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 data-testid="friendship-save"
               >
                 {save.isPending ? "Saving…" :
+                  profileQuery.data?.approvalStatus === "approved" && !profileQuery.data.firstName ? "Add my name for teacher review" :
+                  profileQuery.data?.approvalStatus === "approved" && nameChanged ? "Request review of new name" :
                   profileQuery.data?.approvalStatus === "approved" ? "Update my choices" :
                   profileQuery.data?.approvalStatus === "pending" ? "Update my request" :
                   profileQuery.data?.approvalStatus === "rejected" ? "Ask for another review" : "Ask to join"}
@@ -175,7 +237,12 @@ export function FriendshipMatchmaker() {
               )}
             </div>
             {notice && <p className="mt-4 text-center font-semibold text-foreground" role="status">{notice}</p>}
-            {profileQuery.data?.approvalStatus === "pending" && (
+            {profileQuery.data?.optedIn && (!profileQuery.data.firstName || !profileQuery.data.lastInitial) && (
+              <p className="mt-5 text-center font-semibold text-foreground" role="status">
+                Add your first name and last initial, then update your request so your teacher can review it.
+              </p>
+            )}
+            {profileQuery.data?.approvalStatus === "pending" && profileQuery.data.firstName && profileQuery.data.lastInitial && (
               <p className="mt-5 text-center font-semibold text-foreground" role="status">
                 Waiting for your teacher to approve your request. You are not visible to classmates yet.
               </p>
@@ -185,7 +252,7 @@ export function FriendshipMatchmaker() {
                 Your request was not approved. You can update your choices and ask your teacher to review again.
               </p>
             )}
-            {profileQuery.data?.approvalStatus === "approved" && (
+            {profileQuery.data?.approvalStatus === "approved" && profileQuery.data.firstName && profileQuery.data.lastInitial && (
               <div className="mt-10 border-t border-sage/30 pt-7">
                 <h3 className="mb-4 flex items-center justify-center gap-2 font-display text-3xl font-bold text-foreground"><Sparkles className="text-amber" aria-hidden="true" /> Your matches</h3>
                 {matchesQuery.isLoading ? <p className="text-center" role="status">Finding classmates…</p>

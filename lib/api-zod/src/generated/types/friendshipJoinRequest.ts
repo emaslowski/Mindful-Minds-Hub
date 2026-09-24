@@ -9,6 +9,8 @@
 export interface FriendshipJoinRequest {
   userId: string;
   displayName: string;
+  /** @nullable */
+  matchName: string | null;
   interests: string[];
   qualities: string[];
   requestedAt: string;

@@ -10,6 +10,16 @@ import type { FriendshipProfileInputQualitiesItem } from './friendshipProfileInp
 
 export interface FriendshipProfileInput {
   /**
+     * @minLength 1
+     * @maxLength 30
+     */
+  firstName: string;
+  /**
+     * @minLength 1
+     * @maxLength 1
+     */
+  lastInitial: string;
+  /**
      * @minItems 1
      * @maxItems 5
      */

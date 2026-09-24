@@ -10,6 +10,10 @@ import type { FriendshipProfileApprovalStatus } from './friendshipProfileApprova
 export interface FriendshipProfile {
   optedIn: boolean;
   approvalStatus: FriendshipProfileApprovalStatus;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastInitial: string | null;
   interests: string[];
   qualities: string[];
 }
