@@ -112,6 +112,14 @@ export const AuthUserRole = {
   none: 'none',
 } as const;
 
+export type AuthUserAccountType = typeof AuthUserAccountType[keyof typeof AuthUserAccountType];
+
+
+export const AuthUserAccountType = {
+  primary: 'primary',
+  journal: 'journal',
+} as const;
+
 export interface AuthUser {
   id: string;
   /** @nullable */
@@ -125,6 +133,8 @@ export interface AuthUser {
   /** @nullable */
   displayName?: string | null;
   role: AuthUserRole;
+  accountType?: AuthUserAccountType;
+  journalAccountActive?: boolean;
 }
 
 export interface AuthUserEnvelope {

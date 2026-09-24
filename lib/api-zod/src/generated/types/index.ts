@@ -9,6 +9,7 @@
 export * from './analyticsSummary';
 export * from './authorizationSessionHeaderParameter';
 export * from './authUser';
+export * from './authUserAccountType';
 export * from './authUserEnvelope';
 export * from './authUserRole';
 export * from './beginBrowserLoginParams';

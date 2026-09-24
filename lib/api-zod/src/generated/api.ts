@@ -31,7 +31,9 @@ export const GetCurrentAuthUserResponse = zod.object({
   "lastName": zod.string().nullable(),
   "profileImageUrl": zod.string().nullable(),
   "displayName": zod.string().nullish(),
-  "role": zod.enum(['teacher', 'student', 'none'])
+  "role": zod.enum(['teacher', 'student', 'none']),
+  "accountType": zod.enum(['primary', 'journal']).optional(),
+  "journalAccountActive": zod.boolean().optional()
 }),zod.null()])
 })
 
@@ -312,7 +314,7 @@ export const DeleteFriendshipProfileResponse = zod.void()
 
 
 /**
- * @summary Get similar opted-in enrolled students
+ * @summary Get similar teacher-approved students
  */
 export const GetFriendshipMatchesResponseItem = zod.object({
   "displayName": zod.string(),

@@ -187,7 +187,11 @@ async function determineRoleAndLinkProfile(
 router.get('/auth/user', (req: Request, res: Response) => {
   res.json(
     GetCurrentAuthUserResponse.parse({
-      user: req.user ?? req.anonymousUser ?? null,
+      user: req.user
+        ? { ...req.user, accountType: 'primary', journalAccountActive: !!req.anonymousUser }
+        : req.anonymousUser
+          ? { ...req.anonymousUser, accountType: 'journal' }
+          : null,
     }),
   );
 });

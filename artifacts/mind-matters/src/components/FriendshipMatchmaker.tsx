@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import { HeartHandshake, Sparkles } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@workspace/replit-auth-web";
@@ -26,7 +27,7 @@ function toggle<T extends string>(selected: T[], item: T, max: number): T[] {
 
 export function FriendshipMatchmaker() {
   const { user, isLoading: authLoading, login } = useAuth();
-  const student = user?.role === "student";
+  const student = user?.role === "student" || user?.accountType === "journal" || user?.journalAccountActive === true;
   const queryClient = useQueryClient();
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);
   const [selectedQualities, setSelectedQualities] = useState<Quality[]>([]);
@@ -77,7 +78,7 @@ export function FriendshipMatchmaker() {
   }
 
   return (
-    <section aria-labelledby="friendship-title" className="mx-auto mb-16 w-full max-w-6xl px-4">
+    <section id="friendship-matchmaker" aria-labelledby="friendship-title" className="mx-auto mb-16 w-full max-w-6xl px-4">
       <div className="rounded-3xl border-2 border-sage/35 bg-sage/10 p-6 shadow-sm md:p-10">
         <div className="mb-3 flex items-center justify-center gap-3 text-sage">
           <HeartHandshake size={34} aria-hidden="true" />
@@ -88,6 +89,7 @@ export function FriendshipMatchmaker() {
           Joining is your choice. Your teacher must approve your request before you can see matches or appear in them.
         </p>
         <p className="mt-2 text-center text-sm text-foreground/70">
+          Once approved, classmates may see your first name and the things you share. Journal entries stay private.
           No private messages or contact details here. If you want to meet someone, ask a teacher to help you say hello.
         </p>
 
@@ -95,15 +97,18 @@ export function FriendshipMatchmaker() {
           <p className="mt-8 text-center" role="status">Checking your account…</p>
         ) : !user ? (
           <div className="mt-8 text-center">
-            <p className="mb-4">Sign in with your student account to join.</p>
-            <button type="button" onClick={login} className="rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground hover:bg-primary/85 focus-visible:ring-2 focus-visible:ring-ring">Log in</button>
+            <p className="mb-4">Sign in with your student or Journal account to ask to join.</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <button type="button" onClick={login} className="rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground hover:bg-primary/85 focus-visible:ring-2 focus-visible:ring-ring">Student login</button>
+              <Link href="/anonymous-access?returnTo=/connect%23friendship-matchmaker" className="rounded-full border border-primary px-6 py-3 font-bold text-primary hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring">Journal login</Link>
+            </div>
           </div>
         ) : !student ? (
-          <p className="mt-8 text-center font-semibold">This activity is for enrolled student accounts.</p>
+          <p className="mt-8 text-center font-semibold">This activity is for enrolled students and students with active Journal accounts.</p>
         ) : profileQuery.isLoading ? (
           <p className="mt-8 text-center" role="status">Loading your choices…</p>
         ) : profileQuery.isError ? (
-          <p className="mt-8 text-center text-primary" role="alert">We couldn't load your profile. Make sure you're signed in with an active enrolled student account, then try again.</p>
+          <p className="mt-8 text-center text-primary" role="alert">We couldn't load your profile. Make sure your student or Journal account is active, then try again.</p>
         ) : (
           <div className="mx-auto mt-8 max-w-3xl text-left">
             <div className="grid gap-6 md:grid-cols-2">

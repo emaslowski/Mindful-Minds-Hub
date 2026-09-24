@@ -1611,7 +1611,7 @@ export const getGetFriendshipMatchesUrl = () => {
 }
 
 /**
- * @summary Get similar opted-in enrolled students
+ * @summary Get similar teacher-approved students
  */
 export const getFriendshipMatches = async ( options?: Parameters<typeof customFetch>[1]): Promise<FriendshipMatch[]> => {
 
@@ -1658,7 +1658,7 @@ export type GetFriendshipMatchesQueryError = ErrorType<void>
 
 
 /**
- * @summary Get similar opted-in enrolled students
+ * @summary Get similar teacher-approved students
  */
 
 export function useGetFriendshipMatches<TData = Awaited<ReturnType<typeof getFriendshipMatches>>, TError = ErrorType<void>>(

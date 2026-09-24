@@ -23,21 +23,26 @@ function isJournalOpen(): boolean {
   return hour >= 7 && hour < 21;
 }
 
-function BackButton() {
+function BackButton({ showMatchmaker = false }: { showMatchmaker?: boolean }) {
   return (
-    <div className="mb-8">
+    <div className="mb-8 flex flex-wrap items-center gap-3">
       <Link href="/grow">
         <button className="px-6 py-2 rounded-full border border-terracotta text-terracotta font-sans text-sm tracking-wide transition-all hover:bg-terracotta hover:text-white">
           ← Back to Grow
         </button>
       </Link>
+      {showMatchmaker && (
+        <Link href="/connect#friendship-matchmaker" className="rounded-full border border-sage px-6 py-2 text-sm text-sage hover:bg-sage/10">
+          Try Friendship Matchmaker
+        </Link>
+      )}
     </div>
   );
 }
 
 export default function GrowJournal() {
   const journalOpen = isJournalOpen();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   
   const { data: promptData } = useGetTodayPrompt({ query: { enabled: isAuthenticated && journalOpen } });
   const { data: entries, refetch: refetchEntries } = useGetJournalEntries({ query: { enabled: isAuthenticated && journalOpen } });
@@ -68,7 +73,7 @@ export default function GrowJournal() {
     return (
       <div className="w-full flex flex-col flex-1 pt-12 relative">
         <div className="flex-1 w-full max-w-2xl mx-auto px-4 mb-24 flex flex-col z-10">
-          <BackButton />
+          <BackButton showMatchmaker={user?.accountType === "journal" || user?.journalAccountActive === true} />
           <div className="flex flex-col items-center justify-center text-center flex-1">
             <div className="bg-sage/10 p-6 rounded-full text-sage mb-8 border border-sage/20">
               <Moon size={64} />
@@ -119,7 +124,7 @@ export default function GrowJournal() {
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-4xl mx-auto px-4 mb-24 z-10">
-        <BackButton />
+        <BackButton showMatchmaker={user?.accountType === "journal" || user?.journalAccountActive === true} />
         <div className="flex items-center gap-3 mb-10">
           <PenTool className="text-terracotta" size={32} />
           <h1 className="text-5xl md:text-6xl font-display italic text-foreground">

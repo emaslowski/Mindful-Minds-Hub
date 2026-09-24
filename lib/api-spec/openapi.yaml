@@ -339,7 +339,7 @@ paths:
         "400":
           description: Invalid input
 
-  # Friendship profiles (enrolled students only)
+  # Friendship profiles (enrolled students or active Journal accounts; teacher approval required)
   /friendship/profile:
     get:
       operationId: getFriendshipProfile
@@ -355,7 +355,7 @@ paths:
         "401":
           description: Sign in required
         "403":
-          description: Enrolled student account required
+          description: Active enrolled student or Journal account required
     put:
       operationId: saveFriendshipProfile
       tags: [friendship]
@@ -378,7 +378,7 @@ paths:
         "401":
           description: Sign in required
         "403":
-          description: Enrolled student account required
+          description: Active enrolled student or Journal account required
     delete:
       operationId: deleteFriendshipProfile
       tags: [friendship]
@@ -389,13 +389,13 @@ paths:
         "401":
           description: Sign in required
         "403":
-          description: Enrolled student account required
+          description: Active enrolled student or Journal account required
 
   /friendship/matches:
     get:
       operationId: getFriendshipMatches
       tags: [friendship]
-      summary: Get similar opted-in enrolled students
+      summary: Get similar teacher-approved students
       responses:
         "200":
           description: Matching students
@@ -408,7 +408,7 @@ paths:
         "401":
           description: Sign in required
         "403":
-          description: Enrolled student account required
+          description: Active enrolled student or Journal account required
 
   /teacher/friendship/requests:
     get:
@@ -417,7 +417,7 @@ paths:
       summary: List pending friendship join requests for teachers
       responses:
         "200":
-          description: Pending requests from active enrolled students
+          description: Pending requests from active enrolled students and Journal accounts
           content:
             application/json:
               schema:
@@ -723,6 +723,11 @@ components:
         role:
           type: string
           enum: [teacher, student, none]
+        accountType:
+          type: string
+          enum: [primary, journal]
+        journalAccountActive:
+          type: boolean
     AuthUserEnvelope:
       type: object
       required: [user]
