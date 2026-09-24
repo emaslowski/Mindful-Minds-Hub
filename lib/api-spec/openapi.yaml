@@ -410,6 +410,54 @@ paths:
         "403":
           description: Enrolled student account required
 
+  /teacher/friendship/requests:
+    get:
+      operationId: getFriendshipJoinRequests
+      tags: [friendship]
+      summary: List pending friendship join requests for teachers
+      responses:
+        "200":
+          description: Pending requests from active enrolled students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FriendshipJoinRequest"
+        "403":
+          description: Teacher account required
+
+  /teacher/friendship/requests/{userId}/decision:
+    post:
+      operationId: decideFriendshipJoinRequest
+      tags: [friendship]
+      summary: Approve or decline a student's friendship join request
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FriendshipDecisionInput"
+      responses:
+        "200":
+          description: Decision recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendshipDecisionResult"
+        "400":
+          description: Invalid decision
+        "403":
+          description: Teacher account required
+        "409":
+          description: Request is no longer pending or enrollment is inactive
+
   # Analytics
   /analytics/track:
     post:
@@ -587,10 +635,13 @@ components:
             enum: [Creative, Curious, Kind, Playful, Thoughtful, Adventurous]
     FriendshipProfile:
       type: object
-      required: [optedIn, interests, qualities]
+      required: [optedIn, approvalStatus, interests, qualities]
       properties:
         optedIn:
           type: boolean
+        approvalStatus:
+          type: string
+          enum: [none, pending, approved, rejected]
         interests:
           type: array
           items:
@@ -613,6 +664,38 @@ components:
           type: array
           items:
             type: string
+    FriendshipJoinRequest:
+      type: object
+      required: [userId, displayName, interests, qualities, requestedAt]
+      properties:
+        userId:
+          type: string
+        displayName:
+          type: string
+        interests:
+          type: array
+          items:
+            type: string
+        qualities:
+          type: array
+          items:
+            type: string
+        requestedAt:
+          type: string
+    FriendshipDecisionInput:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [approve, reject]
+    FriendshipDecisionResult:
+      type: object
+      required: [approvalStatus]
+      properties:
+        approvalStatus:
+          type: string
+          enum: [approved, rejected]
     HealthStatus:
       type: object
       properties:

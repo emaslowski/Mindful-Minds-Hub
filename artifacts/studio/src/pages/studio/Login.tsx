@@ -53,7 +53,7 @@ export default function StudioLogin() {
             <path d="M38 56 Q50 65 62 56" stroke="#3D2314" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
           </svg>
         </div>
-        <h1 className="font-serif text-4xl font-semibold text-[#453329]">Mind Matters</h1>
+        <h1 className="font-serif text-4xl font-semibold text-[#453329]">Middle School Matters</h1>
         <p className="text-[#688a52] mt-1 text-lg font-medium">Student Studio</p>
         <p className="text-[#8a6a55] mt-1 text-sm">Your creative workspace</p>
       </div>
@@ -70,7 +70,7 @@ export default function StudioLogin() {
           {urlError === 'not_enrolled' && (
             <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 mb-4">
               <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <p>Your account hasn't been added to Mind Matters Studio yet. Ask your teacher.</p>
+              <p>Your account hasn't been added to Middle School Matters Studio yet. Ask your teacher.</p>
             </div>
           )}
 
@@ -212,7 +212,7 @@ export default function StudioLogin() {
       </Card>
 
       <a href="/" className="mt-6 text-sm text-[#688a52] hover:text-[#453329] underline transition-colors">
-        ← Back to Mind Matters
+        ← Back to Middle School Matters
       </a>
     </div>
   );

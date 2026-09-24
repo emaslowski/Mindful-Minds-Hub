@@ -273,6 +273,24 @@ export const teacherAnonymousAccess = {
     ),
 };
 
+// ── Teacher: Friendship Matchmaker approvals ────────────────────────────────
+export interface FriendshipJoinRequest {
+  userId: string;
+  displayName: string;
+  interests: string[];
+  qualities: string[];
+  requestedAt: string;
+}
+
+export const teacherFriendship = {
+  requests: () => studioFetch<FriendshipJoinRequest[]>('/teacher/friendship/requests'),
+  decide: (userId: string, decision: 'approve' | 'reject') =>
+    studioFetch<{ approvalStatus: 'approved' | 'rejected' }>(
+      `/teacher/friendship/requests/${encodeURIComponent(userId)}/decision`,
+      { method: 'POST', body: JSON.stringify({ decision }) },
+    ),
+};
+
 // ── Shared (student + teacher) ─────────────────────────────────────────────
 export const studioShared = {
   teams: () => studioFetch<{ teams: Team[] }>('/studio/teams'),

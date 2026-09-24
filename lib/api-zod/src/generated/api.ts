@@ -277,6 +277,7 @@ export const AddCollabCommentResponse = zod.object({
  */
 export const GetFriendshipProfileResponse = zod.object({
   "optedIn": zod.boolean(),
+  "approvalStatus": zod.enum(['none', 'pending', 'approved', 'rejected']),
   "interests": zod.array(zod.string()),
   "qualities": zod.array(zod.string())
 })
@@ -298,6 +299,7 @@ export const SaveFriendshipProfileBody = zod.object({
 
 export const SaveFriendshipProfileResponse = zod.object({
   "optedIn": zod.boolean(),
+  "approvalStatus": zod.enum(['none', 'pending', 'approved', 'rejected']),
   "interests": zod.array(zod.string()),
   "qualities": zod.array(zod.string())
 })
@@ -318,6 +320,35 @@ export const GetFriendshipMatchesResponseItem = zod.object({
   "sharedQualities": zod.array(zod.string())
 })
 export const GetFriendshipMatchesResponse = zod.array(GetFriendshipMatchesResponseItem)
+
+
+/**
+ * @summary List pending friendship join requests for teachers
+ */
+export const GetFriendshipJoinRequestsResponseItem = zod.object({
+  "userId": zod.string(),
+  "displayName": zod.string(),
+  "interests": zod.array(zod.string()),
+  "qualities": zod.array(zod.string()),
+  "requestedAt": zod.string()
+})
+export const GetFriendshipJoinRequestsResponse = zod.array(GetFriendshipJoinRequestsResponseItem)
+
+
+/**
+ * @summary Approve or decline a student's friendship join request
+ */
+export const DecideFriendshipJoinRequestParams = zod.object({
+  "userId": zod.coerce.string()
+})
+
+export const DecideFriendshipJoinRequestBody = zod.object({
+  "decision": zod.enum(['approve', 'reject'])
+})
+
+export const DecideFriendshipJoinRequestResponse = zod.object({
+  "approvalStatus": zod.enum(['approved', 'rejected'])
+})
 
 
 /**

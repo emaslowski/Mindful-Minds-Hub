@@ -32,6 +32,9 @@ import type {
   CollabPost,
   CollabPostInput,
   Event,
+  FriendshipDecisionInput,
+  FriendshipDecisionResult,
+  FriendshipJoinRequest,
   FriendshipMatch,
   FriendshipProfile,
   FriendshipProfileInput,
@@ -1675,6 +1678,155 @@ export function useGetFriendshipMatches<TData = Awaited<ReturnType<typeof getFri
 
 
 
+
+export const getGetFriendshipJoinRequestsUrl = () => {
+
+
+
+
+  return `/api/teacher/friendship/requests`
+}
+
+/**
+ * @summary List pending friendship join requests for teachers
+ */
+export const getFriendshipJoinRequests = async ( options?: Parameters<typeof customFetch>[1]): Promise<FriendshipJoinRequest[]> => {
+
+  return customFetch<FriendshipJoinRequest[]>(getGetFriendshipJoinRequestsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFriendshipJoinRequestsQueryKey = () => {
+    return [
+    `/api/teacher/friendship/requests`
+    ] as const;
+    }
+
+
+export const getGetFriendshipJoinRequestsQueryOptions = <TData = Awaited<ReturnType<typeof getFriendshipJoinRequests>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFriendshipJoinRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFriendshipJoinRequestsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFriendshipJoinRequests>>> = ({ signal }) => getFriendshipJoinRequests({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFriendshipJoinRequests>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFriendshipJoinRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof getFriendshipJoinRequests>>>
+export type GetFriendshipJoinRequestsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List pending friendship join requests for teachers
+ */
+
+export function useGetFriendshipJoinRequests<TData = Awaited<ReturnType<typeof getFriendshipJoinRequests>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFriendshipJoinRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFriendshipJoinRequestsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDecideFriendshipJoinRequestUrl = (userId: string,) => {
+
+
+
+
+  return `/api/teacher/friendship/requests/${userId}/decision`
+}
+
+/**
+ * @summary Approve or decline a student's friendship join request
+ */
+export const decideFriendshipJoinRequest = async (userId: string,
+    friendshipDecisionInput: FriendshipDecisionInput, options?: Parameters<typeof customFetch>[1]): Promise<FriendshipDecisionResult> => {
+
+  return customFetch<FriendshipDecisionResult>(getDecideFriendshipJoinRequestUrl(userId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(friendshipDecisionInput)
+  }
+);}
+
+
+
+
+
+export const getDecideFriendshipJoinRequestMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideFriendshipJoinRequest>>, TError,{userId: string;data: BodyType<FriendshipDecisionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof decideFriendshipJoinRequest>>, TError,{userId: string;data: BodyType<FriendshipDecisionInput>}, TContext> => {
+
+const mutationKey = ['decideFriendshipJoinRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof decideFriendshipJoinRequest>>, {userId: string;data: BodyType<FriendshipDecisionInput>}> = (props) => {
+          const {userId,data} = props ?? {};
+
+          return  decideFriendshipJoinRequest(userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DecideFriendshipJoinRequestMutationResult = NonNullable<Awaited<ReturnType<typeof decideFriendshipJoinRequest>>>
+    export type DecideFriendshipJoinRequestMutationBody = BodyType<FriendshipDecisionInput>
+    export type DecideFriendshipJoinRequestMutationError = ErrorType<void>
+
+    /**
+ * @summary Approve or decline a student's friendship join request
+ */
+export const useDecideFriendshipJoinRequest = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideFriendshipJoinRequest>>, TError,{userId: string;data: BodyType<FriendshipDecisionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof decideFriendshipJoinRequest>>,
+        TError,
+        {userId: string;data: BodyType<FriendshipDecisionInput>},
+        TContext
+      > => {
+      return useMutation(getDecideFriendshipJoinRequestMutationOptions(options));
+    }
 
 export const getTrackPageViewUrl = () => {
 

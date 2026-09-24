@@ -5,9 +5,11 @@
  * Mind Matters API
  * OpenAPI spec version: 0.1.0
  */
+import type { FriendshipProfileApprovalStatus } from './friendshipProfileApprovalStatus';
 
 export interface FriendshipProfile {
   optedIn: boolean;
+  approvalStatus: FriendshipProfileApprovalStatus;
   interests: string[];
   qualities: string[];
 }

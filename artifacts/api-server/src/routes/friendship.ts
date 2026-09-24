@@ -1,5 +1,5 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
-import { and, eq, ne } from "drizzle-orm";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "@workspace/db";
 import { friendshipProfilesTable, studioProfilesTable, usersTable } from "@workspace/db/schema";
 import {
@@ -7,8 +7,12 @@ import {
   SaveFriendshipProfileBody,
   SaveFriendshipProfileResponse,
   GetFriendshipMatchesResponse,
+  GetFriendshipJoinRequestsResponse,
+  DecideFriendshipJoinRequestBody,
+  DecideFriendshipJoinRequestResponse,
 } from "@workspace/api-zod";
 import { requireRole } from "../middlewares/requireRoleMiddleware";
+import { requireStudioRole } from "../middlewares/studioAuthMiddleware";
 
 const router: IRouter = Router();
 router.use("/friendship", requireRole("student"));
@@ -37,9 +41,11 @@ router.get("/friendship/profile", async (req, res): Promise<void> => {
   const [profile] = await db.select({
     interests: friendshipProfilesTable.interests,
     qualities: friendshipProfilesTable.qualities,
+    approvalStatus: friendshipProfilesTable.approvalStatus,
   }).from(friendshipProfilesTable).where(eq(friendshipProfilesTable.userId, req.user!.id));
   res.json(GetFriendshipProfileResponse.parse({
     optedIn: Boolean(profile),
+    approvalStatus: profile?.approvalStatus ?? "none",
     interests: profile?.interests ?? [],
     qualities: profile?.qualities ?? [],
   }));
@@ -54,13 +60,21 @@ router.put("/friendship/profile", async (req, res): Promise<void> => {
     return;
   }
   const { interests, qualities } = parsed.data;
-  await db.insert(friendshipProfilesTable)
+  const [profile] = await db.insert(friendshipProfilesTable)
     .values({ userId: req.user!.id, interests, qualities })
     .onConflictDoUpdate({
       target: friendshipProfilesTable.userId,
-      set: { interests, qualities, updatedAt: new Date() },
-    });
-  res.json(SaveFriendshipProfileResponse.parse({ optedIn: true, interests, qualities }));
+      // Editing an approved profile keeps access. A rejected student can
+      // request another review; pending students remain hidden until approval.
+      set: {
+        interests,
+        qualities,
+        approvalStatus: sql`CASE WHEN ${friendshipProfilesTable.approvalStatus} = 'approved' THEN 'approved' ELSE 'pending' END`,
+        updatedAt: new Date(),
+      },
+    })
+    .returning({ approvalStatus: friendshipProfilesTable.approvalStatus });
+  res.json(SaveFriendshipProfileResponse.parse({ optedIn: true, approvalStatus: profile.approvalStatus, interests, qualities }));
 });
 
 router.delete("/friendship/profile", async (req, res): Promise<void> => {
@@ -72,9 +86,10 @@ router.get("/friendship/matches", async (req, res): Promise<void> => {
   const [mine] = await db.select({
     interests: friendshipProfilesTable.interests,
     qualities: friendshipProfilesTable.qualities,
+    approvalStatus: friendshipProfilesTable.approvalStatus,
   }).from(friendshipProfilesTable).where(eq(friendshipProfilesTable.userId, req.user!.id));
-  // No browsing other students without opting in first.
-  if (!mine) {
+  // No browsing before teacher approval, even by calling the endpoint directly.
+  if (mine?.approvalStatus !== "approved") {
     res.json(GetFriendshipMatchesResponse.parse([]));
     return;
   }
@@ -91,7 +106,10 @@ router.get("/friendship/matches", async (req, res): Promise<void> => {
       eq(studioProfilesTable.accountStatus, "active"),
     ))
     .innerJoin(usersTable, eq(usersTable.id, friendshipProfilesTable.userId))
-    .where(ne(friendshipProfilesTable.userId, req.user!.id));
+    .where(and(
+      ne(friendshipProfilesTable.userId, req.user!.id),
+      eq(friendshipProfilesTable.approvalStatus, "approved"),
+    ));
 
   const interests = new Set(mine.interests);
   const qualities = new Set(mine.qualities);
@@ -111,6 +129,56 @@ router.get("/friendship/matches", async (req, res): Promise<void> => {
     .map(({ displayName, sharedInterests, sharedQualities }) =>
       ({ displayName, sharedInterests, sharedQualities }));
   res.json(GetFriendshipMatchesResponse.parse(matches));
+});
+
+router.get("/teacher/friendship/requests", requireStudioRole("teacher"), async (_req, res): Promise<void> => {
+  const requests = await db.select({
+    userId: friendshipProfilesTable.userId,
+    displayName: studioProfilesTable.displayName,
+    enrolledEmail: studioProfilesTable.email,
+    interests: friendshipProfilesTable.interests,
+    qualities: friendshipProfilesTable.qualities,
+    requestedAt: friendshipProfilesTable.updatedAt,
+  })
+    .from(friendshipProfilesTable)
+    .innerJoin(studioProfilesTable, and(
+      eq(studioProfilesTable.userId, friendshipProfilesTable.userId),
+      eq(studioProfilesTable.role, "student"),
+      eq(studioProfilesTable.accountStatus, "active"),
+    ))
+    .where(eq(friendshipProfilesTable.approvalStatus, "pending"))
+    .orderBy(desc(friendshipProfilesTable.updatedAt));
+
+  res.json(GetFriendshipJoinRequestsResponse.parse(requests.map((request) => ({
+    ...request,
+    displayName: request.displayName?.trim() || request.enrolledEmail,
+    requestedAt: request.requestedAt.toISOString(),
+  }))));
+});
+
+router.post("/teacher/friendship/requests/:userId/decision", requireStudioRole("teacher"), async (req, res): Promise<void> => {
+  const input = DecideFriendshipJoinRequestBody.safeParse(req.body);
+  const userId = req.params.userId;
+  if (!input.success || typeof userId !== "string" || !userId) {
+    res.status(400).json({ error: "A valid decision and student are required" });
+    return;
+  }
+
+  // The conditional update makes simultaneous approvals/withdrawals safe:
+  // only an active student's still-pending request may be changed.
+  const [updated] = await db.update(friendshipProfilesTable)
+    .set({ approvalStatus: input.data.decision === "approve" ? "approved" : "rejected" })
+    .where(and(
+      eq(friendshipProfilesTable.userId, userId),
+      eq(friendshipProfilesTable.approvalStatus, "pending"),
+      sql`EXISTS (SELECT 1 FROM studio_profiles sp WHERE sp.user_id = ${friendshipProfilesTable.userId} AND sp.role = 'student' AND sp.account_status = 'active')`,
+    ))
+    .returning({ approvalStatus: friendshipProfilesTable.approvalStatus });
+  if (!updated) {
+    res.status(409).json({ error: "This request is no longer pending or the student is not enrolled" });
+    return;
+  }
+  res.json(DecideFriendshipJoinRequestResponse.parse(updated));
 });
 
 export default router;

@@ -31,9 +31,11 @@ export function FriendshipMatchmaker() {
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);
   const [selectedQualities, setSelectedQualities] = useState<Quality[]>([]);
   const [notice, setNotice] = useState("");
-  const profileQuery = useGetFriendshipProfile({ query: { enabled: student, retry: false } });
+  const profileQuery = useGetFriendshipProfile({
+    query: { enabled: student, retry: false, refetchInterval: 15_000, refetchOnWindowFocus: true },
+  });
   const matchesQuery = useGetFriendshipMatches({
-    query: { enabled: student && profileQuery.data?.optedIn === true, staleTime: 30_000, retry: false },
+    query: { enabled: student && profileQuery.data?.approvalStatus === "approved", staleTime: 30_000, retry: false },
   });
   const save = useSaveFriendshipProfile();
   const remove = useDeleteFriendshipProfile();
@@ -52,7 +54,9 @@ export function FriendshipMatchmaker() {
       const updated = await save.mutateAsync({ data: { interests: selectedInterests, qualities: selectedQualities } });
       queryClient.setQueryData(getGetFriendshipProfileQueryKey(), updated);
       await queryClient.invalidateQueries({ queryKey: getGetFriendshipMatchesQueryKey() });
-      setNotice("Your choices are saved. Your matches are below.");
+      setNotice(updated.approvalStatus === "approved"
+        ? "Your choices are saved. Your matches are below."
+        : "Your request was sent to your teacher. You'll appear in matches only after approval.");
     } catch {
       setNotice("We couldn't save your choices. Please try again.");
     }
@@ -62,7 +66,7 @@ export function FriendshipMatchmaker() {
     setNotice("");
     try {
       await remove.mutateAsync();
-      queryClient.setQueryData(getGetFriendshipProfileQueryKey(), { optedIn: false, interests: [], qualities: [] });
+      queryClient.setQueryData(getGetFriendshipProfileQueryKey(), { optedIn: false, approvalStatus: "none", interests: [], qualities: [] });
       queryClient.removeQueries({ queryKey: getGetFriendshipMatchesQueryKey() });
       setSelectedInterests([]);
       setSelectedQualities([]);
@@ -81,7 +85,7 @@ export function FriendshipMatchmaker() {
         </div>
         <p className="mx-auto max-w-2xl text-center text-foreground/80">
           Pick things you enjoy and qualities that sound like you. Find classmates who share them!
-          Joining is your choice. Only enrolled students who join can see matches.
+          Joining is your choice. Your teacher must approve your request before you can see matches or appear in them.
         </p>
         <p className="mt-2 text-center text-sm text-foreground/70">
           No private messages or contact details here. If you want to meet someone, ask a teacher to help you say hello.
@@ -148,7 +152,10 @@ export function FriendshipMatchmaker() {
                 className="rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground hover:bg-primary/85 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 data-testid="friendship-save"
               >
-                {save.isPending ? "Saving…" : profileQuery.data?.optedIn ? "Update my choices" : "Join and find matches"}
+                {save.isPending ? "Saving…" :
+                  profileQuery.data?.approvalStatus === "approved" ? "Update my choices" :
+                  profileQuery.data?.approvalStatus === "pending" ? "Update my request" :
+                  profileQuery.data?.approvalStatus === "rejected" ? "Ask for another review" : "Ask to join"}
               </button>
               {profileQuery.data?.optedIn && (
                 <button
@@ -163,7 +170,17 @@ export function FriendshipMatchmaker() {
               )}
             </div>
             {notice && <p className="mt-4 text-center font-semibold text-foreground" role="status">{notice}</p>}
-            {profileQuery.data?.optedIn && (
+            {profileQuery.data?.approvalStatus === "pending" && (
+              <p className="mt-5 text-center font-semibold text-foreground" role="status">
+                Waiting for your teacher to approve your request. You are not visible to classmates yet.
+              </p>
+            )}
+            {profileQuery.data?.approvalStatus === "rejected" && (
+              <p className="mt-5 text-center font-semibold text-foreground" role="status">
+                Your request was not approved. You can update your choices and ask your teacher to review again.
+              </p>
+            )}
+            {profileQuery.data?.approvalStatus === "approved" && (
               <div className="mt-10 border-t border-sage/30 pt-7">
                 <h3 className="mb-4 flex items-center justify-center gap-2 font-display text-3xl font-bold text-foreground"><Sparkles className="text-amber" aria-hidden="true" /> Your matches</h3>
                 {matchesQuery.isLoading ? <p className="text-center" role="status">Finding classmates…</p>

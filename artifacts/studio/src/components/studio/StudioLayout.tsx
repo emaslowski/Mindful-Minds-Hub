@@ -61,7 +61,7 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
         <div className="px-5 py-5 border-b border-[#5a4035]">
           <Link href={dashboardRoot}>
             <h1 className="font-serif text-lg font-semibold leading-tight">
-              Mind Matters
+              Middle School Matters
             </h1>
             <p className="text-xs text-[#d5cabe] mt-0.5">
               {user?.role === 'teacher' ? 'Command Center' : 'Studio'}
@@ -133,7 +133,7 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
           {/* Plain <a> so clicking does a full-page navigation to the public site */}
           <a href="/" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#d5cabe] hover:bg-[#5a4035] hover:text-white transition-colors">
             <Globe className="h-4 w-4" />
-            Public Website
+            Middle School Matters Website
           </a>
           <button
             onClick={() => logout()}

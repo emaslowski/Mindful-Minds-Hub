@@ -44,8 +44,19 @@ export interface FriendshipProfileInput {
   qualities: FriendshipProfileInputQualitiesItem[];
 }
 
+export type FriendshipProfileApprovalStatus = typeof FriendshipProfileApprovalStatus[keyof typeof FriendshipProfileApprovalStatus];
+
+
+export const FriendshipProfileApprovalStatus = {
+  none: 'none',
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
 export interface FriendshipProfile {
   optedIn: boolean;
+  approvalStatus: FriendshipProfileApprovalStatus;
   interests: string[];
   qualities: string[];
 }
@@ -54,6 +65,38 @@ export interface FriendshipMatch {
   displayName: string;
   sharedInterests: string[];
   sharedQualities: string[];
+}
+
+export interface FriendshipJoinRequest {
+  userId: string;
+  displayName: string;
+  interests: string[];
+  qualities: string[];
+  requestedAt: string;
+}
+
+export type FriendshipDecisionInputDecision = typeof FriendshipDecisionInputDecision[keyof typeof FriendshipDecisionInputDecision];
+
+
+export const FriendshipDecisionInputDecision = {
+  approve: 'approve',
+  reject: 'reject',
+} as const;
+
+export interface FriendshipDecisionInput {
+  decision: FriendshipDecisionInputDecision;
+}
+
+export type FriendshipDecisionResultApprovalStatus = typeof FriendshipDecisionResultApprovalStatus[keyof typeof FriendshipDecisionResultApprovalStatus];
+
+
+export const FriendshipDecisionResultApprovalStatus = {
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface FriendshipDecisionResult {
+  approvalStatus: FriendshipDecisionResultApprovalStatus;
 }
 
 export interface HealthStatus {
