@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherReview, teacherAnalytics, teacherModeration, type ModerationItem } from '@/lib/studioApi';
+import { teacherReview, teacherAnalytics, teacherModeration, teacherAnonymousAccess, type ModerationItem } from '@/lib/studioApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  Users, FolderOpen, ClipboardCheck, Star,
+  Users, FolderOpen, ClipboardCheck, Star, KeyRound,
   RefreshCw, AlertCircle, ChevronRight, Trash2, CheckCircle2, FileText, MessageSquare,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -48,6 +48,14 @@ export default function CommandCenter() {
     queryFn: () => teacherModeration.list(),
     enabled: !!user,
     refetchOnWindowFocus: true,
+  });
+
+  const { data: anonymousAccess, isLoading: accessLoading, isError: accessError, refetch: refetchAccess } = useQuery({
+    queryKey: ['teacher-anonymous-access'],
+    queryFn: teacherAnonymousAccess.list,
+    enabled: !!user,
+    refetchOnWindowFocus: true,
+    refetchInterval: 30_000,
   });
 
   const { mutate: deleteProject, isPending: isDeleting } = useMutation({
@@ -95,6 +103,7 @@ export default function CommandCenter() {
 
   const s = analytics?.summary;
   const queue = queueData?.projects ?? [];
+  const pendingAccessRequests = (anonymousAccess?.requests ?? []).filter((request) => request.status === 'pending');
   const authorizationQueue = [
     ...(moderationData?.blogPosts ?? []),
     ...(moderationData?.collabPosts ?? []),
@@ -108,6 +117,7 @@ export default function CommandCenter() {
   };
 
   const summaryCards = [
+    { label: 'Journal Access Requests', value: accessError ? '!' : accessLoading ? '…' : pendingAccessRequests.length, icon: <KeyRound className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/anonymous-access' },
     { label: 'Active Students', value: s?.activeStudents ?? 0, icon: <Users className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/students' },
     { label: 'Projects In Progress', value: s?.totalProjects ?? 0, icon: <FolderOpen className="h-5 w-5 text-[#688a52]" />, href: '/studio/teacher/projects' },
     { label: 'Awaiting Review', value: s?.pendingReview ?? 0, icon: <ClipboardCheck className="h-5 w-5 text-orange-500" />, href: '/studio/teacher/review' },
@@ -135,6 +145,65 @@ export default function CommandCenter() {
             </Link>
           ))}
         </div>
+
+        {/* Private journal access requests require teacher approval before credentials are issued. */}
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-[#453329]">Private Journal Access Requests</h2>
+            <p className="text-xs text-[#688a52] mt-0.5">
+              Review requests before students receive their private journal sign-in details.
+            </p>
+          </div>
+          <span
+            aria-label={accessError ? 'Journal access requests could not be loaded' : accessLoading ? 'Loading journal access requests' : `${pendingAccessRequests.length} pending journal access requests`}
+            className="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-[#c4622d] text-white text-xs font-bold"
+          >
+            {accessError ? '!' : accessLoading ? '…' : pendingAccessRequests.length}
+          </span>
+        </div>
+        {accessError ? (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8">
+            <CardContent className="p-6 text-sm text-red-700">
+              Could not load journal access requests.{' '}
+              <button type="button" className="underline font-semibold" onClick={() => refetchAccess()}>Try again</button>
+            </CardContent>
+          </Card>
+        ) : accessLoading ? (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8">
+            <CardContent className="p-6 text-sm text-[#688a52]">Loading journal access requests…</CardContent>
+          </Card>
+        ) : pendingAccessRequests.length === 0 ? (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8">
+            <CardContent className="p-6 flex items-center gap-3 text-sm text-[#688a52]">
+              <CheckCircle2 className="h-5 w-5" />
+              No private journal access requests are waiting for approval.
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-[#eee6d8] border-[#d5cabe] mb-8 overflow-hidden">
+            <div className="divide-y divide-[#d5cabe]">
+              {pendingAccessRequests.map((request) => (
+                <div key={request.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4">
+                  <KeyRound className="h-5 w-5 shrink-0 text-[#c4622d]" aria-hidden="true" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-[#453329]">
+                      {[request.firstName, request.lastName].filter(Boolean).join(' ') || 'Student'}
+                      <span className="ml-2 text-xs text-[#688a52]">Grade {request.grade || 'not provided'}</span>
+                    </p>
+                    <p className="text-xs text-[#688a52]">
+                      Request {request.requestCode} · {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true })}
+                    </p>
+                  </div>
+                  <Link href="/studio/teacher/anonymous-access">
+                    <Button size="sm" className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full">
+                      Review &amp; Approve
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {/* Public content moderation */}
         <div className="flex items-center justify-between mb-3">
