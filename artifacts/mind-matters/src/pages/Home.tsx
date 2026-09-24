@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { ImpactStats } from "@/components/ImpactStats";
+import { HomeActivitySections } from "@/components/HomeActivitySections";
 
 export default function Home() {
   const categories = [
@@ -225,6 +226,8 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      <HomeActivitySections />
 
       {/* Our Impact */}
       <ImpactStats />
