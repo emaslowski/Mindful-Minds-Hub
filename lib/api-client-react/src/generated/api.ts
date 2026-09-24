@@ -32,6 +32,9 @@ import type {
   CollabPost,
   CollabPostInput,
   Event,
+  FriendshipMatch,
+  FriendshipProfile,
+  FriendshipProfileInput,
   GetPublishedContentParams,
   GratitudeEntry,
   GratitudeEntryInput,
@@ -1376,6 +1379,302 @@ export const useAddCollabComment = <TError = ErrorType<void>,
       > => {
       return useMutation(getAddCollabCommentMutationOptions(options));
     }
+
+export const getGetFriendshipProfileUrl = () => {
+
+
+
+
+  return `/api/friendship/profile`
+}
+
+/**
+ * @summary Get my opt-in friendship profile
+ */
+export const getFriendshipProfile = async ( options?: Parameters<typeof customFetch>[1]): Promise<FriendshipProfile> => {
+
+  return customFetch<FriendshipProfile>(getGetFriendshipProfileUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFriendshipProfileQueryKey = () => {
+    return [
+    `/api/friendship/profile`
+    ] as const;
+    }
+
+
+export const getGetFriendshipProfileQueryOptions = <TData = Awaited<ReturnType<typeof getFriendshipProfile>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFriendshipProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFriendshipProfileQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFriendshipProfile>>> = ({ signal }) => getFriendshipProfile({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFriendshipProfile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFriendshipProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getFriendshipProfile>>>
+export type GetFriendshipProfileQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get my opt-in friendship profile
+ */
+
+export function useGetFriendshipProfile<TData = Awaited<ReturnType<typeof getFriendshipProfile>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFriendshipProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFriendshipProfileQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveFriendshipProfileUrl = () => {
+
+
+
+
+  return `/api/friendship/profile`
+}
+
+/**
+ * @summary Opt in or update my friendship profile
+ */
+export const saveFriendshipProfile = async (friendshipProfileInput: FriendshipProfileInput, options?: Parameters<typeof customFetch>[1]): Promise<FriendshipProfile> => {
+
+  return customFetch<FriendshipProfile>(getSaveFriendshipProfileUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(friendshipProfileInput)
+  }
+);}
+
+
+
+
+
+export const getSaveFriendshipProfileMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveFriendshipProfile>>, TError,{data: BodyType<FriendshipProfileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveFriendshipProfile>>, TError,{data: BodyType<FriendshipProfileInput>}, TContext> => {
+
+const mutationKey = ['saveFriendshipProfile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveFriendshipProfile>>, {data: BodyType<FriendshipProfileInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  saveFriendshipProfile(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveFriendshipProfileMutationResult = NonNullable<Awaited<ReturnType<typeof saveFriendshipProfile>>>
+    export type SaveFriendshipProfileMutationBody = BodyType<FriendshipProfileInput>
+    export type SaveFriendshipProfileMutationError = ErrorType<void>
+
+    /**
+ * @summary Opt in or update my friendship profile
+ */
+export const useSaveFriendshipProfile = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveFriendshipProfile>>, TError,{data: BodyType<FriendshipProfileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveFriendshipProfile>>,
+        TError,
+        {data: BodyType<FriendshipProfileInput>},
+        TContext
+      > => {
+      return useMutation(getSaveFriendshipProfileMutationOptions(options));
+    }
+
+export const getDeleteFriendshipProfileUrl = () => {
+
+
+
+
+  return `/api/friendship/profile`
+}
+
+/**
+ * @summary Leave friendship matching and remove my profile
+ */
+export const deleteFriendshipProfile = async ( options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteFriendshipProfileUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteFriendshipProfileMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFriendshipProfile>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteFriendshipProfile>>, TError,void, TContext> => {
+
+const mutationKey = ['deleteFriendshipProfile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteFriendshipProfile>>, void> = () => {
+
+
+          return  deleteFriendshipProfile(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteFriendshipProfileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteFriendshipProfile>>>
+
+    export type DeleteFriendshipProfileMutationError = ErrorType<void>
+
+    /**
+ * @summary Leave friendship matching and remove my profile
+ */
+export const useDeleteFriendshipProfile = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFriendshipProfile>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteFriendshipProfile>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDeleteFriendshipProfileMutationOptions(options));
+    }
+
+export const getGetFriendshipMatchesUrl = () => {
+
+
+
+
+  return `/api/friendship/matches`
+}
+
+/**
+ * @summary Get similar opted-in enrolled students
+ */
+export const getFriendshipMatches = async ( options?: Parameters<typeof customFetch>[1]): Promise<FriendshipMatch[]> => {
+
+  return customFetch<FriendshipMatch[]>(getGetFriendshipMatchesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFriendshipMatchesQueryKey = () => {
+    return [
+    `/api/friendship/matches`
+    ] as const;
+    }
+
+
+export const getGetFriendshipMatchesQueryOptions = <TData = Awaited<ReturnType<typeof getFriendshipMatches>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFriendshipMatches>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFriendshipMatchesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFriendshipMatches>>> = ({ signal }) => getFriendshipMatches({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFriendshipMatches>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFriendshipMatchesQueryResult = NonNullable<Awaited<ReturnType<typeof getFriendshipMatches>>>
+export type GetFriendshipMatchesQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get similar opted-in enrolled students
+ */
+
+export function useGetFriendshipMatches<TData = Awaited<ReturnType<typeof getFriendshipMatches>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFriendshipMatches>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFriendshipMatchesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getTrackPageViewUrl = () => {
 

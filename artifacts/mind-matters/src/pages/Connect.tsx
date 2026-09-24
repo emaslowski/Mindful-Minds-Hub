@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
 import { useGetBlogPosts, useGetPublishedContent } from "@workspace/api-client-react";
 import { Star } from "lucide-react";
+import { FriendshipMatchmaker } from "@/components/FriendshipMatchmaker";
 
 const SAMPLE_POSTS = [
   {
@@ -218,6 +219,7 @@ export default function Connect() {
         </div>
       )}
 
+      <FriendshipMatchmaker />
       <WaveFooter quote="Your voice matters." />
     </div>
   );

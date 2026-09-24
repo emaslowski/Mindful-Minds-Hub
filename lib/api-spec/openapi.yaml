@@ -25,6 +25,8 @@ tags:
     description: Site reviews
   - name: events
     description: Community events
+  - name: friendship
+    description: Opt-in friendship matches for enrolled students
 
 paths:
   /healthz:
@@ -337,6 +339,77 @@ paths:
         "400":
           description: Invalid input
 
+  # Friendship profiles (enrolled students only)
+  /friendship/profile:
+    get:
+      operationId: getFriendshipProfile
+      tags: [friendship]
+      summary: Get my opt-in friendship profile
+      responses:
+        "200":
+          description: My friendship profile or an empty selection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendshipProfile"
+        "401":
+          description: Sign in required
+        "403":
+          description: Enrolled student account required
+    put:
+      operationId: saveFriendshipProfile
+      tags: [friendship]
+      summary: Opt in or update my friendship profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FriendshipProfileInput"
+      responses:
+        "200":
+          description: Saved profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendshipProfile"
+        "400":
+          description: Invalid selection
+        "401":
+          description: Sign in required
+        "403":
+          description: Enrolled student account required
+    delete:
+      operationId: deleteFriendshipProfile
+      tags: [friendship]
+      summary: Leave friendship matching and remove my profile
+      responses:
+        "204":
+          description: Profile removed
+        "401":
+          description: Sign in required
+        "403":
+          description: Enrolled student account required
+
+  /friendship/matches:
+    get:
+      operationId: getFriendshipMatches
+      tags: [friendship]
+      summary: Get similar opted-in enrolled students
+      responses:
+        "200":
+          description: Matching students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FriendshipMatch"
+        "401":
+          description: Sign in required
+        "403":
+          description: Enrolled student account required
+
   # Analytics
   /analytics/track:
     post:
@@ -492,6 +565,54 @@ components:
         type: string
 
   schemas:
+    FriendshipProfileInput:
+      type: object
+      required: [interests, qualities]
+      properties:
+        interests:
+          type: array
+          minItems: 1
+          maxItems: 5
+          uniqueItems: true
+          items:
+            type: string
+            enum: [Art, Books, Cooking, Gardening, Games, Music, Nature, Sports]
+        qualities:
+          type: array
+          minItems: 1
+          maxItems: 4
+          uniqueItems: true
+          items:
+            type: string
+            enum: [Creative, Curious, Kind, Playful, Thoughtful, Adventurous]
+    FriendshipProfile:
+      type: object
+      required: [optedIn, interests, qualities]
+      properties:
+        optedIn:
+          type: boolean
+        interests:
+          type: array
+          items:
+            type: string
+        qualities:
+          type: array
+          items:
+            type: string
+    FriendshipMatch:
+      type: object
+      required: [displayName, sharedInterests, sharedQualities]
+      properties:
+        displayName:
+          type: string
+        sharedInterests:
+          type: array
+          items:
+            type: string
+        sharedQualities:
+          type: array
+          items:
+            type: string
     HealthStatus:
       type: object
       properties:

@@ -273,6 +273,54 @@ export const AddCollabCommentResponse = zod.object({
 
 
 /**
+ * @summary Get my opt-in friendship profile
+ */
+export const GetFriendshipProfileResponse = zod.object({
+  "optedIn": zod.boolean(),
+  "interests": zod.array(zod.string()),
+  "qualities": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Opt in or update my friendship profile
+ */
+export const saveFriendshipProfileBodyInterestsMax = 5;
+
+export const saveFriendshipProfileBodyQualitiesMax = 4;
+
+
+
+export const SaveFriendshipProfileBody = zod.object({
+  "interests": zod.array(zod.enum(['Art', 'Books', 'Cooking', 'Gardening', 'Games', 'Music', 'Nature', 'Sports'])).min(1).max(saveFriendshipProfileBodyInterestsMax),
+  "qualities": zod.array(zod.enum(['Creative', 'Curious', 'Kind', 'Playful', 'Thoughtful', 'Adventurous'])).min(1).max(saveFriendshipProfileBodyQualitiesMax)
+})
+
+export const SaveFriendshipProfileResponse = zod.object({
+  "optedIn": zod.boolean(),
+  "interests": zod.array(zod.string()),
+  "qualities": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Leave friendship matching and remove my profile
+ */
+export const DeleteFriendshipProfileResponse = zod.void()
+
+
+/**
+ * @summary Get similar opted-in enrolled students
+ */
+export const GetFriendshipMatchesResponseItem = zod.object({
+  "displayName": zod.string(),
+  "sharedInterests": zod.array(zod.string()),
+  "sharedQualities": zod.array(zod.string())
+})
+export const GetFriendshipMatchesResponse = zod.array(GetFriendshipMatchesResponseItem)
+
+
+/**
  * @summary Track a page view or section click
  */
 export const TrackPageViewBody = zod.object({

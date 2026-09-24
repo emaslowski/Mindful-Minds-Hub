@@ -5,6 +5,57 @@
  * Mind Matters API
  * OpenAPI spec version: 0.1.0
  */
+export type FriendshipProfileInputInterestsItem = typeof FriendshipProfileInputInterestsItem[keyof typeof FriendshipProfileInputInterestsItem];
+
+
+export const FriendshipProfileInputInterestsItem = {
+  Art: 'Art',
+  Books: 'Books',
+  Cooking: 'Cooking',
+  Gardening: 'Gardening',
+  Games: 'Games',
+  Music: 'Music',
+  Nature: 'Nature',
+  Sports: 'Sports',
+} as const;
+
+export type FriendshipProfileInputQualitiesItem = typeof FriendshipProfileInputQualitiesItem[keyof typeof FriendshipProfileInputQualitiesItem];
+
+
+export const FriendshipProfileInputQualitiesItem = {
+  Creative: 'Creative',
+  Curious: 'Curious',
+  Kind: 'Kind',
+  Playful: 'Playful',
+  Thoughtful: 'Thoughtful',
+  Adventurous: 'Adventurous',
+} as const;
+
+export interface FriendshipProfileInput {
+  /**
+     * @minItems 1
+     * @maxItems 5
+     */
+  interests: FriendshipProfileInputInterestsItem[];
+  /**
+     * @minItems 1
+     * @maxItems 4
+     */
+  qualities: FriendshipProfileInputQualitiesItem[];
+}
+
+export interface FriendshipProfile {
+  optedIn: boolean;
+  interests: string[];
+  qualities: string[];
+}
+
+export interface FriendshipMatch {
+  displayName: string;
+  sharedInterests: string[];
+  sharedQualities: string[];
+}
+
 export interface HealthStatus {
   status: string;
 }

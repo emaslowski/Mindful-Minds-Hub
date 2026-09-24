@@ -10,6 +10,7 @@ import checkinRouter from "./checkin";
 import reviewsRouter from "./reviews";
 import eventsRouter from "./events";
 import contactRouter from "./contact";
+import friendshipRouter from "./friendship";
 // Studio routes
 import studioAuthRouter from "./studio/auth";
 import studioProjectsRouter from "./studio/projects";
@@ -40,6 +41,7 @@ router.use(checkinRouter);
 router.use(reviewsRouter);
 router.use(eventsRouter);
 router.use(contactRouter);
+router.use(friendshipRouter);
 // Studio — student
 router.use(studioAuthRouter);
 router.use(studioProjectsRouter);

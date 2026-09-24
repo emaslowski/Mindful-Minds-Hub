@@ -9,3 +9,4 @@
 - [Mind Matters collaboration counts](mind-matters-collaboration-counts.md) — show pending activity in counts while withholding unapproved comment text
 - [Mind Matters anonymous wellness access](mind-matters-anonymous-wellness-access.md) — anonymous journal access is a dedicated, secondary identity that must not replace OAuth or Studio sessions
 - [Durable verification scripts](durable-verification-scripts.md) — use fixed, cleaned test identifiers in the CodeExecution sandbox; runtime time and random APIs are unavailable
+- [Student friendship matching](student-friendship-matching.md) — real matches belong below Connect’s blog; opt-in enrolled individuals only, with limited traits and no direct contact
