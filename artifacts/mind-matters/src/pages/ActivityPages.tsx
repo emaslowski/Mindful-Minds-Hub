@@ -3,8 +3,8 @@ import { Link } from "wouter";
 import {
   GardeningSection,
   LanguageSection,
-  GamesSection,
 } from "@/components/HomeActivitySections";
+import { SnakeGame } from "@/components/SnakeGame";
 
 function ActivityPage({ children }: { children: ReactNode }) {
   return (
@@ -26,5 +26,5 @@ export function LanguageCornerPage() {
 }
 
 export function GamesPage() {
-  return <ActivityPage><GamesSection /></ActivityPage>;
+  return <ActivityPage><SnakeGame /></ActivityPage>;
 }
