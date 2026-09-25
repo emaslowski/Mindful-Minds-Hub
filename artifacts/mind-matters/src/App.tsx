@@ -13,6 +13,7 @@ import {
 import { useTrackPageView } from '@workspace/api-client-react';
 
 import { Layout } from '@/components/Layout';
+import { WebsiteRulesGate } from '@/components/WebsiteRulesGate';
 import Home from '@/pages/Home';
 import { GardeningPage, LanguageCornerPage, GamesPage } from '@/pages/ActivityPages';
 import Learn from '@/pages/Learn';
@@ -151,6 +152,7 @@ function App() {
             <PublicRouter />
           </RoutedErrorBoundary>
         </WouterRouter>
+        <WebsiteRulesGate />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
