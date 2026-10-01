@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, FolderOpen, ClipboardCheck, RefreshCw, Send, CheckCircle, BookOpen } from 'lucide-react';
 import { useState } from 'react';
+import { RESOURCE_WORKSPACE_CONFIGS } from '@/components/studio/resourceWorkspaceConfigs';
 
 const STATUS_GROUPS = {
   'My Assignments': ['Assigned', 'Researching', 'Drafting'],
@@ -242,6 +243,14 @@ function CreateProjectForm({
           </SelectContent>
         </Select>
       </div>
+      {RESOURCE_WORKSPACE_CONFIGS[contentType] && (
+        <div className="rounded-xl border border-[#d5cabe] bg-[#eee6d8] p-3 text-sm text-[#453329]">
+          <p className="font-medium">{RESOURCE_WORKSPACE_CONFIGS[contentType].intro}</p>
+          <p className="mt-1 text-xs leading-relaxed text-[#8a6a55]">
+            Your workspace includes guided prompts for {RESOURCE_WORKSPACE_CONFIGS[contentType].sections.map((section) => section.label.toLowerCase()).join(', ')}.
+          </p>
+        </div>
+      )}
       <Button
         className="w-full bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
         onClick={() => create()}

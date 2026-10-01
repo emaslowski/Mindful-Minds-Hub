@@ -149,7 +149,7 @@ export default function ProjectWorkspace() {
         title={title || 'Untitled Project'}
         subtitle={project.contentType}
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <StatusBadge status={project.status} />
             {canDelete && (
               <button

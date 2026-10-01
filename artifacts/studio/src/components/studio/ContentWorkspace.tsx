@@ -3,12 +3,14 @@
  * Stores content as formatted text sections (## Heading\nbody) so it remains
  * human-readable in the teacher review queue without any schema changes.
  */
-import { useCallback, useMemo } from 'react';
+import { useCallback, useId, useMemo } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Lightbulb } from 'lucide-react';
+import type { WorkspaceConfig } from './workspaceConfig';
+import { RESOURCE_WORKSPACE_CONFIGS } from './resourceWorkspaceConfigs';
 
 // ── Section parsing ──────────────────────────────────────────────────────────
 
@@ -32,29 +34,10 @@ function buildContent(pairs: Array<[string, string]>): string {
   return pairs.map(([k, v]) => `## ${k}\n${v}`).join('\n\n');
 }
 
-// ── Config types ─────────────────────────────────────────────────────────────
-
-interface SectionDef {
-  key: string;
-  label: string;
-  placeholder: string;
-  rows?: number;
-  short?: boolean; // render as <Input> instead of <Textarea>
-}
-
-interface WorkspaceConfig {
-  jobGroup: string;
-  emoji: string;
-  accent: string;   // tailwind text color
-  bg: string;       // tailwind bg color for header
-  intro: string;
-  tips: string[];
-  sections: SectionDef[];
-}
-
 // ── Per-type configs ──────────────────────────────────────────────────────────
 
 const CONFIGS: Record<string, WorkspaceConfig> = {
+  ...RESOURCE_WORKSPACE_CONFIGS,
 
   'Podcast': {
     jobGroup: 'Podcasters',
@@ -479,6 +462,7 @@ interface ContentWorkspaceProps {
 }
 
 export function ContentWorkspace({ contentType, content, onChange, disabled }: ContentWorkspaceProps) {
+  const fieldPrefix = useId();
   const config = CONFIGS[contentType] ?? FALLBACK_CONFIG;
 
   const parsed = useMemo(() => parseSections(content), [content]);
@@ -508,11 +492,18 @@ export function ContentWorkspace({ contentType, content, onChange, disabled }: C
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-5">
         {/* Sections */}
         <div className="space-y-4">
-          {config.sections.map((section) => (
+          {config.sections.map((section, index) => (
             <div key={section.key} className="space-y-1.5">
-              <Label className="text-sm font-medium text-[#453329]">{section.label}</Label>
+              <Label htmlFor={`${fieldPrefix}-${index}`} className="text-sm font-medium text-[#453329]">{section.label}</Label>
+              {section.prompt && (
+                <p id={`${fieldPrefix}-${index}-prompt`} className="text-xs leading-relaxed text-[#8a6a55]">
+                  {section.prompt}
+                </p>
+              )}
               {section.short ? (
                 <Input
+                  id={`${fieldPrefix}-${index}`}
+                  aria-describedby={section.prompt ? `${fieldPrefix}-${index}-prompt` : undefined}
                   value={getValue(section.key)}
                   onChange={(e) => handleChange(section.key, e.target.value)}
                   placeholder={section.placeholder}
@@ -521,6 +512,8 @@ export function ContentWorkspace({ contentType, content, onChange, disabled }: C
                 />
               ) : (
                 <Textarea
+                  id={`${fieldPrefix}-${index}`}
+                  aria-describedby={section.prompt ? `${fieldPrefix}-${index}-prompt` : undefined}
                   value={getValue(section.key)}
                   onChange={(e) => handleChange(section.key, e.target.value)}
                   placeholder={section.placeholder}
