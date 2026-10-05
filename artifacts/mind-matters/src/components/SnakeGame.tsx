@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Pause, Play, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Pause, Play, RotateCcw, Sprout } from "lucide-react";
 
 const SIZE = 16;
 const HIGH_SCORE_KEY = "mind-matters-snake-best";
@@ -104,24 +104,26 @@ const keys: Record<string, Direction> = {
   w: "up", s: "down", a: "left", d: "right",
 };
 
-export function SnakeGame() {
+export function SnakeGame({ isActive = true }: { isActive?: boolean }) {
   const [game, dispatch] = useReducer(updateGame, undefined, initialGame);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
-    if (game.status !== "running") return;
+    if (game.status !== "running" || !isActive) return;
     const timer = window.setInterval(
       () => dispatch({ type: "tick", random: Math.random() }),
       Math.max(90, 190 - game.score * 5),
     );
     return () => window.clearInterval(timer);
-  }, [game.status, game.score]);
+  }, [game.status, game.score, isActive]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.altKey || event.ctrlKey || event.metaKey ||
+      if (!isActive || event.altKey || event.ctrlKey || event.metaKey ||
           event.target instanceof HTMLInputElement ||
-          event.target instanceof HTMLTextAreaElement) return;
+          event.target instanceof HTMLTextAreaElement ||
+          event.target instanceof HTMLSelectElement ||
+          (event.target instanceof HTMLElement && event.target.isContentEditable)) return;
       const direction = keys[event.key] ?? keys[event.key.toLowerCase()];
       if (direction && game.status === "running") {
         event.preventDefault();
@@ -133,7 +135,7 @@ export function SnakeGame() {
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [game.status]);
+  }, [game.status, isActive]);
 
   useEffect(() => {
     try {
@@ -155,7 +157,7 @@ export function SnakeGame() {
   return (
     <section aria-labelledby="snake-title" className="rounded-3xl border-2 border-secondary/40 bg-secondary/10 p-4 shadow-md sm:p-7">
       <div className="mb-4 flex items-center gap-3 text-secondary">
-        <span aria-hidden="true" className="text-3xl">🐍</span>
+        <Sprout aria-hidden="true" className="h-8 w-8" />
         <h1 id="snake-title" className="font-display text-4xl font-bold text-foreground">Snake</h1>
       </div>
       <p className="mb-5 text-foreground/85">Collect the golden snacks to grow. Avoid the walls and your own tail!</p>
