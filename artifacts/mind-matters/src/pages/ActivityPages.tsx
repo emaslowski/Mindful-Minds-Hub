@@ -9,6 +9,7 @@ import {
 import { SnakeGame } from "@/components/SnakeGame";
 import { HangmanGame } from "@/components/games/HangmanGame";
 import { ScrabbleGame } from "@/components/games/ScrabbleGame";
+import { ScratchPlayground } from "@/components/games/ScratchPlayground";
 
 function ActivityPage({ children }: { children: ReactNode }) {
   return (
@@ -30,11 +31,12 @@ export function LanguageCornerPage() {
 }
 
 export function GamesPage() {
-  const [activeGame, setActiveGame] = useState<"snake" | "hangman" | "tiles">("snake");
+  const [activeGame, setActiveGame] = useState<"snake" | "hangman" | "tiles" | "coding">("snake");
   const games = [
     { id: "snake", label: "Snake" },
     { id: "hangman", label: "Hangman" },
     { id: "tiles", label: "Scrabble-style" },
+    { id: "coding", label: "Coding playground" },
   ] as const;
 
   return (
@@ -72,10 +74,9 @@ export function GamesPage() {
       <div id="game-panel-tiles" aria-label="Word tiles game" hidden={activeGame !== "tiles"}>
         <ScrabbleGame isActive={activeGame === "tiles"} />
       </div>
-      <aside className="mt-8 rounded-2xl border border-secondary/30 bg-secondary/10 p-5">
-        <h2 className="text-xl font-bold">Thinking about coding?</h2>
-        <p className="mt-1 text-foreground/80">A future private starter-code lab could let students experiment safely and share work for teacher review. There is no coding lab in this game area yet.</p>
-      </aside>
+      <div id="game-panel-coding" aria-label="Coding playground" hidden={activeGame !== "coding"}>
+        <ScratchPlayground isActive={activeGame === "coding"} />
+      </div>
     </main>
   );
 }
