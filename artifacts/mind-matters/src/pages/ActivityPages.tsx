@@ -9,7 +9,6 @@ import {
 import { SnakeGame } from "@/components/SnakeGame";
 import { HangmanGame } from "@/components/games/HangmanGame";
 import { ScrabbleGame } from "@/components/games/ScrabbleGame";
-import { ScratchPlayground } from "@/components/games/ScratchPlayground";
 
 function ActivityPage({ children }: { children: ReactNode }) {
   return (
@@ -31,12 +30,11 @@ export function LanguageCornerPage() {
 }
 
 export function GamesPage() {
-  const [activeGame, setActiveGame] = useState<"snake" | "hangman" | "tiles" | "coding">("snake");
+  const [activeGame, setActiveGame] = useState<"snake" | "hangman" | "tiles">("snake");
   const games = [
     { id: "snake", label: "Snake" },
     { id: "hangman", label: "Hangman" },
     { id: "tiles", label: "Scrabble-style" },
-    { id: "coding", label: "Coding playground" },
   ] as const;
 
   return (
@@ -73,9 +71,6 @@ export function GamesPage() {
       </div>
       <div id="game-panel-tiles" aria-label="Word tiles game" hidden={activeGame !== "tiles"}>
         <ScrabbleGame isActive={activeGame === "tiles"} />
-      </div>
-      <div id="game-panel-coding" aria-label="Coding playground" hidden={activeGame !== "coding"}>
-        <ScratchPlayground isActive={activeGame === "coding"} />
       </div>
     </main>
   );
