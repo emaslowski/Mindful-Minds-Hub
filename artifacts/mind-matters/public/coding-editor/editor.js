@@ -126,10 +126,56 @@
         showTelemetryModal: false,
         onClickLogo: () => {},
       });
-      // This is our own hosting message, not an assumed vendor API.
-      if (window.parent !== window) {
-        window.parent.postMessage({ type: "mind-matters:scratch-ready" }, base.origin);
-      }
+      const starters = {
+        "chase-the-star": "Chase the star",
+        "bouncing-ball": "Bouncing ball",
+        "click-counter": "Click counter",
+      };
+      let loadingStarter = false;
+      // Use the same VM/file-upload lifecycle as the pinned upstream uploader.
+      // Only the host window can supply the three known starter projects.
+      window.addEventListener("message", async (event) => {
+        if (event.source !== window.parent || event.origin !== base.origin ||
+            event.data?.type !== "mind-matters:load-starter") return;
+        const { id, bytes } = event.data;
+        if (!Object.hasOwn(starters, id) || !(bytes instanceof ArrayBuffer) ||
+            !bytes.byteLength || bytes.byteLength > 200000 || loadingStarter) return;
+        const gui = state.store.getState().scratchGui;
+        if (!["NOT_LOADED", "SHOWING_WITH_ID", "SHOWING_WITHOUT_ID"].includes(gui.projectState.loadingState)) {
+          window.parent.postMessage({ type: "mind-matters:starter-error" }, base.origin);
+          return;
+        }
+        loadingStarter = true;
+        try {
+          gui.vm.stopAll();
+          state.dispatch({ type: "scratch-gui/project-state/START_LOADING_VM_FILE_UPLOAD" });
+          await gui.vm.loadProject(bytes);
+          state.dispatch({ type: "projectTitle/SET_PROJECT_TITLE", title: starters[id] });
+          state.dispatch({ type: "scratch-gui/project-state/DONE_LOADING_VM_WITHOUT_ID" });
+          window.parent.postMessage({ type: "mind-matters:starter-loaded", id }, base.origin);
+        } catch (error) {
+          console.error("Starter loading failed", error);
+          state.dispatch({ type: "scratch-gui/project-state/RETURN_TO_SHOWING" });
+          window.parent.postMessage({ type: "mind-matters:starter-error" }, base.origin);
+        } finally {
+          loadingStarter = false;
+        }
+      });
+      // Standalone starts with NOT_LOADED until its first local project. Wait
+      // for the VM/audio/renderer mount, not a default-project fetch that never
+      // happens here. Polling also observes vm.initialized, which isn't Redux.
+      const announceReady = () => {
+        const gui = state.store.getState().scratchGui;
+        if (gui.vm.initialized && ["NOT_LOADED", "SHOWING_WITH_ID", "SHOWING_WITHOUT_ID"].includes(gui.projectState.loadingState)) {
+          clearInterval(readyTimer);
+          unsubscribe();
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: "mind-matters:scratch-ready" }, base.origin);
+          }
+        }
+      };
+      const readyTimer = setInterval(announceReady, 50);
+      const unsubscribe = state.store.subscribe(announceReady);
     } catch (error) {
       console.error("Scratch editor initialization failed", error);
       showError();

@@ -17,6 +17,12 @@ The user chose “Host Scratch on this site.” Keep the coding editor inside Ga
 
 **How to apply:** Preserve the local editor and its source/license offer. Keep the editor isolated from the main site's signed-in session; do not grant same-origin sandbox access merely to satisfy upstream cookie or storage expectations.
 
+Starters should open directly with one click, without downloading or manually importing a starter file.
+
+**Why:** The user requested “click a starter with no downloading.”
+
+**How to apply:** Keep direct starter opening as the primary entry point. Do not restore manual starter downloads as a prerequisite for starting a game.
+
 ## Browser verification
 
 Check the testing browser's WebGL capability before treating Scratch's unsupported-browser dialog as an application defect.

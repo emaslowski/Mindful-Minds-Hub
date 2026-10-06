@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { AlertTriangle, ArrowUpRight, Download, Gamepad2, Lightbulb, ShieldCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AlertTriangle, ArrowUpRight, Gamepad2, Lightbulb, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SCRATCH_STARTERS, starterHref } from "@/components/games/scratchStarters";
 
@@ -10,6 +10,79 @@ const LEAVE_WARNING =
 export function ScratchPlayground({ isActive }: { isActive: boolean }) {
   const [editorOpened, setEditorOpened] = useState(false);
   const [selectedStarter, setSelectedStarter] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [editorReady, setEditorReady] = useState(false);
+  const [starterRequest, setStarterRequest] = useState<{ id: string; bytes: ArrayBuffer } | null>(null);
+  const [loadingStarter, setLoadingStarter] = useState(false);
+  const [starterError, setStarterError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const receiveEditorMessage = (event: MessageEvent) => {
+      if (event.source !== iframeRef.current?.contentWindow || event.origin !== "null") return;
+      if (event.data?.type === "mind-matters:scratch-ready") setEditorReady(true);
+      if (event.data?.type === "mind-matters:starter-loaded") {
+        if (!SCRATCH_STARTERS.some((starter) => starter.id === event.data.id)) return;
+        setSelectedStarter(event.data.id);
+        setStarterRequest(null);
+        setLoadingStarter(false);
+      }
+      if (event.data?.type === "mind-matters:starter-error" || event.data?.type === "mind-matters:scratch-error") {
+        setStarterError("The starter could not open. Please try again, or reload the page if the editor did not load.");
+        setStarterRequest(null);
+        setLoadingStarter(false);
+      }
+    };
+    window.addEventListener("message", receiveEditorMessage);
+    return () => window.removeEventListener("message", receiveEditorMessage);
+  }, []);
+
+  useEffect(() => {
+    if (!editorReady || !starterRequest) return;
+    const bytes = starterRequest.bytes.slice(0);
+    // The editor has an opaque sandbox origin. Only its own window receives
+    // these allowlisted starter bytes; it never receives site/session data.
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "mind-matters:load-starter", id: starterRequest.id, bytes },
+      "*",
+      [bytes],
+    );
+  }, [editorReady, starterRequest]);
+
+  useEffect(() => {
+    if (editorOpened && starterRequest) {
+      iframeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [editorOpened, starterRequest]);
+
+  useEffect(() => {
+    if (!loadingStarter) return;
+    const timeout = window.setTimeout(() => {
+      setStarterError("The editor is taking too long to load. Check your connection and reload the page to try again.");
+      setStarterRequest(null);
+      setLoadingStarter(false);
+    }, 60_000);
+    return () => window.clearTimeout(timeout);
+  }, [loadingStarter]);
+
+  async function openStarter(starter: (typeof SCRATCH_STARTERS)[number]) {
+    if (!isActive || loadingStarter) return;
+    if (editorOpened && !window.confirm("Opening a starter replaces the current project. Save any work you want to keep with File > Save to your computer first. Open this starter?")) return;
+    setLoadingStarter(true);
+    setStarterError(null);
+    try {
+      // Fetch in the trusted parent, rather than depending on cross-origin
+      // fetch permissions in the isolated editor. No file download is triggered.
+      const response = await fetch(starterHref(starter.filename));
+      if (!response.ok) throw new Error("Starter unavailable");
+      const bytes = await response.arrayBuffer();
+      if (!bytes.byteLength || bytes.byteLength > 200_000) throw new Error("Invalid starter");
+      setStarterRequest({ id: starter.id, bytes });
+      setEditorOpened(true);
+    } catch {
+      setStarterError("The starter could not open. Check your connection and try again.");
+      setLoadingStarter(false);
+    }
+  }
 
   useEffect(() => {
     if (!editorOpened) return;
@@ -64,8 +137,8 @@ export function ScratchPlayground({ isActive }: { isActive: boolean }) {
               Your first game, one block at a time
             </h2>
             <p className="mt-2 max-w-3xl text-foreground/80">
-              Choose a starter, open the Scratch-compatible editor, and change the blocks to make the game your own.
-              No account is needed.
+              Click a starter to open it in the Scratch-compatible editor, then change the blocks to make the game your own.
+              No download or account is needed to start.
             </p>
           </div>
         </div>
@@ -76,8 +149,8 @@ export function ScratchPlayground({ isActive }: { isActive: boolean }) {
           <p className="text-sm font-semibold uppercase tracking-wider text-secondary">Start with a small win</p>
           <h3 id="starter-games-title" className="mt-1 text-2xl font-bold">Pick a starter game</h3>
           <p className="mt-1 max-w-3xl text-foreground/80">
-            Download a starter file first. In the editor, choose <strong>File &gt; Load from your computer</strong> and
-            select the <code className="rounded bg-muted px-1.5 py-0.5 text-sm">.sb3</code> file you downloaded.
+            Choose <strong>Open starter</strong> to load a game directly in the editor below.
+            There is nothing to download or import first.
           </p>
         </div>
         <div className="grid min-w-0 gap-4 md:grid-cols-2">
@@ -104,25 +177,26 @@ export function ScratchPlayground({ isActive }: { isActive: boolean }) {
                 <span><strong>Try this next:</strong> {starter.challenge}</span>
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
-                <Button asChild variant="outline" data-testid={`download-starter-${starter.id}`}>
-                  <a
-                    href={starterHref(starter.filename)}
-                    download={starter.filename}
-                    onClick={() => setSelectedStarter(starter.id)}
-                  >
-                    <Download aria-hidden="true" />
-                    Download {starter.title}
-                  </a>
+                <Button
+                  variant="outline"
+                  data-testid={`open-starter-${starter.id}`}
+                  disabled={loadingStarter}
+                  onClick={() => void openStarter(starter)}
+                >
+                  <Gamepad2 aria-hidden="true" />
+                  Open starter: {starter.title}
                 </Button>
                 {selectedStarter === starter.id && (
-                  <span role="status" className="text-sm font-semibold text-secondary" data-testid={`status-downloaded-${starter.id}`}>
-                    Next: load this file in the editor.
+                  <span role="status" className="text-sm font-semibold text-secondary" data-testid={`status-opened-${starter.id}`}>
+                    Opened in the editor.
                   </span>
                 )}
               </div>
             </article>
           ))}
         </div>
+        {loadingStarter && <p role="status" className="text-sm font-semibold text-secondary">Opening your starter in the editor…</p>}
+        {starterError && <p role="alert" className="text-sm text-foreground">{starterError}</p>}
       </section>
 
       <section aria-labelledby="editor-title" className="space-y-4 rounded-3xl border border-card-border bg-card p-5 shadow-sm sm:p-7">
@@ -153,8 +227,8 @@ export function ScratchPlayground({ isActive }: { isActive: boolean }) {
         {!editorOpened ? (
           <div className="rounded-2xl border border-dashed border-secondary/50 bg-background/70 p-5 sm:p-6">
             <p className="text-sm text-foreground/80">
-              The editor opens only after you choose below. Its own file menu handles loading and saving; this site does
-              not upload or store your game.
+              Click a starter above, or open an empty editor below. Saved projects can still be reopened using
+              File &gt; Load from your computer. This site does not upload or store your game.
             </p>
             <Button
               type="button"
@@ -184,6 +258,7 @@ export function ScratchPlayground({ isActive }: { isActive: boolean }) {
             </div>
             <div className="w-full max-w-full overflow-auto rounded-2xl border border-card-border bg-background p-1">
               <iframe
+                ref={iframeRef}
                 title="Scratch block-coding game editor"
                 src={EDITOR_URL}
                 className="block w-full rounded-xl"
@@ -207,7 +282,7 @@ export function ScratchPlayground({ isActive }: { isActive: boolean }) {
       <section aria-label="Build and save steps" className="rounded-2xl border border-secondary/25 bg-secondary/10 p-5">
         <h3 className="text-xl font-bold">The quick path</h3>
         <ol className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
-          <li className="rounded-xl bg-background/75 p-3"><strong>1. Load</strong><br />Download a starter, then use File &gt; Load from your computer.</li>
+          <li className="rounded-xl bg-background/75 p-3"><strong>1. Open</strong><br />Click Open starter. Your game loads directly—no download needed.</li>
           <li className="rounded-xl bg-background/75 p-3"><strong>2. Experiment</strong><br />Press the green flag, then change a block and see what happens.</li>
           <li className="rounded-xl bg-background/75 p-3"><strong>3. Keep it</strong><br />Use File &gt; Save to your computer to get your own .sb3 copy.</li>
         </ol>
