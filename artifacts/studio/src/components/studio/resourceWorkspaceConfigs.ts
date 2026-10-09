@@ -57,6 +57,21 @@ export const RESOURCE_WORKSPACE_CONFIGS: Record<string, WorkspaceConfig> = {
       { key: 'Host Script', label: 'Host Script', placeholder: 'Write a quick welcome, rules explanation, and encouraging wrap-up for the game leader.', rows: 4, prompt: 'Draft friendly words the host can actually say, including how to invite questions.' },
     ],
   },
+  'Sports Rules': {
+    jobGroup: 'Sports Coaches', emoji: '🏀', accent: 'text-[#c4622d]', bg: 'bg-orange-50 border-orange-200',
+    intro: 'Create a beginner-friendly guide that explains how a sport is played, scored, and kept safe and fair.',
+    tips: ['Choose one sport and identify the rule set, age group, or league you are explaining.', 'Check rules with an official sports organization or a trusted school resource, and add citations in the Sources tab.', 'Explain unfamiliar terms and include an example of play.', 'Clearly label classroom adaptations rather than presenting them as official rules.'],
+    sections: [
+      { key: 'Sport & Overview', label: 'Sport & Overview', placeholder: 'Name the sport, the rule set or league, and what players try to accomplish.', rows: 3, prompt: 'Introduce the sport in simple language and identify which version of its rules you are describing.' },
+      { key: 'Players & Equipment', label: 'Players & Equipment', placeholder: 'Describe team size, player roles, equipment, and the playing area.', rows: 4, prompt: 'Explain what is needed to play. Check player numbers and equipment requirements against your sources.' },
+      { key: 'Goal & Scoring', label: 'Goal & Scoring', placeholder: 'Explain how points are earned, when the game ends, how a winner is decided, and how ties are handled.', rows: 4, prompt: 'Make scoring and the winning conditions clear, including any time limits for your chosen rule set.' },
+      { key: 'Basic Rules', label: 'Basic Rules', placeholder: 'List the main rules in numbered steps: starting play, taking turns or moving, boundaries, and restarting play.', rows: 6, prompt: 'Focus on the rules a beginner needs for a first game. Define terms instead of assuming readers know them.' },
+      { key: 'Fouls & Penalties', label: 'Fouls & Penalties', placeholder: 'Describe common rule violations, what happens afterward, and who makes the call.', rows: 4, prompt: 'Use clear examples and verify penalties for the age group or league you chose.' },
+      { key: 'Example Play', label: 'Example Play', placeholder: 'Walk through one short example of play. Explain which rules apply and how the score or possession changes.', rows: 4, prompt: 'Help beginners apply the rules by describing a realistic sequence from start to finish.' },
+      { key: 'Safety & Fair Play', label: 'Safety & Fair Play', placeholder: 'Explain safe spacing, appropriate equipment, respectful disagreement, breaks, and ways everyone can participate.', rows: 4, prompt: 'Encourage safe, respectful play and adult supervision where needed. Players should stop if they feel pain or unwell.' },
+      { key: 'Beginner Adaptations', label: 'Beginner Adaptations', placeholder: 'Suggest clearly labeled classroom or beginner variations, such as smaller teams, shorter rounds, seated options, or no-contact play.', rows: 4, prompt: 'Separate optional adaptations from official rules and explain how each helps classmates participate.' },
+    ],
+  },
   'Sports drills': {
     jobGroup: 'Sports Coaches', emoji: '🏀', accent: 'text-[#c4622d]', bg: 'bg-orange-50 border-orange-200',
     intro: 'Plan an encouraging skill drill with clear steps, safe space, and options for different bodies.',
