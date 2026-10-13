@@ -18,7 +18,7 @@ export default function HandoffNew() {
   const [, navigate] = useLocation();
 
   const { data: projectsData } = useQuery({
-    queryKey: ['studio-projects'],
+    queryKey: ['studio-projects', user?.id, user?.jobId ?? null],
     queryFn: () => studioProjects.list(),
     enabled: !!user,
   });

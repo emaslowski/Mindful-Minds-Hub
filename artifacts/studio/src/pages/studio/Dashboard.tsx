@@ -26,7 +26,7 @@ export default function StudentDashboard() {
   const [createOpen, setCreateOpen] = useState(false);
 
   const { data } = useQuery({
-    queryKey: ['studio-projects'],
+    queryKey: ['studio-projects', user?.id, user?.jobId ?? null],
     queryFn: () => studioProjects.list(),
     enabled: !!user,
   });
@@ -38,7 +38,7 @@ export default function StudentDashboard() {
   });
 
   const { data: peerReviewData } = useQuery({
-    queryKey: ['studio-peer-review-queue'],
+    queryKey: ['studio-peer-review-queue', user?.id, user?.jobId ?? null],
     queryFn: studioPeerReviews.myQueue,
     enabled: !!user,
     refetchOnWindowFocus: true,

@@ -17,7 +17,9 @@ export function useStudioLogout() {
   const [, navigate] = useLocation();
   return useMutation({
     mutationFn: () => studioAuth.logout(),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.cancelQueries();
+      queryClient.clear();
       queryClient.setQueryData(['studio-user'], null);
       navigate('/studio/login');
     },

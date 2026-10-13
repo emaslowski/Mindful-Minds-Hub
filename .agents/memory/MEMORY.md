@@ -13,3 +13,4 @@
 - [School coding restrictions](scratch-editor-embedding.md) — user requested removing the coding playground because iboss blocked it on their school account.
 - [Student workflow recovery](student-workflow-recovery.md) — returning after accidental research-stage advancement corrects the stage without restarting or discarding work.
 - [Content preview branding](content-preview-branding.md) — student content-creation previews should say Middle School Matters, not Mind Matters.
+- [Student project visibility](student-project-visibility.md) — student dashboards show only their own working projects; switching group logins must not reuse another group's cached data.

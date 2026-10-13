@@ -39,7 +39,7 @@ export default function ProjectList() {
   const [confirmTitle, setConfirmTitle] = useState('');
 
   const { data } = useQuery({
-    queryKey: ['studio-projects'],
+    queryKey: ['studio-projects', user?.id, user?.jobId ?? null],
     queryFn: () => studioProjects.list(),
     enabled: !!user,
   });

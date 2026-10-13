@@ -24,7 +24,10 @@ export default function StudioLogin() {
 
   const loginMutation = useMutation({
     mutationFn: (creds: { u: string; p: string }) => studioAuth.login(creds.u, creds.p),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // Cancel old requests and remove data belonging to the previous login.
+      await queryClient.cancelQueries();
+      queryClient.clear();
       queryClient.setQueryData(['studio-user'], data.user);
       const dest = data.user.role === 'teacher' ? '/studio/teacher' : '/studio';
       navigate(dest);
