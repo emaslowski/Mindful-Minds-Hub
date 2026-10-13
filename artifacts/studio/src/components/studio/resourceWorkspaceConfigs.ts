@@ -1,6 +1,23 @@
 import type { WorkspaceConfig } from './workspaceConfig';
 
 export const RESOURCE_WORKSPACE_CONFIGS: Record<string, WorkspaceConfig> = {
+  'Project Manager Plan': {
+    jobGroup: 'Project Managers', emoji: '📋', accent: 'text-[#688a52]', bg: 'bg-green-50 border-green-200',
+    intro: 'Help your group set clear goals, share responsibilities, and keep its project moving with regular check-ins.',
+    tips: ['Agree on goals with your group rather than deciding everything for them.', 'Use job roles or group names, not private information about classmates.', 'Break large goals into small steps with realistic deadlines.', 'Check in kindly, notice progress, and ask your teacher for help when the group is stuck.'],
+    sections: [
+      { key: 'Group & Project', label: 'Group & Project', placeholder: 'Which group are you helping, and what project are they working on?', rows: 3, prompt: 'Name the group and briefly describe its project and audience. Do not include personal details about students.' },
+      { key: 'Group Goals', label: 'Group Goals', placeholder: 'What should the group accomplish? Write 1–3 specific goals that the group agrees on.', rows: 4, prompt: 'Make each goal clear, realistic, and measurable. What will be different when the goal is reached?' },
+      { key: 'Success Criteria', label: 'Success Criteria', placeholder: 'How will your group know the work is ready? List the requirements or signs of success.', rows: 4, prompt: 'Create a short checklist the group can use to judge its own progress and the quality of its work.' },
+      { key: 'Roles & Responsibilities', label: 'Roles & Responsibilities', placeholder: 'List each job role, its responsibilities, and how the group will share the workload fairly.', rows: 4, prompt: 'Clarify who handles each task using job roles. Make sure everyone has a useful role and knows where to ask for help.' },
+      { key: 'Action Plan', label: 'Action Plan', placeholder: 'Break the project into steps. For each step, include the task, responsible role, and expected result.', rows: 6, prompt: 'Put tasks in a practical order and identify anything that must happen before another task can begin.' },
+      { key: 'Timeline & Milestones', label: 'Timeline & Milestones', placeholder: 'Set target dates for planning, research, drafting, review, and completion. Leave time for revisions.', rows: 4, prompt: 'Choose realistic checkpoints with your group and teacher, including time to respond to feedback.' },
+      { key: 'Check-In Questions', label: 'Check-In Questions', placeholder: 'What have we finished? What are we working on next? What is confusing? Does anyone need help?', rows: 4, prompt: 'Write friendly questions that help every group member share progress, concerns, and ideas.' },
+      { key: 'Progress & Blockers', label: 'Progress & Blockers', placeholder: 'What is on track? What is unfinished or stuck? What is preventing progress, and what could help?', rows: 4, prompt: 'Describe problems without blaming classmates. Suggest a practical next step or a question for your teacher.' },
+      { key: 'Feedback & Support', label: 'Feedback & Support', placeholder: 'What feedback has the group received? What materials, information, or teacher support does it need?', rows: 4, prompt: 'Record helpful feedback, agree on changes, and identify support the group can request.' },
+      { key: 'Next Steps & Reflection', label: 'Next Steps & Reflection', placeholder: 'What are the next priorities? What worked well? What should the group do differently next time?', rows: 4, prompt: 'End with clear next actions and a brief reflection on teamwork, communication, and progress toward the goals.' },
+    ],
+  },
   'Plant demonstration': {
     jobGroup: 'Plant Demonstrators', emoji: '🌱', accent: 'text-[#688a52]', bg: 'bg-green-50 border-green-200',
     intro: 'Make a clear, safe demonstration that helps classmates understand how plants grow.',

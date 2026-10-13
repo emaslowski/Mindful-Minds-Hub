@@ -11,3 +11,5 @@
 - [Durable verification scripts](durable-verification-scripts.md) — use fixed, cleaned test identifiers in the CodeExecution sandbox; runtime time and random APIs are unavailable
 - [Student friendship matching](student-friendship-matching.md) — real matches belong below Connect’s blog; opt-in enrolled individuals only, with limited traits and no direct contact
 - [School coding restrictions](scratch-editor-embedding.md) — user requested removing the coding playground because iboss blocked it on their school account.
+- [Student workflow recovery](student-workflow-recovery.md) — returning after accidental research-stage advancement corrects the stage without restarting or discarding work.
+- [Content preview branding](content-preview-branding.md) — student content-creation previews should say Middle School Matters, not Mind Matters.

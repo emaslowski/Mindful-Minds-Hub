@@ -86,7 +86,7 @@ async function sendReadyForReviewEmail(
 
 const WORKFLOW_TRANSITIONS: Record<string, string[]> = {
   'Assigned':                  ['Researching'],
-  'Researching':               ['Drafting'],
+  'Researching':               ['Drafting', 'Assigned'],
   'Drafting':                  ['Peer Review'],
   'Peer Review':               [],            // advanced by peer reviewer
   'Revision Needed':           ['Drafting'],
@@ -321,7 +321,7 @@ router.delete(
   },
 );
 
-// POST /api/studio/projects/:id/transition — advance workflow status
+// POST /api/studio/projects/:id/transition — change an allowed workflow status
 router.post(
   '/studio/projects/:id/transition',
   requireStudioRole('student'),
@@ -367,8 +367,16 @@ router.post(
           peerReviewerJobId: EDITORS_DESIGNERS_JOB_ID,
         }),
       })
-      .where(eq(studioProjectsTable.id, id))
+      .where(and(
+        eq(studioProjectsTable.id, id),
+        eq(studioProjectsTable.status, project.status),
+      ))
       .returning();
+
+    if (!updated) {
+      res.status(409).json({ error: 'This project changed in another session. Refresh and try again.' });
+      return;
+    }
 
     // Notify teachers when a student submits for review
     if (toStatus === 'Ready for Teacher Review') {

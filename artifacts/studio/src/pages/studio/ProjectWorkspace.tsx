@@ -22,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Trash2, Plus, ExternalLink, ChevronRight, Save, AlertCircle, BookOpen, Eye, MessageSquare } from 'lucide-react';
+import { Trash2, Plus, ExternalLink, ChevronRight, ArrowLeft, Save, AlertCircle, BookOpen, Eye, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const WORKFLOW_STEPS = [
@@ -100,10 +100,19 @@ export default function ProjectWorkspace() {
   });
 
   const { mutate: transition, isPending: isTransitioning } = useMutation({
-    mutationFn: (toStatus: string) => studioProjects.transition(projectId, toStatus),
+    mutationFn: async (toStatus: string) => {
+      // Persist current edits before changing stages, which reloads the form.
+      // A failed save must leave the student in the current stage.
+      if (isDirty) {
+        await studioProjects.update(projectId, { title, content, notes });
+      }
+      return studioProjects.transition(projectId, toStatus);
+    },
     onSuccess: (data) => {
+      queryClient.setQueryData(['studio-project', projectId], data);
       queryClient.invalidateQueries({ queryKey: ['studio-project', projectId] });
       queryClient.invalidateQueries({ queryKey: ['studio-projects'] });
+      setIsDirty(false);
       toast({ title: 'Status updated', description: `Project moved to: ${data.project.status}` });
     },
     onError: (err) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
@@ -154,6 +163,7 @@ export default function ProjectWorkspace() {
             {canDelete && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
+                disabled={isSaving || isTransitioning || isDeleting}
                 className="p-1.5 rounded-lg text-[#d5cabe] hover:text-red-500 hover:bg-red-50 transition-colors"
                 title="Delete project"
               >
@@ -166,7 +176,7 @@ export default function ProjectWorkspace() {
                 variant="outline"
                 className="border-[#d5cabe] text-[#453329] gap-1"
                 onClick={() => saveProject()}
-                disabled={isSaving}
+                disabled={isSaving || isTransitioning}
               >
                 <Save className="h-3.5 w-3.5" />
                 {isSaving ? 'Saving…' : 'Save'}
@@ -176,11 +186,8 @@ export default function ProjectWorkspace() {
               <Button
                 size="sm"
                 className="bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-1"
-                onClick={() => {
-                  if (isDirty) saveProject();
-                  transition(nextStatus);
-                }}
-                disabled={isTransitioning}
+                onClick={() => transition(nextStatus)}
+                disabled={isTransitioning || isSaving}
               >
                 <ChevronRight className="h-3.5 w-3.5" />
                 {nextStatus === 'Peer Review' ? 'Submit for Peer Review' :
@@ -237,6 +244,24 @@ export default function ProjectWorkspace() {
                 Add your sources in the <strong>Sources</strong> tab below before moving to Drafting. 
                 Document every website, book, or resource you used. Strong sources make your content more trustworthy!
               </p>
+              {canEdit && user?.role === 'student' && (
+                <div className="mt-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-blue-200 text-blue-800 gap-1"
+                    onClick={() => transition('Assigned')}
+                    disabled={isTransitioning || isSaving}
+                    data-testid="back-to-beginning"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    {isTransitioning ? 'Saving and moving…' : 'Back to beginning'}
+                  </Button>
+                  <p className="mt-1 text-xs text-blue-800">
+                    Moved here by accident? Return to the Assigned stage to plan your content. Your content, notes, and sources will be kept.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -286,7 +311,7 @@ export default function ProjectWorkspace() {
               <Input
                 value={title}
                 onChange={(e) => { setTitle(e.target.value); setIsDirty(true); }}
-                disabled={!canEdit}
+                disabled={!canEdit || isTransitioning || isSaving}
                 className="bg-white border-[#d5cabe] text-base font-medium"
                 placeholder="Give your project a title"
               />
@@ -296,7 +321,7 @@ export default function ProjectWorkspace() {
               contentType={project.contentType}
               content={content}
               onChange={(val) => { setContent(val); setIsDirty(true); }}
-              disabled={!canEdit}
+              disabled={!canEdit || isTransitioning || isSaving}
             />
 
             <p className="text-xs text-[#688a52]">
@@ -307,7 +332,7 @@ export default function ProjectWorkspace() {
               <Button
                 className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full"
                 onClick={() => saveProject()}
-                disabled={isSaving || !isDirty}
+                disabled={isSaving || isTransitioning || !isDirty}
               >
                 {isSaving ? 'Saving…' : 'Save Draft'}
               </Button>
@@ -323,7 +348,7 @@ export default function ProjectWorkspace() {
             )}
             <SourcesPanel
               projectId={projectId}
-              canEdit={canEdit}
+              canEdit={canEdit && !isTransitioning && !isSaving}
               sources={sourcesData?.sources ?? []}
               onRefresh={refetchSources}
             />
@@ -332,7 +357,7 @@ export default function ProjectWorkspace() {
                 <Button
                   className="bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-1"
                   onClick={() => transition('Drafting')}
-                  disabled={isTransitioning}
+                  disabled={isTransitioning || isSaving}
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
                   {isTransitioning ? 'Moving…' : 'Done Researching — Start Drafting'}
@@ -353,7 +378,7 @@ export default function ProjectWorkspace() {
               <Textarea
                 value={notes}
                 onChange={(e) => { setNotes(e.target.value); setIsDirty(true); }}
-                disabled={!canEdit}
+                disabled={!canEdit || isTransitioning || isSaving}
                 className="bg-white border-[#d5cabe] min-h-40 text-sm resize-y"
                 placeholder="Add any research notes, ideas, or reminders here…"
               />
@@ -363,7 +388,7 @@ export default function ProjectWorkspace() {
                 variant="outline"
                 className="border-[#d5cabe] text-[#453329] rounded-full"
                 onClick={() => saveProject()}
-                disabled={isSaving || !isDirty}
+                disabled={isSaving || isTransitioning || !isDirty}
               >
                 Save Notes
               </Button>
@@ -386,7 +411,7 @@ export default function ProjectWorkspace() {
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={() => deleteProject()}
-              disabled={isDeleting}
+              disabled={isDeleting || isSaving || isTransitioning}
             >
               {isDeleting ? 'Deleting…' : 'Yes, delete'}
             </AlertDialogAction>

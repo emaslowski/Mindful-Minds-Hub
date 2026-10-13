@@ -113,7 +113,7 @@ router.post(
         author: author ?? null,
         website: website ?? null,
         url: url ?? null,
-        accessedDate: accessedDate ?? null,
+        accessedDate: accessedDate?.trim() || null,
         notes: notes ?? null,
       })
       .returning();

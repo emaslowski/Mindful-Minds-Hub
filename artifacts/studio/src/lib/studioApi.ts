@@ -557,6 +557,7 @@ export const CONTENT_TYPES = [
   'School resource',
   'Student resource',
   'Research summary',
+  'Project Manager Plan',
   'Music production',
   'Social media campaign',
 ] as const;
@@ -585,6 +586,7 @@ export const DESTINATION_SECTIONS: Record<string, string> = {
   'School resource': 'resources',
   'Student resource': 'resources',
   'Research summary': 'learn',
+  'Project Manager Plan': 'resources',
   'Music production': 'create',
   'Social media campaign': 'blog',
 };
