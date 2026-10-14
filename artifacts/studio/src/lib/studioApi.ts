@@ -27,7 +27,7 @@ export class StudioApiError extends Error {
   }
 }
 
-async function studioFetch<T = unknown>(
+export async function studioFetch<T = unknown>(
   path: string,
   options?: RequestInit,
 ): Promise<T> {
@@ -477,6 +477,7 @@ export interface DecisionData {
   feedback?: string;
   destinationSection?: string;
   authorDisplay?: string;
+  sendToVideoProducer?: boolean;
 }
 
 export interface TeacherHandoff {

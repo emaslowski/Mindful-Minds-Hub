@@ -4,12 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useStudioUser, useStudioLogout } from '@/hooks/useStudioAuth';
 import { studioPeerReviews } from '@/lib/studioApi';
+import { isEditorialGroup } from '@/lib/editorialRole';
 import {
   LayoutDashboard, FolderOpen, Users, Star, Send, BookOpen,
   LogOut, Globe, ClipboardCheck, BarChart3, RefreshCw,
-  Briefcase, CalendarDays, ChevronRight, Settings, KeyRound, Menu, X,
+  Briefcase, CalendarDays, ChevronRight, Settings, KeyRound, Menu, X, Film,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { isVideoProducer } from '@/lib/videoApi';
 
 interface NavItem {
   href: string;
@@ -21,6 +23,7 @@ const STUDENT_NAV: NavItem[] = [
   { href: '/studio', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
   { href: '/studio/projects', label: 'My Projects', icon: <FolderOpen className="h-4 w-4" /> },
   { href: '/studio/peer-reviews', label: 'Peer Reviews', icon: <ClipboardCheck className="h-4 w-4" /> },
+  { href: '/studio/video-productions', label: 'Video Productions', icon: <Film className="h-4 w-4" /> },
   { href: '/studio/handoff/new', label: 'Handoffs', icon: <RefreshCw className="h-4 w-4" /> },
   { href: '/studio/portfolio', label: 'My Portfolio', icon: <Star className="h-4 w-4" /> },
 ];
@@ -52,9 +55,11 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
     refetchInterval: user?.role === 'student' ? 30_000 : false,
   });
 
-  const isEditorGroup = user?.jobId === 269;
+  const isEditorGroup = isEditorialGroup(user?.jobTitle);
+  const isProducer = user?.role === 'student' && isVideoProducer(user.jobTitle);
   const nav = user?.role === 'teacher' ? TEACHER_NAV : STUDENT_NAV.map((item) =>
-    isEditorGroup && item.href === '/studio' ? { ...item, label: 'Command Center' } : item);
+    (isEditorGroup || isProducer) && item.href === '/studio' ? { ...item, label: 'Command Center' } : item)
+    .filter((item) => item.href !== '/studio/video-productions' || isProducer);
   const dashboardRoot = user?.role === 'teacher' ? '/studio/teacher' : '/studio';
   const pendingReviewCount = peerReviewQueue?.projects.filter((project) => project.status === 'Peer Review').length ?? 0;
 
@@ -89,7 +94,7 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
               Middle School Matters
             </h1>
             <p className="text-xs text-[#d5cabe] mt-0.5">
-              {user?.role === 'teacher' || isEditorGroup ? 'Command Center' : 'Studio'}
+              {user?.role === 'teacher' || isEditorGroup || isProducer ? 'Command Center' : 'Studio'}
             </p>
           </Link>
         </div>

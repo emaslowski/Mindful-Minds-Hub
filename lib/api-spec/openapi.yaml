@@ -29,6 +29,75 @@ tags:
     description: Opt-in friendship matches for enrolled students
 
 paths:
+  /studio/video-productions:
+    get:
+      operationId: listVideoProductions
+      responses:
+        "200":
+          description: Video production assignments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoProductionsEnvelope"
+  /studio/video-productions/{projectId}:
+    get:
+      operationId: getVideoProduction
+      parameters:
+        - { name: projectId, in: path, required: true, schema: { type: number } }
+      responses:
+        "200":
+          description: Video production, if assigned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoProductionEnvelope"
+  /studio/video-productions/{projectId}/upload-url:
+    post:
+      operationId: requestVideoUpload
+      parameters:
+        - { name: projectId, in: path, required: true, schema: { type: number } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VideoUploadInput"
+      responses:
+        "200":
+          description: Private signed upload URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoUploadTicket"
+  /studio/video-productions/{projectId}/complete:
+    post:
+      operationId: completeVideoUpload
+      parameters:
+        - { name: projectId, in: path, required: true, schema: { type: number } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VideoCompletionInput"
+      responses:
+        "200":
+          description: Uploaded video sent to teacher review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
+  /studio/video-productions/{projectId}/content:
+    get:
+      operationId: getPrivateProjectVideo
+      parameters:
+        - { name: projectId, in: path, required: true, schema: { type: number } }
+      responses:
+        "200":
+          description: Authorized video stream
+          content:
+            video/mp4:
+              schema: { type: string, format: binary }
   /healthz:
     get:
       operationId: healthCheck
@@ -613,6 +682,55 @@ components:
         type: string
 
   schemas:
+    VideoProduction:
+      type: object
+      required: [projectId, projectTitle, contentType, content, projectStatus, status, instructions, filename, uploadedAt, videoUrl, createdAt]
+      properties:
+        projectId: { type: number }
+        projectTitle: { type: string }
+        contentType: { type: string }
+        content: { type: string }
+        projectStatus: { type: string }
+        status: { type: string, enum: [assigned, uploaded] }
+        instructions: { type: string }
+        filename: { type: [string, "null"] }
+        uploadedAt: { type: [string, "null"] }
+        videoUrl: { type: [string, "null"] }
+        createdAt: { type: string }
+    VideoProductionsEnvelope:
+      type: object
+      required: [productions]
+      properties:
+        productions:
+          type: array
+          items:
+            $ref: "#/components/schemas/VideoProduction"
+    VideoProductionEnvelope:
+      type: object
+      required: [production]
+      properties:
+        production:
+          oneOf:
+            - $ref: "#/components/schemas/VideoProduction"
+            - type: "null"
+    VideoUploadInput:
+      type: object
+      required: [filename, contentType, size]
+      properties:
+        filename: { type: string, minLength: 1, maxLength: 200 }
+        contentType: { type: string, enum: [video/mp4, video/webm, video/quicktime, video/ogg] }
+        size: { type: number, minimum: 1, maximum: 262144000 }
+    VideoUploadTicket:
+      type: object
+      required: [uploadUrl, objectPath]
+      properties:
+        uploadUrl: { type: string }
+        objectPath: { type: string }
+    VideoCompletionInput:
+      type: object
+      required: [objectPath]
+      properties:
+        objectPath: { type: string, minLength: 1 }
     FriendshipProfileInput:
       type: object
       required: [firstName, lastInitial, interests, qualities]

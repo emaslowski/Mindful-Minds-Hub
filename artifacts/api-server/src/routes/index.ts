@@ -16,6 +16,7 @@ import studioAuthRouter from "./studio/auth";
 import studioProjectsRouter from "./studio/projects";
 import studioSourcesRouter from "./studio/sources";
 import studioPeerReviewRouter from "./studio/peerReview";
+import studioVideoProductionsRouter from "./studio/videoProductions";
 import studioPortfolioRouter from "./studio/portfolio";
 import teacherStudentsRouter from "./studio/teacher/students";
 import teacherTeamsJobsRouter from "./studio/teacher/teamsJobs";
@@ -47,6 +48,7 @@ router.use(studioAuthRouter);
 router.use(studioProjectsRouter);
 router.use(studioSourcesRouter);
 router.use(studioPeerReviewRouter);
+router.use(studioVideoProductionsRouter);
 router.use(studioPortfolioRouter);
 // Studio — teacher
 router.use(teacherStudentsRouter);

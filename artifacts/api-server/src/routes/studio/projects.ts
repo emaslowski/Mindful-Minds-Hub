@@ -14,6 +14,7 @@ import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
 import { checkContent } from '../../lib/safetyCheck';
 import nodemailer from 'nodemailer';
 import { logger } from '../../lib/logger';
+import { resolveEditorialJobId } from '../../lib/editorialRouting';
 
 const router = Router();
 
@@ -354,7 +355,11 @@ router.post(
       return;
     }
 
-    const EDITORS_DESIGNERS_JOB_ID = 269; // Editors and Designers job group
+    const editorJobId = toStatus === 'Peer Review' ? await resolveEditorialJobId() : null;
+    if (toStatus === 'Peer Review' && editorJobId == null) {
+      res.status(409).json({ error: 'Your teacher needs to configure one Editors & Designers job group before this project can be sent for review. Your work is still saved.' });
+      return;
+    }
 
     const [updated] = await db
       .update(studioProjectsTable)
@@ -364,7 +369,7 @@ router.post(
         // Auto-assign E&D as peer reviewer when entering Peer Review stage
         ...(toStatus === 'Peer Review' && {
           peerReviewerId: null,
-          peerReviewerJobId: EDITORS_DESIGNERS_JOB_ID,
+          peerReviewerJobId: editorJobId,
         }),
       })
       .where(and(

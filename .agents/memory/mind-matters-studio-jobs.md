@@ -38,9 +38,11 @@ ALTER TABLE studio_projects ADD COLUMN IF NOT EXISTS job_id integer;
 ALTER TABLE studio_projects ADD COLUMN IF NOT EXISTS peer_reviewer_job_id integer;
 ```
 
-## Key Job IDs
-- Editors and Designers: `jobId = 269`
-- All other jobs: 267–292 range
+## Job identity across environments
+
+Job IDs are not shared between development and production. See
+[peer-review identities](mind-matters-peer-review-identities.md) for the editorial
+routing rule; never use a development seed ID to address a production group.
 
 ## ContentWorkspace Format
 Content stored as `## Section\nbody` text. `ContentPreview` component in `artifacts/studio/src/components/studio/ContentPreview.tsx` renders this as a styled site preview.

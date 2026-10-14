@@ -15,6 +15,8 @@ import PeerReviewPage from '@/pages/studio/PeerReviewPage';
 import Portfolio from '@/pages/studio/Portfolio';
 import HandoffNew from '@/pages/studio/HandoffNew';
 import IncomingHandoffs from '@/pages/studio/IncomingHandoffs';
+import VideoProductions from '@/pages/studio/VideoProductions';
+import VideoProductionDetail from '@/pages/studio/VideoProductionDetail';
 
 // Studio pages — teacher
 import CommandCenter from '@/pages/studio/teacher/CommandCenter';
@@ -43,6 +45,8 @@ function StudioRouter() {
       <Route path="/studio/login" component={StudioLogin} />
 
       {/* Student routes */}
+      <Route path="/studio/video-productions/:projectId" component={VideoProductionDetail} />
+      <Route path="/studio/video-productions" component={VideoProductions} />
       <Route path="/studio/projects/:id" component={ProjectWorkspace} />
       <Route path="/studio/projects" component={ProjectList} />
       <Route path="/studio/peer-reviews/:projectId" component={PeerReviewPage} />

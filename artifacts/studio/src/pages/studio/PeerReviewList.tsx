@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
 import { studioPeerReviews } from '@/lib/studioApi';
+import { isEditorialGroup } from '@/lib/editorialRole';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ClipboardCheck, ChevronRight } from 'lucide-react';
@@ -10,7 +11,7 @@ import { ClipboardCheck, ChevronRight } from 'lucide-react';
 export default function PeerReviewList() {
   const { user, isLoading } = useRequireStudioRole('student');
 
-  const { data } = useQuery({
+  const { data, isLoading: queueLoading, isError: queueError, refetch } = useQuery({
     queryKey: ['studio-peer-review-queue', user?.id, user?.jobId ?? null],
     queryFn: () => studioPeerReviews.myQueue(),
     enabled: !!user,
@@ -24,7 +25,7 @@ export default function PeerReviewList() {
   const done = projects.filter((p) => p.status !== 'Peer Review');
 
   // E&D job group gets a tailored heading
-  const isEditorGroup = user.jobId === 269;
+  const isEditorGroup = isEditorialGroup(user.jobTitle);
   const pageSubtitle = isEditorGroup
     ? 'Projects submitted by other groups for your editorial review'
     : 'Projects assigned to you for review';
@@ -35,7 +36,11 @@ export default function PeerReviewList() {
         title={isEditorGroup ? 'Editorial Review Inbox' : 'Peer Reviews'}
         subtitle={pageSubtitle}
       >
-        {pending.length === 0 && done.length === 0 ? (
+        {queueLoading ? (
+          <Card className="bg-[#eee6d8] border-[#d5cabe]"><CardContent className="p-6 text-sm text-[#688a52]">Loading projects for review…</CardContent></Card>
+        ) : queueError ? (
+          <Card className="bg-[#eee6d8] border-[#d5cabe]"><CardContent className="p-6 text-sm text-[#453329]">Projects could not be loaded. <Button variant="outline" onClick={() => refetch()}>Retry</Button></CardContent></Card>
+        ) : pending.length === 0 && done.length === 0 ? (
           <Card className="bg-[#eee6d8] border-[#d5cabe]">
             <CardContent className="p-10 text-center">
               <ClipboardCheck className="h-10 w-10 text-[#d5cabe] mx-auto mb-3" />

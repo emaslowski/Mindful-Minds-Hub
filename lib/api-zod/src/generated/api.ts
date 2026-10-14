@@ -8,6 +8,90 @@
 import * as zod from 'zod';
 
 
+export const ListVideoProductionsResponse = zod.object({
+  "productions": zod.array(zod.object({
+  "projectId": zod.number(),
+  "projectTitle": zod.string(),
+  "contentType": zod.string(),
+  "content": zod.string(),
+  "projectStatus": zod.string(),
+  "status": zod.enum(['assigned', 'uploaded']),
+  "instructions": zod.string(),
+  "filename": zod.string().nullable(),
+  "uploadedAt": zod.string().nullable(),
+  "videoUrl": zod.string().nullable(),
+  "createdAt": zod.string()
+}))
+})
+
+
+export const GetVideoProductionParams = zod.object({
+  "projectId": zod.coerce.number()
+})
+
+export const GetVideoProductionResponse = zod.object({
+  "production": zod.union([zod.object({
+  "projectId": zod.number(),
+  "projectTitle": zod.string(),
+  "contentType": zod.string(),
+  "content": zod.string(),
+  "projectStatus": zod.string(),
+  "status": zod.enum(['assigned', 'uploaded']),
+  "instructions": zod.string(),
+  "filename": zod.string().nullable(),
+  "uploadedAt": zod.string().nullable(),
+  "videoUrl": zod.string().nullable(),
+  "createdAt": zod.string()
+}),zod.null()])
+})
+
+
+export const RequestVideoUploadParams = zod.object({
+  "projectId": zod.coerce.number()
+})
+
+export const requestVideoUploadBodyFilenameMax = 200;
+
+export const requestVideoUploadBodySizeMax = 262144000;
+
+
+
+export const RequestVideoUploadBody = zod.object({
+  "filename": zod.string().min(1).max(requestVideoUploadBodyFilenameMax),
+  "contentType": zod.enum(['video/mp4', 'video/webm', 'video/quicktime', 'video/ogg']),
+  "size": zod.number().min(1).max(requestVideoUploadBodySizeMax)
+})
+
+export const RequestVideoUploadResponse = zod.object({
+  "uploadUrl": zod.string(),
+  "objectPath": zod.string()
+})
+
+
+export const CompleteVideoUploadParams = zod.object({
+  "projectId": zod.coerce.number()
+})
+
+
+
+
+export const CompleteVideoUploadBody = zod.object({
+  "objectPath": zod.string().min(1)
+})
+
+export const CompleteVideoUploadResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string()
+})
+
+
+export const GetPrivateProjectVideoParams = zod.object({
+  "projectId": zod.coerce.number()
+})
+
+export const GetPrivateProjectVideoResponse = zod.unknown()
+
+
 /**
  * @summary Health check
  */

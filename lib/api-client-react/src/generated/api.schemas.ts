@@ -5,6 +5,73 @@
  * Mind Matters API
  * OpenAPI spec version: 0.1.0
  */
+export type VideoProductionStatus = typeof VideoProductionStatus[keyof typeof VideoProductionStatus];
+
+
+export const VideoProductionStatus = {
+  assigned: 'assigned',
+  uploaded: 'uploaded',
+} as const;
+
+export interface VideoProduction {
+  projectId: number;
+  projectTitle: string;
+  contentType: string;
+  content: string;
+  projectStatus: string;
+  status: VideoProductionStatus;
+  instructions: string;
+  /** @nullable */
+  filename: string | null;
+  /** @nullable */
+  uploadedAt: string | null;
+  /** @nullable */
+  videoUrl: string | null;
+  createdAt: string;
+}
+
+export interface VideoProductionsEnvelope {
+  productions: VideoProduction[];
+}
+
+export interface VideoProductionEnvelope {
+  production: VideoProduction | null;
+}
+
+export type VideoUploadInputContentType = typeof VideoUploadInputContentType[keyof typeof VideoUploadInputContentType];
+
+
+export const VideoUploadInputContentType = {
+  'video/mp4': 'video/mp4',
+  'video/webm': 'video/webm',
+  'video/quicktime': 'video/quicktime',
+  'video/ogg': 'video/ogg',
+} as const;
+
+export interface VideoUploadInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  filename: string;
+  contentType: VideoUploadInputContentType;
+  /**
+     * @minimum 1
+     * @maximum 262144000
+     */
+  size: number;
+}
+
+export interface VideoUploadTicket {
+  uploadUrl: string;
+  objectPath: string;
+}
+
+export interface VideoCompletionInput {
+  /** @minLength 1 */
+  objectPath: string;
+}
+
 export type FriendshipProfileInputInterestsItem = typeof FriendshipProfileInputInterestsItem[keyof typeof FriendshipProfileInputInterestsItem];
 
 

@@ -11,8 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, CheckCircle, RotateCcw, Bookmark, Archive, ExternalLink } from 'lucide-react';
+import { AlertCircle, CheckCircle, RotateCcw, Bookmark, Archive, ExternalLink, Film, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { videoProductions } from '@/lib/videoApi';
 
 // ── Structured content helpers ────────────────────────────────────────────────
 
@@ -109,6 +110,25 @@ export default function ProjectReview() {
     enabled: !!user,
   });
 
+  const {
+    data: productionData,
+    isLoading: productionLoading,
+    isError: productionError,
+    error: productionLoadError,
+    refetch: refetchProduction,
+  } = useQuery({
+    queryKey: ['studio-video-production', projectId, user?.id, user?.jobId ?? null],
+    queryFn: () => videoProductions.get(projectId),
+    enabled: !!user && Number.isFinite(projectId) && projectId > 0,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+  });
+  const production = productionData?.production ?? null;
+  const productionActive = production?.status === 'assigned';
+  const projectStatusKey = production?.projectStatus.toLowerCase();
+  const replacementUnavailable = production?.status === 'uploaded'
+    && (projectStatusKey === 'published' || projectStatusKey === 'archived');
+
   const authorDisplayOptions = settingsData?.authorDisplayOptions ?? AUTHOR_DISPLAY_OPTIONS;
 
   const [feedback, setFeedback] = useState('');
@@ -121,9 +141,13 @@ export default function ProjectReview() {
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['teacher-review-queue'] });
       queryClient.invalidateQueries({ queryKey: ['teacher-project', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['studio-video-productions'] });
+      queryClient.invalidateQueries({ queryKey: ['studio-video-production', projectId] });
       toast({
-        title: vars.decision === 'approve_and_publish' ? 'Published!' : 'Decision saved',
-        description: vars.decision === 'approve_and_publish'
+        title: vars.sendToVideoProducer ? 'Sent to Video Producers' : vars.decision === 'approve_and_publish' ? 'Published!' : 'Decision saved',
+        description: vars.sendToVideoProducer
+          ? 'The project was approved and assigned for video production. It is not published; you will review the video before making a final decision.'
+          : vars.decision === 'approve_and_publish'
           ? 'The project is now live on the public website.'
           : 'The project status has been updated.',
       });
@@ -246,6 +270,61 @@ export default function ProjectReview() {
                 ))}
               </TabsContent>
             </Tabs>
+
+            <Card className="border-[#d5cabe] bg-[#eee6d8]">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 font-serif text-base text-[#453329]">
+                  <Film className="h-4 w-4 text-[#688a52]" /> Video production
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {productionLoading ? (
+                  <div className="h-16 animate-pulse rounded-lg bg-white" aria-label="Loading production assignment" />
+                ) : productionError ? (
+                  <div className="flex flex-col items-start gap-2 rounded-lg border border-[#d5cabe] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-[#453329]">Could not load the production assignment{productionLoadError instanceof Error ? `: ${productionLoadError.message}` : '.'}</p>
+                    <Button variant="outline" size="sm" onClick={() => refetchProduction()}>Retry</Button>
+                  </div>
+                ) : production ? (
+                  <div className="space-y-3">
+                    <div className="rounded-lg border border-[#d5cabe] bg-white p-3">
+                      <p className="text-sm font-medium text-[#453329]">
+                        {production.status === 'uploaded' ? 'Video uploaded and awaiting your review' : 'Assigned to Video Producers'}
+                      </p>
+                      <p className="mt-1 text-xs text-[#688a52]">
+                        {production.status === 'uploaded' && production.uploadedAt
+                          ? `Uploaded ${new Date(production.uploadedAt).toLocaleString()}`
+                          : 'Production is in progress. This project has not been published.'}
+                      </p>
+                      {production.instructions && (
+                        <div className="mt-3 border-t border-[#d5cabe] pt-3">
+                          <p className="mb-1 text-xs font-medium text-[#453329]">Directions sent to producers</p>
+                          <p className="whitespace-pre-wrap text-sm text-[#688a52]">{production.instructions}</p>
+                        </div>
+                      )}
+                    </div>
+                    {production.videoUrl && (
+                      <div className="space-y-2 rounded-lg border border-[#d5cabe] bg-white p-3">
+                        {production.status === 'assigned' && (
+                          <p className="text-xs font-medium text-[#688a52]">Prior uploaded version; replacement is in progress.</p>
+                        )}
+                        <video className="max-h-96 w-full rounded-lg bg-black" controls playsInline src={production.videoUrl}>
+                          Your browser does not support embedded video.
+                        </video>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-xs text-[#453329]">{production.filename || 'Uploaded video'}</p>
+                          <a href={production.videoUrl} download={production.filename || true} className="inline-flex items-center gap-1 text-xs text-[#c4622d] underline">
+                            <Download className="h-3.5 w-3.5" /> Download video
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[#688a52]">No video production assignment yet.</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right: decision panel */}
@@ -261,6 +340,9 @@ export default function ProjectReview() {
                   className="bg-white border-[#d5cabe] min-h-24 text-sm"
                   placeholder="Leave feedback for the student (optional)…"
                 />
+                <p className="text-xs leading-relaxed text-[#688a52]">
+                  When you send this project for video production, this feedback is also shared as directions for the production group.
+                </p>
               </CardContent>
             </Card>
 
@@ -304,10 +386,23 @@ export default function ProjectReview() {
 
             {/* Action buttons */}
             <div className="space-y-2">
+              <p className="rounded-lg border border-[#d5cabe] bg-white p-3 text-xs leading-relaxed text-[#688a52]">
+                Sending a project for video production approves the content for production only. It does not publish the project. A teacher makes the final publication decision after reviewing the uploaded video.
+              </p>
+              {productionActive && (
+                <p className="rounded-lg border border-[#d5cabe] bg-[#eee6d8] p-3 text-xs leading-relaxed text-[#453329]">
+                  This project is currently assigned for video production. Approve &amp; Publish is unavailable until the producer returns the video for your final review.
+                </p>
+              )}
+              {replacementUnavailable && (
+                <p className="rounded-lg border border-[#d5cabe] bg-[#eee6d8] p-3 text-xs leading-relaxed text-[#453329]">
+                  A replacement video can only be requested for an unpublished project that has not been archived.
+                </p>
+              )}
               <Button
                 className="w-full bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-2"
                 onClick={() => decide({ decision: 'approve_and_publish', feedback, destinationSection: destinationSection || suggestedDestination, authorDisplay: authorDisplay || authorDisplayOptions[0] || AUTHOR_DISPLAY_OPTIONS[0] })}
-                disabled={isPending}
+                disabled={isPending || productionLoading || productionError || productionActive}
               >
                 <CheckCircle className="h-4 w-4" /> Approve &amp; Publish
               </Button>
@@ -318,6 +413,19 @@ export default function ProjectReview() {
                 disabled={isPending}
               >
                 <CheckCircle className="h-4 w-4" /> Approve (don't publish yet)
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full border-[#c4622d] text-[#c4622d] rounded-full gap-2"
+                onClick={() => decide({ decision: 'approve', sendToVideoProducer: true, feedback })}
+                disabled={isPending || productionLoading || productionError || productionActive || replacementUnavailable}
+              >
+                <Film className="h-4 w-4" />
+                {productionActive
+                  ? 'Already Assigned to Video Production'
+                  : production?.status === 'uploaded'
+                    ? replacementUnavailable ? 'Replacement Unavailable' : 'Approve & Send Replacement to Video Producer'
+                    : 'Approve & Send to Video Producer'}
               </Button>
               <Button
                 variant="outline"

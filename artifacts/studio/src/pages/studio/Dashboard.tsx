@@ -12,6 +12,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, FolderOpen, ClipboardCheck, RefreshCw, Send, CheckCircle, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import { RESOURCE_WORKSPACE_CONFIGS } from '@/components/studio/resourceWorkspaceConfigs';
+import { VideoProductionQueue } from '@/components/studio/VideoProductionQueue';
+import { isEditorialGroup } from '@/lib/editorialRole';
+import { isVideoProducer } from '@/lib/videoApi';
 
 const STATUS_GROUPS = {
   'My Assignments': ['Assigned', 'Researching', 'Drafting'],
@@ -37,7 +40,7 @@ export default function StudentDashboard() {
     enabled: !!user,
   });
 
-  const { data: peerReviewData } = useQuery({
+  const { data: peerReviewData, isLoading: reviewsLoading, isError: reviewsError, refetch: refetchReviews } = useQuery({
     queryKey: ['studio-peer-review-queue', user?.id, user?.jobId ?? null],
     queryFn: studioPeerReviews.myQueue,
     enabled: !!user,
@@ -49,14 +52,15 @@ export default function StudentDashboard() {
 
   const projects = data?.projects ?? [];
   const pendingReviewCount = (peerReviewData?.projects ?? []).filter((project) => project.status === 'Peer Review').length;
-  const isEditorGroup = user.jobId === 269;
+  const isEditorGroup = isEditorialGroup(user.jobTitle);
+  const isProducer = isVideoProducer(user.jobTitle);
 
   const countFor = (statuses: string[]) => projects.filter((p) => statuses.includes(p.status)).length;
 
   return (
     <StudioLayout>
       <StudioPage
-        title={isEditorGroup ? 'Editors & Designers Command Center' : `Welcome, ${user.displayName}`}
+        title={isProducer ? 'Video Producer Command Center' : isEditorGroup ? 'Editors & Designers Command Center' : `Welcome, ${user.displayName}`}
         subtitle={[user.jobTitle, user.teamName, user.cycleName].filter(Boolean).join(' · ')}
         action={
           <Dialog open={createOpen} onOpenChange={setCreateOpen}>
@@ -78,11 +82,27 @@ export default function StudentDashboard() {
           </Dialog>
         }
       >
+        {isProducer && (
+          <section className="mb-6">
+            <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="font-serif text-lg font-semibold text-[#453329]">Assigned Video Productions</h2>
+                <p className="text-sm text-[#688a52]">Work from teacher-approved projects and send finished videos back for review.</p>
+              </div>
+              <Link href="/studio/video-productions" className="text-sm font-medium text-[#c4622d] underline">Open production queue</Link>
+            </div>
+            <VideoProductionQueue userId={user.id} jobId={user.jobId} />
+          </section>
+        )}
         {isEditorGroup && (
           <section className="mb-6">
             <h2 className="font-serif text-lg font-semibold text-[#453329] mb-2">Projects Awaiting Peer Review</h2>
             <p className="text-sm text-[#688a52] mb-3">Review each project, write a compliment sandwich, and send it to the Teacher Command Center.</p>
-            {pendingReviewCount === 0 ? (
+            {reviewsLoading ? (
+              <Card className="bg-[#eee6d8] border-[#d5cabe]"><CardContent className="p-4 text-sm text-[#688a52]">Loading projects for review…</CardContent></Card>
+            ) : reviewsError ? (
+              <Card className="bg-[#eee6d8] border-[#d5cabe]"><CardContent className="p-4 text-sm text-[#453329]">Projects could not be loaded. <Button variant="outline" onClick={() => refetchReviews()}>Retry</Button></CardContent></Card>
+            ) : pendingReviewCount === 0 ? (
               <Card className="bg-[#eee6d8] border-[#d5cabe]"><CardContent className="p-4 text-sm text-[#688a52]">No projects are waiting for your review right now.</CardContent></Card>
             ) : (
               <div className="space-y-2">
@@ -206,7 +226,7 @@ export default function StudentDashboard() {
 
         {/* Safety reminder */}
         <div className="mt-8 bg-[#eee6d8] border border-[#d5cabe] rounded-xl p-4 text-sm text-[#453329]">
-          <p className="font-medium mb-1">📋 Reminder</p>
+          <p className="font-medium mb-1">Reminder</p>
           <p className="text-[#688a52] leading-relaxed">
             Do not include private information about yourself or another student. Mind Matters provides
             general educational wellness information and does not replace help from a trusted adult or professional.

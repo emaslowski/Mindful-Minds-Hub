@@ -15,3 +15,5 @@
 - [Content preview branding](content-preview-branding.md) — student content-creation previews should say Middle School Matters, not Mind Matters.
 - [Student project visibility](student-project-visibility.md) — student dashboards show only their own working projects; switching group logins must not reuse another group's cached data.
 - [Editorial teacher workflow](editorial-teacher-workflow.md) — compliment-sandwich peer feedback goes to the teacher for decisions; no separate drafting stage.
+- [Video production workflow](video-production-workflow.md) — optional teacher-approved handoff to Video Producers; uploads return for final teacher review.
+- [Video playback verification](video-playback-verification.md) — test browser codec support separately from successful private video storage and streaming.

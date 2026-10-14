@@ -8,6 +8,8 @@ import {
   studioSafetyFlagsTable,
   studioPeerReviewsTable,
   studioSourcesTable,
+  studioJobsTable,
+  studioVideoProductionsTable,
 } from '@workspace/db/schema';
 import { eq, desc, inArray, sql } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
@@ -183,11 +185,13 @@ router.post(
       feedback,
       destinationSection,
       authorDisplay,
+      sendToVideoProducer,
     } = req.body as {
       decision?: string;
       feedback?: string;
       destinationSection?: string;
       authorDisplay?: string;
+      sendToVideoProducer?: boolean;
     };
 
     const validDecisions = ['approve', 'approve_and_publish', 'return_for_revision', 'save_for_later', 'archive'];
@@ -196,72 +200,72 @@ router.post(
       return;
     }
 
-    const [project] = await db
-      .select()
-      .from(studioProjectsTable)
-      .where(eq(studioProjectsTable.id, id));
-
-    if (!project) { res.status(404).json({ error: 'Project not found' }); return; }
-
-    const teacherId = await getTeacherReviewAuthorId(req.studioUser!.id);
-
-    // Record the teacher review.
-    await db.insert(studioTeacherReviewsTable).values({
-      projectId: id,
-      teacherId,
-      decision: decision as 'approve' | 'approve_and_publish' | 'return_for_revision' | 'save_for_later' | 'archive',
-      feedback: feedback ?? null,
-    });
-
-    // Update project status
-    const statusMap: Record<string, string> = {
-      approve: 'Approved',
-      approve_and_publish: 'Published',
-      return_for_revision: 'Revision Needed',
-      save_for_later: 'Teacher Reviewing',
-      archive: 'Archived',
-    };
-
-    const newStatus = statusMap[decision]!;
-    const statusUpdates: Partial<typeof studioProjectsTable.$inferInsert> = {
-      status: newStatus as typeof project.status,
-      updatedAt: new Date(),
-    };
-    if (decision === 'approve_and_publish') {
-      statusUpdates.publishedAt = new Date();
+    if (!Number.isSafeInteger(id) || id <= 0 ||
+      (sendToVideoProducer != null && typeof sendToVideoProducer !== 'boolean') ||
+      (sendToVideoProducer && decision !== 'approve')) {
+      res.status(400).json({ error: 'Video production is an option when approving a project without publishing yet.' }); return;
     }
-
-    await db
-      .update(studioProjectsTable)
-      .set(statusUpdates)
-      .where(eq(studioProjectsTable.id, id));
-
-    // Create publication record if publishing
-    if (decision === 'approve_and_publish') {
-      if (!destinationSection) {
-        res.status(400).json({ error: 'destinationSection is required when publishing' });
-        return;
+    if (decision === 'approve_and_publish' && !destinationSection?.trim()) {
+      res.status(400).json({ error: 'destinationSection is required when publishing' }); return;
+    }
+    const producerJobs = sendToVideoProducer ? await db.select({ id: studioJobsTable.id }).from(studioJobsTable)
+      .where(sql`lower(trim(${studioJobsTable.title})) IN ('video producer', 'video producers', 'videographer', 'videographers')`) : [];
+    if (sendToVideoProducer && producerJobs.length !== 1) {
+      res.status(409).json({ error: 'Please keep one Video Producers job group in Jobs before assigning video production.' }); return;
+    }
+    const teacherId = await getTeacherReviewAuthorId(req.studioUser!.id);
+    const result = await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(${id})`);
+      const [project] = await tx.select().from(studioProjectsTable).where(eq(studioProjectsTable.id, id));
+      if (!project) return { error: 'Project not found', code: 404 };
+      const [production] = await tx.select().from(studioVideoProductionsTable).where(eq(studioVideoProductionsTable.projectId, id));
+      if (sendToVideoProducer && (project.status === 'Published' || project.status === 'Archived')) {
+        return { error: 'Only an unpublished, active project can be sent for video production.', code: 409 };
       }
-      await db
-        .insert(studioPublicationsTable)
-        .values({
-          projectId: id,
-          destinationSection,
-          authorDisplay: authorDisplay ?? 'Mind Matters Student Team',
-          publicationStatus: 'active',
-        })
-        .onConflictDoUpdate({
-          target: studioPublicationsTable.projectId,
-          set: {
-            destinationSection,
-            authorDisplay: authorDisplay ?? 'Mind Matters Student Team',
-            publicationStatus: 'active',
-            publishedAt: new Date(),
+      if (sendToVideoProducer && production?.status === 'assigned' && project.status === 'Approved') {
+        return { error: 'This project is already waiting for its video producer.', code: 409 };
+      }
+      if (decision === 'approve_and_publish' && production?.status === 'assigned') {
+        return { error: 'Please wait for the video upload and review it before publishing.', code: 409 };
+      }
+      await tx.insert(studioTeacherReviewsTable).values({
+        projectId: id, teacherId,
+        decision: decision as 'approve' | 'approve_and_publish' | 'return_for_revision' | 'save_for_later' | 'archive',
+        feedback: feedback ?? null,
+      });
+      const statusMap: Record<string, typeof project.status> = {
+        approve: 'Approved', approve_and_publish: 'Published', return_for_revision: 'Revision Needed',
+        save_for_later: 'Teacher Reviewing', archive: 'Archived',
+      };
+      const newStatus = statusMap[decision]!;
+      await tx.update(studioProjectsTable).set({
+        status: newStatus, updatedAt: new Date(),
+        ...(decision === 'approve_and_publish' ? { publishedAt: new Date() } : {}),
+      }).where(eq(studioProjectsTable.id, id));
+      if (sendToVideoProducer) {
+        const assignment = {
+          producerJobId: producerJobs[0]!.id, instructions: feedback ?? '', status: 'assigned',
+          pendingObjectPath: null, pendingFilename: null, pendingMimeType: null,
+          pendingSize: null, pendingExpiresAt: null, updatedAt: new Date(),
+        };
+        await tx.insert(studioVideoProductionsTable).values({ projectId: id, ...assignment })
+          .onConflictDoUpdate({ target: studioVideoProductionsTable.projectId, set: assignment });
+      }
+      if (decision === 'approve_and_publish') {
+        await tx.insert(studioPublicationsTable).values({
+          projectId: id, destinationSection: destinationSection!,
+          authorDisplay: authorDisplay ?? 'Mind Matters Student Team', publicationStatus: 'active',
+        }).onConflictDoUpdate({
+          target: studioPublicationsTable.projectId, set: {
+            destinationSection: destinationSection!, authorDisplay: authorDisplay ?? 'Mind Matters Student Team',
+            publicationStatus: 'active', publishedAt: new Date(),
           },
         });
-    }
-
-    res.json({ success: true, newStatus });
+      }
+      return { newStatus };
+    });
+    if ('error' in result) { res.status(result.code!).json({ error: result.error }); return; }
+    res.json({ success: true, ...result, sentToVideoProducer: !!sendToVideoProducer });
   },
 );
 

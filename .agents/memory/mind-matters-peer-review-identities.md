@@ -37,3 +37,18 @@ round as already submitted, while allowing a new round or a separately assigned
 reviewer after reassignment. Submission and teacher reassignment must share the same
 per-project transaction lock, and every assignment must clear the inactive
 individual or job-group reviewer route.
+
+## Group routing across environments
+
+Do not assume a job group's numeric ID is the same in development and production.
+Resolve the actual Editors & Designers group in the current database and recognize
+its role independently of its numeric ID.
+
+**Why:** A live Blog Writers submission was routed to a development-only job ID.
+The published database had a different Editors & Designers ID, leaving the project
+in Peer Review but invisible to the reviewers.
+
+**How to apply:** If the editorial group is missing or ambiguous, fail before
+advancing the project. Restore orphaned pending automatic assignments without
+overwriting valid teacher-selected reviewers, deleting review history, changing
+content, or requiring students to resubmit.
