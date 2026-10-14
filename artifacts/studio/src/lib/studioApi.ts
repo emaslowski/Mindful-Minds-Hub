@@ -379,7 +379,9 @@ export interface PeerReviewSubmission {
   checklistNoPrivateInfo?: boolean;
   checklistGrammarChecked?: boolean;
   checklistFitsMission?: boolean;
-  comments?: string;
+  compliment: string;
+  suggestion: string;
+  encouragement: string;
   recommendRevision: boolean;
 }
 

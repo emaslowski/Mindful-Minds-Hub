@@ -223,8 +223,8 @@ export default function ProjectReview() {
                       ))}
                       {r.comments && (
                         <div className="mt-3 p-3 bg-white rounded border border-[#d5cabe]">
-                          <p className="text-xs font-medium text-[#453329] mb-1">Comments:</p>
-                          <p className="text-xs text-[#688a52]">{r.comments}</p>
+                          <p className="text-xs font-medium text-[#453329] mb-1">Peer feedback:</p>
+                          <p className="text-xs text-[#688a52] whitespace-pre-wrap">{r.comments}</p>
                         </div>
                       )}
                     </CardContent>

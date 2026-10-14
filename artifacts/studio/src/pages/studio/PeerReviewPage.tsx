@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useParams } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
+import { ContentPreview } from '@/components/studio/ContentPreview';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { studioProjects, studioPeerReviews, type PeerReviewSubmission } from '@/lib/studioApi';
+import { studioProjects, studioPeerReviews, studioSources, type PeerReviewSubmission } from '@/lib/studioApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -44,27 +45,39 @@ export default function PeerReviewPage() {
     enabled: !!user,
   });
 
+  const { data: sourcesData, isError: sourcesError } = useQuery({
+    queryKey: ['studio-sources', pid],
+    queryFn: () => studioSources.list(pid),
+    enabled: !!user,
+  });
+
   const [checklist, setChecklist] = useState<Record<ChecklistKey, boolean | undefined>>(
     Object.fromEntries(CHECKLIST.map((c) => [c.key, undefined])) as Record<ChecklistKey, boolean | undefined>,
   );
-  const [comments, setComments] = useState('');
+  const [compliment, setCompliment] = useState('');
+  const [suggestion, setSuggestion] = useState('');
+  const [encouragement, setEncouragement] = useState('');
   const [recommendRevision, setRecommendRevision] = useState(false);
 
-  const alreadyReviewed = (reviewsData?.reviews ?? []).length > 0;
   const project = projectData?.project;
+  const alreadyReviewed = project?.status !== 'Peer Review' && (reviewsData?.reviews ?? []).length > 0;
 
   const { mutate: submit, isPending } = useMutation({
     mutationFn: () =>
       studioPeerReviews.submit(pid, {
         ...checklist,
-        comments,
+        compliment,
+        suggestion,
+        encouragement,
         recommendRevision,
       } as PeerReviewSubmission),
     onSuccess: () => {
-      toast({ title: 'Review submitted!', description: 'Thank you for your peer review.' });
+      toast({ title: 'Sent to teacher!', description: 'Your feedback and the project are ready in the Teacher Command Center.' });
       queryClient.invalidateQueries({ queryKey: ['peer-review', pid] });
       queryClient.invalidateQueries({ queryKey: ['studio-peer-review-queue'] });
       queryClient.invalidateQueries({ queryKey: ['studio-projects'] });
+      queryClient.invalidateQueries({ queryKey: ['studio-project', pid] });
+      queryClient.invalidateQueries({ queryKey: ['teacher-review-queue'] });
     },
     onError: (err) => toast({ title: 'Error', description: err.message, variant: 'destructive' }),
   });
@@ -79,7 +92,8 @@ export default function PeerReviewPage() {
             <CardContent className="p-8 text-center">
               <CheckCircle className="h-10 w-10 text-[#688a52] mx-auto mb-3" />
               <p className="text-[#453329] font-medium">You've already submitted your review for this project.</p>
-              <p className="text-sm text-[#688a52] mt-1">The author will receive your feedback.</p>
+              <p className="text-sm text-[#688a52] mt-1">The project and your feedback have been sent to the Teacher Command Center.</p>
+              <p className="text-sm text-[#453329] mt-4 whitespace-pre-wrap text-left">{reviewsData?.reviews.at(-1)?.comments}</p>
             </CardContent>
           </Card>
         </StudioPage>
@@ -103,6 +117,26 @@ export default function PeerReviewPage() {
             <div className="prose prose-sm max-w-none text-[#453329] whitespace-pre-wrap bg-white rounded-lg p-4 border border-[#d5cabe] min-h-32 text-sm">
               {project.content || <span className="text-[#d5cabe] italic">No content yet.</span>}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#eee6d8] border-[#d5cabe] mb-6">
+          <CardHeader><CardTitle className="font-serif text-[#453329] text-base">Design Preview</CardTitle></CardHeader>
+          <CardContent><ContentPreview title={project.title} contentType={project.contentType} content={project.content} /></CardContent>
+        </Card>
+        <Card className="bg-[#eee6d8] border-[#d5cabe] mb-6">
+          <CardHeader><CardTitle className="font-serif text-[#453329] text-base">Research Sources</CardTitle></CardHeader>
+          <CardContent className="space-y-3 text-sm text-[#453329]">
+            {sourcesError ? <p>Sources could not be loaded. Refresh before checking the sources checklist item.</p> :
+              !sourcesData ? <p>Loading sources…</p> :
+              sourcesData.sources.length === 0 ? <p>No sources included.</p> :
+              sourcesData.sources.map((source) => (
+                <div key={source.id}>
+                  <p className="font-medium">{source.title}</p>
+                  <p className="text-xs text-[#688a52]">{[source.author, source.website, source.accessedDate].filter(Boolean).join(' · ')}</p>
+                  {source.url && <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-[#c4622d] underline break-all">{source.url}</a>}
+                </div>
+              ))}
           </CardContent>
         </Card>
 
@@ -139,15 +173,20 @@ export default function PeerReviewPage() {
         {/* Comments */}
         <Card className="bg-[#eee6d8] border-[#d5cabe] mb-4">
           <CardHeader className="pb-3">
-            <CardTitle className="font-serif text-[#453329] text-base">Constructive Comments</CardTitle>
+            <CardTitle className="font-serif text-[#453329] text-base">Compliment Sandwich</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Textarea
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-              className="bg-white border-[#d5cabe] min-h-28 text-sm"
-              placeholder="Share specific, helpful feedback. What worked well? What could be improved?"
-            />
+          <CardContent className="space-y-4">
+            <p className="text-sm text-[#688a52]">Start with a strength, offer a specific way to improve, and finish with encouragement. All three parts will accompany the project to your teacher.</p>
+            {[
+              { id: 'compliment', label: '1. Opening compliment', value: compliment, setValue: setCompliment, placeholder: 'What did this group do well? Give a specific example.' },
+              { id: 'suggestion', label: '2. Constructive suggestion', value: suggestion, setValue: setSuggestion, placeholder: 'What could be clearer or stronger, and how could they improve it?' },
+              { id: 'encouragement', label: '3. Encouraging closing', value: encouragement, setValue: setEncouragement, placeholder: 'End with another strength or encouragement for their next steps.' },
+            ].map((field) => (
+              <div key={field.id} className="space-y-2">
+                <Label htmlFor={field.id} className="text-[#453329]">{field.label} *</Label>
+                <Textarea id={field.id} required value={field.value} onChange={(e) => field.setValue(e.target.value)} className="bg-white border-[#d5cabe] min-h-24 text-sm" placeholder={field.placeholder} />
+              </div>
+            ))}
           </CardContent>
         </Card>
 
@@ -161,7 +200,7 @@ export default function PeerReviewPage() {
               className="mt-0.5 border-[#d5cabe]"
             />
             <Label htmlFor="recommend-revision" className="text-sm text-[#453329] cursor-pointer">
-              I recommend this project be returned for revision before teacher review
+              I recommend revisions. The teacher will review my feedback and decide whether to return the project to the author.
             </Label>
           </CardContent>
         </Card>
@@ -169,9 +208,9 @@ export default function PeerReviewPage() {
         <Button
           className="bg-[#688a52] hover:bg-[#557a43] text-white rounded-full px-6"
           onClick={() => submit()}
-          disabled={isPending}
+          disabled={isPending || !compliment.trim() || !suggestion.trim() || !encouragement.trim() || project.status !== 'Peer Review'}
         >
-          {isPending ? 'Submitting…' : 'Submit Peer Review'}
+          {isPending ? 'Sending…' : 'Send to Teacher Command Center'}
         </Button>
       </StudioPage>
     </StudioLayout>

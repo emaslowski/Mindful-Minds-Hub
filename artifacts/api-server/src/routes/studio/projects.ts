@@ -86,10 +86,10 @@ async function sendReadyForReviewEmail(
 
 const WORKFLOW_TRANSITIONS: Record<string, string[]> = {
   'Assigned':                  ['Researching'],
-  'Researching':               ['Drafting', 'Assigned'],
+  'Researching':               ['Peer Review', 'Assigned'],
   'Drafting':                  ['Peer Review'],
   'Peer Review':               [],            // advanced by peer reviewer
-  'Revision Needed':           ['Drafting'],
+  'Revision Needed':           ['Peer Review'],
   'Ready for Teacher Review':  [],            // advanced by teacher
   'Teacher Reviewing':         [],            // advanced by teacher
   'Approved':                  [],

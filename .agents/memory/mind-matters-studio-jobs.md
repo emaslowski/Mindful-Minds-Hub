@@ -28,15 +28,9 @@ Studio databases still enforce `studio_teacher_reviews.teacher_id` against
 **How to apply:** use the active teacher account as the review author when the
 session ID is not numeric; retain the session ID fallback for newer databases.
 
-## Workflow Stages (job-group flow)
+## Workflow policy
 
-1. **Assigned** → student creates project
-2. **Researching** → Sources tab auto-focuses; student adds citations; "Done Researching" button in Sources tab
-3. **Drafting** → Preview tab appears (renders `## Section\nbody` content as styled site preview)
-4. **Peer Review** → auto-assigns `peerReviewerJobId = 269` (Editors & Designers); E&D sees it in their `/studio/peer-reviews` inbox; E&D submits checklist → advances to Ready for Teacher Review or Revision Needed
-5. **Revision Needed** → student sees teacher feedback banner (from `GET /studio/projects/:id/teacher-feedback`)
-6. **Ready for Teacher Review** → appears in teacher Command Center; teacher approves or returns with comment
-7. **Teacher Reviewing / Approved / Published** → teacher-controlled
+See [Editorial and teacher review workflow](editorial-teacher-workflow.md) for the user's current review order and removal of a separate drafting stage. Editorial reviewers recommend changes; the teacher decides whether to return work for revisions.
 
 ## Columns Added to studio_projects
 ```sql

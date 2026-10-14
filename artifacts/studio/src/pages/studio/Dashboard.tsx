@@ -56,7 +56,7 @@ export default function StudentDashboard() {
   return (
     <StudioLayout>
       <StudioPage
-        title={`Welcome, ${user.displayName}`}
+        title={isEditorGroup ? 'Editors & Designers Command Center' : `Welcome, ${user.displayName}`}
         subtitle={[user.jobTitle, user.teamName, user.cycleName].filter(Boolean).join(' · ')}
         action={
           <Dialog open={createOpen} onOpenChange={setCreateOpen}>
@@ -78,6 +78,28 @@ export default function StudentDashboard() {
           </Dialog>
         }
       >
+        {isEditorGroup && (
+          <section className="mb-6">
+            <h2 className="font-serif text-lg font-semibold text-[#453329] mb-2">Projects Awaiting Peer Review</h2>
+            <p className="text-sm text-[#688a52] mb-3">Review each project, write a compliment sandwich, and send it to the Teacher Command Center.</p>
+            {pendingReviewCount === 0 ? (
+              <Card className="bg-[#eee6d8] border-[#d5cabe]"><CardContent className="p-4 text-sm text-[#688a52]">No projects are waiting for your review right now.</CardContent></Card>
+            ) : (
+              <div className="space-y-2">
+                {(peerReviewData?.projects ?? []).filter((project) => project.status === 'Peer Review').map((project) => (
+                  <Link key={project.id} href={`/studio/peer-reviews/${project.id}`}>
+                    <Card className="bg-[#eee6d8] border-[#d5cabe] hover:shadow-md transition-shadow">
+                      <CardContent className="p-4 flex items-center justify-between gap-3">
+                        <div><p className="font-medium text-[#453329]">{project.title}</p><p className="text-xs text-[#688a52]">{project.contentType}</p></div>
+                        <span className="text-sm font-medium text-[#c4622d]">Review project →</span>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
         {pendingReviewCount > 0 && (
           <Card className="bg-[#fff8e6] border-[#d4a44c] mb-6">
             <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

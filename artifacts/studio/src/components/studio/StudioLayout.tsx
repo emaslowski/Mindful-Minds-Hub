@@ -45,14 +45,16 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   useEffect(() => setMobileNavOpen(false), [location]);
   const { data: peerReviewQueue } = useQuery({
-    queryKey: ['studio-peer-review-queue'],
+    queryKey: ['studio-peer-review-queue', user?.id, user?.jobId ?? null],
     queryFn: studioPeerReviews.myQueue,
     enabled: user?.role === 'student',
     refetchOnWindowFocus: true,
     refetchInterval: user?.role === 'student' ? 30_000 : false,
   });
 
-  const nav = user?.role === 'teacher' ? TEACHER_NAV : STUDENT_NAV;
+  const isEditorGroup = user?.jobId === 269;
+  const nav = user?.role === 'teacher' ? TEACHER_NAV : STUDENT_NAV.map((item) =>
+    isEditorGroup && item.href === '/studio' ? { ...item, label: 'Command Center' } : item);
   const dashboardRoot = user?.role === 'teacher' ? '/studio/teacher' : '/studio';
   const pendingReviewCount = peerReviewQueue?.projects.filter((project) => project.status === 'Peer Review').length ?? 0;
 
@@ -87,7 +89,7 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
               Middle School Matters
             </h1>
             <p className="text-xs text-[#d5cabe] mt-0.5">
-              {user?.role === 'teacher' ? 'Command Center' : 'Studio'}
+              {user?.role === 'teacher' || isEditorGroup ? 'Command Center' : 'Studio'}
             </p>
           </Link>
         </div>
@@ -216,7 +218,7 @@ export function StatusBadge({ status }: { status: string }) {
   };
   return (
     <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', colors[status] ?? 'bg-gray-100 text-gray-700')}>
-      {status}
+      {status === 'Drafting' ? 'Researching' : status}
     </span>
   );
 }

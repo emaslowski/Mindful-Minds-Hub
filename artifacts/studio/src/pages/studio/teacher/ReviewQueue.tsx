@@ -15,6 +15,7 @@ export default function ReviewQueue() {
     queryKey: ['teacher-review-queue'],
     queryFn: () => teacherReview.queue(),
     enabled: !!user,
+    refetchInterval: 30_000,
   });
 
   if (isLoading || !user) return null;

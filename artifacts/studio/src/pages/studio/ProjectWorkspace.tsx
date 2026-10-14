@@ -26,21 +26,21 @@ import { Trash2, Plus, ExternalLink, ChevronRight, ArrowLeft, Save, AlertCircle,
 import { useToast } from '@/hooks/use-toast';
 
 const WORKFLOW_STEPS = [
-  'Assigned', 'Researching', 'Drafting', 'Peer Review',
+  'Assigned', 'Researching', 'Peer Review',
   'Revision Needed', 'Ready for Teacher Review', 'Teacher Reviewing',
   'Approved', 'Published',
 ];
 
 const NEXT_STATUS: Record<string, string> = {
   'Assigned': 'Researching',
-  'Researching': 'Drafting',
+  'Researching': 'Peer Review',
   'Drafting': 'Peer Review',
-  'Revision Needed': 'Drafting',
+  'Revision Needed': 'Peer Review',
 };
 
 /** Stages where the Preview tab is available */
 const PREVIEW_STAGES = new Set([
-  'Drafting', 'Peer Review', 'Revision Needed',
+  'Assigned', 'Researching', 'Drafting', 'Peer Review', 'Revision Needed',
   'Ready for Teacher Review', 'Teacher Reviewing', 'Approved', 'Published',
 ]);
 
@@ -149,7 +149,9 @@ export default function ProjectWorkspace() {
     return <div className="flex items-center justify-center h-screen text-[#453329]">Loading…</div>;
   }
 
-  const stepIndex = WORKFLOW_STEPS.indexOf(project.status);
+  const displayStatus = project.status === 'Drafting' ? 'Researching' : project.status;
+  const progressSteps = WORKFLOW_STEPS.filter((step) => step !== 'Revision Needed');
+  const stepIndex = progressSteps.indexOf(displayStatus);
   const sourceCount = sourcesData?.sources?.length ?? 0;
 
   return (
@@ -201,10 +203,10 @@ export default function ProjectWorkspace() {
         {/* Progress bar */}
         <div className="mb-6 bg-[#eee6d8] rounded-xl p-4 border border-[#d5cabe]">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-            {WORKFLOW_STEPS.filter(s => s !== 'Revision Needed').map((step, i, arr) => (
+            {progressSteps.map((step, i, arr) => (
               <div key={step} className="flex items-center gap-1.5 flex-shrink-0">
                 <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-                  step === project.status
+                  step === displayStatus
                     ? 'bg-[#c4622d] text-white'
                     : i < stepIndex
                       ? 'bg-[#688a52] text-white'
@@ -241,7 +243,7 @@ export default function ProjectWorkspace() {
             <div>
               <p className="text-sm font-semibold text-blue-700 mb-1">Research Stage</p>
               <p className="text-sm text-blue-800 leading-relaxed">
-                Add your sources in the <strong>Sources</strong> tab below before moving to Drafting. 
+                Create your content and add your sources in the <strong>Sources</strong> tab below before submitting for peer review.
                 Document every website, book, or resource you used. Strong sources make your content more trustworthy!
               </p>
               {canEdit && user?.role === 'student' && (
@@ -343,7 +345,7 @@ export default function ProjectWorkspace() {
             {project.status === 'Researching' && (
               <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
                 📚 <strong>Add every source you research here.</strong> Include websites, books, articles — anything you read to learn about your topic.
-                You need at least one source before moving to Drafting.
+                Add your sources and finish your content before sending it to the Editors & Designers for peer review.
               </div>
             )}
             <SourcesPanel
@@ -356,11 +358,11 @@ export default function ProjectWorkspace() {
               <div className="mt-6 pt-4 border-t border-[#d5cabe]">
                 <Button
                   className="bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-1"
-                  onClick={() => transition('Drafting')}
+                  onClick={() => transition('Peer Review')}
                   disabled={isTransitioning || isSaving}
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
-                  {isTransitioning ? 'Moving…' : 'Done Researching — Start Drafting'}
+                  {isTransitioning ? 'Sending…' : 'Submit for Peer Review'}
                 </Button>
               </div>
             )}

@@ -11,9 +11,10 @@ export default function PeerReviewList() {
   const { user, isLoading } = useRequireStudioRole('student');
 
   const { data } = useQuery({
-    queryKey: ['studio-peer-review-queue'],
+    queryKey: ['studio-peer-review-queue', user?.id, user?.jobId ?? null],
     queryFn: () => studioPeerReviews.myQueue(),
     enabled: !!user,
+    refetchInterval: 30_000,
   });
 
   if (isLoading || !user) return null;

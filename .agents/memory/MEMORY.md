@@ -14,3 +14,4 @@
 - [Student workflow recovery](student-workflow-recovery.md) — returning after accidental research-stage advancement corrects the stage without restarting or discarding work.
 - [Content preview branding](content-preview-branding.md) — student content-creation previews should say Middle School Matters, not Mind Matters.
 - [Student project visibility](student-project-visibility.md) — student dashboards show only their own working projects; switching group logins must not reuse another group's cached data.
+- [Editorial teacher workflow](editorial-teacher-workflow.md) — compliment-sandwich peer feedback goes to the teacher for decisions; no separate drafting stage.

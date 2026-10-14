@@ -22,7 +22,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 const ALL_STATUSES = [
-  'Assigned', 'Researching', 'Drafting', 'Peer Review',
+  'Assigned', 'Researching', 'Peer Review',
   'Revision Needed', 'Ready for Teacher Review', 'Teacher Reviewing',
   'Approved', 'Published', 'Archived',
 ];
@@ -61,7 +61,7 @@ export default function AllProjects() {
   // Archived projects remain available through the explicit Archived filter,
   // but should not stay in the normal active project list after deletion.
   const filtered = statusFilter
-    ? all.filter((p) => p.status === statusFilter)
+    ? all.filter((p) => p.status === statusFilter || (statusFilter === 'Researching' && p.status === 'Drafting'))
     : all.filter((p) => p.status !== 'Archived');
 
   return (

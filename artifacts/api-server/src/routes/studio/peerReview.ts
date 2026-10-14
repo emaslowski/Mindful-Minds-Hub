@@ -87,7 +87,8 @@ router.get(
               eq(studioPeerReviewsTable.projectId, projectId),
               eq(studioPeerReviewsTable.reviewerId, req.studioUser!.id),
             ),
-      );
+      )
+      .orderBy(studioPeerReviewsTable.submittedAt);
 
     res.json({ reviews });
   },
@@ -109,7 +110,9 @@ router.post(
       checklistNoPrivateInfo,
       checklistGrammarChecked,
       checklistFitsMission,
-      comments,
+      compliment,
+      suggestion,
+      encouragement,
       recommendRevision,
     } = req.body as {
       checklistInfoClear?: boolean;
@@ -120,9 +123,22 @@ router.post(
       checklistNoPrivateInfo?: boolean;
       checklistGrammarChecked?: boolean;
       checklistFitsMission?: boolean;
-      comments?: string;
+      compliment?: string;
+      suggestion?: string;
+      encouragement?: string;
       recommendRevision?: boolean;
     };
+
+    if ([compliment, suggestion, encouragement].some((value) => typeof value !== 'string' || !value.trim())) {
+      res.status(400).json({ error: 'Please include an opening compliment, a constructive suggestion, and an encouraging closing.' });
+      return;
+    }
+    const comments = [
+      `Opening compliment:\n${compliment!.trim()}`,
+      `Constructive suggestion:\n${suggestion!.trim()}`,
+      `Encouraging closing:\n${encouragement!.trim()}`,
+      ...(recommendRevision ? ['Reviewer recommendation: This project needs revision. Please review before returning it to the author.'] : []),
+    ].join('\n\n');
 
     // Individual and job-group sessions both provide a stable reviewer identity.
     const reviewerId = req.studioUser!.id;
@@ -150,16 +166,18 @@ router.post(
       }
 
       const [existingReview] = await tx
-        .select({ id: studioPeerReviewsTable.id })
+        .select({ id: studioPeerReviewsTable.id, submittedAt: studioPeerReviewsTable.submittedAt })
         .from(studioPeerReviewsTable)
         .where(
           and(
             eq(studioPeerReviewsTable.projectId, projectId),
             eq(studioPeerReviewsTable.reviewerId, reviewerId),
           ),
-        );
+        )
+        .orderBy(desc(studioPeerReviewsTable.submittedAt))
+        .limit(1);
 
-      if (existingReview) {
+      if (existingReview && (project.status !== 'Peer Review' || existingReview.submittedAt >= project.updatedAt)) {
         return { error: { status: 409, message: 'You have already submitted a review for this project' } };
       }
 
@@ -208,7 +226,9 @@ router.post(
           .onConflictDoNothing();
       }
 
-      const nextStatus = recommendRevision ? 'Revision Needed' : 'Ready for Teacher Review';
+      // The teacher makes the revision decision; editorial feedback always
+      // goes to the teacher's command center, never directly back to the author.
+      const nextStatus = 'Ready for Teacher Review';
       await tx
         .update(studioProjectsTable)
         .set({ status: nextStatus, updatedAt: new Date() })

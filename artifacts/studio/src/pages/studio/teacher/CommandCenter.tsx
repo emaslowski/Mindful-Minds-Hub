@@ -42,6 +42,7 @@ export default function CommandCenter() {
     queryKey: ['teacher-review-queue'],
     queryFn: () => teacherReview.queue(),
     enabled: !!user,
+    refetchInterval: 30_000,
   });
 
   const { data: moderationData } = useQuery({

@@ -23,16 +23,17 @@ values to text without deleting historical work.
 
 ## Submission consistency
 
-Serialize peer-review submission per project, check for an existing review by
-the current reviewer identity, then create the review and advance project
-status in the same transaction.
+Serialize peer-review submission per project, prevent duplicate submissions
+in the same review round, then create the review and advance project status
+in the same transaction. A new peer-review round after revisions may be
+reviewed by the same identity without deleting its earlier feedback.
 
 **Why:** Shared job credentials can be used in multiple tabs at once. Without
 serialization, duplicate reviews can race each other and leave conflicting
 workflow outcomes.
 
-**How to apply:** Treat an existing review from the same identity as already
-submitted, while allowing a separately assigned reviewer to submit after
-reassignment. Submission and teacher reassignment must share the same
+**How to apply:** Treat an existing review from the same identity in the current
+round as already submitted, while allowing a new round or a separately assigned
+reviewer after reassignment. Submission and teacher reassignment must share the same
 per-project transaction lock, and every assignment must clear the inactive
 individual or job-group reviewer route.
