@@ -18,3 +18,4 @@
 - [Video production workflow](video-production-workflow.md) — optional teacher-approved handoff to Video Producers; uploads return for final teacher review.
 - [Video playback verification](video-playback-verification.md) — test browser codec support separately from successful private video storage and streaming.
 - [Teacher publication control](teacher-publication-control.md) — teachers control website editions; draft saves preserve student originals and do not silently update live pages.
+- [Blog publication style](blog-publication-style.md) — calming cover image, continuous writing without worksheet headings, and no sample articles.

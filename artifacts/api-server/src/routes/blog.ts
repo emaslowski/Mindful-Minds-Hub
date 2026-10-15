@@ -3,6 +3,7 @@ import { db, blogPostsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import nodemailer from "nodemailer";
 import { SubmitBlogPostBody } from "@workspace/api-zod";
+import { isExampleBlogPost } from "../lib/exampleBlogPosts";
 
 const router = Router();
 const MODERATOR_EMAIL = "mindmatters0526@gmail.com";
@@ -37,7 +38,7 @@ router.get("/blog-posts", async (req, res) => {
       .where(eq(blogPostsTable.approved, true))
       .orderBy(desc(blogPostsTable.approvedAt));
 
-    const result = posts.map((p) => ({
+    const result = posts.filter((p) => !isExampleBlogPost(p)).map((p) => ({
       id: p.id,
       title: p.title,
       author: p.author,
@@ -68,7 +69,7 @@ router.get("/blog-posts/:id", async (req, res) => {
       .from(blogPostsTable)
       .where(eq(blogPostsTable.id, id));
 
-    if (!post || !post.approved) {
+    if (!post || !post.approved || isExampleBlogPost(post)) {
       res.status(404).json({ error: "Post not found" });
       return;
     }

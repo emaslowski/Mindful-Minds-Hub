@@ -29,7 +29,7 @@ export function PublishedSection({ section, heading = "From Our Students", class
   );
 
   if (isLoading) {
-    return <div className={`mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 px-4 md:grid-cols-2 ${className}`} aria-label="Loading published articles">
+    return <div className={`mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 px-4 ${section === "blog" ? "" : "md:grid-cols-2"} ${className}`} aria-label="Loading published articles">
       {[0, 1].map((key) => <div key={key} className="h-52 animate-pulse rounded-2xl border border-card-border/50 bg-card p-6" />)}
     </div>;
   }
@@ -48,9 +48,9 @@ export function PublishedSection({ section, heading = "From Our Students", class
         <h2 className="font-display text-2xl italic text-foreground">{heading}</h2>
         <div className="h-px max-w-[120px] flex-1 bg-sage/20" />
       </div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className={`grid grid-cols-1 gap-6 ${section === "blog" ? "" : "md:grid-cols-2"}`}>
         {items.map((item) => (
-          <div key={item.id} className={`rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm ${item.appearance?.pageWidth === "full" ? "md:col-span-2" : ""}`}>
+          <div key={item.id} className={`w-full rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm ${section !== "blog" && item.appearance?.pageWidth === "full" ? "md:col-span-2" : ""}`}>
             <PublishedArticle
               title={item.title}
               content={item.content}
@@ -58,6 +58,7 @@ export function PublishedSection({ section, heading = "From Our Students", class
               authorDisplay={item.authorDisplay}
               blocks={item.blocks}
               projectId={item.projectId ?? item.id}
+              presentation={section === "blog" ? "blog" : "default"}
             />
           </div>
         ))}

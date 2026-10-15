@@ -3,47 +3,10 @@ import { WaveFooter } from "@/components/WaveFooter";
 import { useGetBlogPosts } from "@workspace/api-client-react";
 import { FriendshipMatchmaker } from "@/components/FriendshipMatchmaker";
 import { PublishedSection } from "@/components/PublishedSection";
-
-const SAMPLE_POSTS = [
-  {
-    id: 1,
-    title: "How I Deal with Test Anxiety",
-    author: "Anna",
-    excerpt: "Math is definitely not my strongest subject. When I hear the teacher say, \"We have a test on Friday!\" I feel anxious the rest of the week! Some things that really helped...",
-    gradient: "from-amber/30 to-terracotta/20",
-  },
-  {
-    id: 2,
-    title: "Breathing Ideas that WORK!",
-    author: "Anonymous",
-    excerpt: "I had never found any breathing exercises that worked...until now! I was talking with a friend and they told me about this cool new way to ground myself when I am overwhelmed...",
-    gradient: "from-sage/30 to-dusty-rose/20",
-  },
-  {
-    id: 3,
-    title: "Moving Feels GOOD",
-    author: "Mya",
-    excerpt: "Believe me, I would much rather come home after a long day at school and slump down on the couch. The other day, I decided to go on a walk when I got home. I looked around and listened to the sounds...",
-    gradient: "from-dusty-rose/30 to-amber/20",
-  }
-];
+import { DEFAULT_BLOG_COVER } from "@workspace/mind-matters-ds/components/PublishedArticle";
 
 export default function Connect() {
   const { data: apiPosts, isLoading } = useGetBlogPosts();
-  
-  const gradients = [
-    "from-amber/30 to-terracotta/20",
-    "from-sage/30 to-dusty-rose/20",
-    "from-dusty-rose/30 to-amber/20",
-    "from-terracotta/30 to-sage/20"
-  ];
-
-  const posts = apiPosts && apiPosts.length > 0 
-    ? apiPosts.map((p, i) => ({
-        ...p, 
-        gradient: gradients[i % gradients.length]
-      }))
-    : SAMPLE_POSTS;
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
@@ -116,13 +79,13 @@ export default function Connect() {
         {/* Submit Post Button Top Right */}
         <div className="absolute top-4 right-4 md:right-12 z-20">
           <Link href="/connect/submit">
-            <button className="bg-terracotta hover:bg-terracotta/90 text-white px-8 py-3 rounded-full font-sans font-bold text-lg tracking-wide shadow-md transition-all hover:scale-105 flex items-center gap-3">
+            <span className="bg-terracotta hover:bg-terracotta/90 text-white px-8 py-3 rounded-full font-sans font-bold text-lg tracking-wide shadow-md transition-all hover:scale-105 flex items-center gap-3">
               Submit Post
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
                 <path d="M12 20h9" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-            </button>
+            </span>
           </Link>
         </div>
 
@@ -134,52 +97,28 @@ export default function Connect() {
         </p>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-card rounded-[2rem] p-6 h-[400px] animate-pulse border border-card-border/50">
-                <div className="w-full h-40 bg-card-border/30 rounded-2xl mb-6"></div>
-                <div className="h-6 bg-card-border/30 rounded-md w-3/4 mb-3"></div>
-                <div className="h-4 bg-card-border/30 rounded-md w-1/4 mb-6"></div>
-                <div className="h-4 bg-card-border/30 rounded-md w-full mb-2"></div>
-                <div className="h-4 bg-card-border/30 rounded-md w-full mb-2"></div>
-                <div className="h-4 bg-card-border/30 rounded-md w-2/3"></div>
-              </div>
+          <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 text-left" aria-label="Loading blog posts">
+            {[0, 1].map((i) => <div key={i} className="animate-pulse rounded-2xl border border-card-border/50 bg-card p-6">
+              <div className="mb-6 h-56 w-full rounded-2xl bg-card-border/30" />
+              <div className="mb-3 h-6 w-3/4 rounded-md bg-card-border/30" />
+              <div className="h-4 w-full rounded-md bg-card-border/30" />
+            </div>)}
+          </div>
+        ) : apiPosts?.length ? (
+          <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 text-left">
+            {apiPosts.map((post) => (
+              <article key={post.id} className="rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm">
+                <img src={DEFAULT_BLOG_COVER} alt="A calm lake surrounded by a green landscape" className="mb-6 max-h-96 w-full rounded-2xl object-cover" />
+                <h2 className="mb-2 font-display text-3xl italic leading-tight text-foreground">{post.title}</h2>
+                <p className="mb-4 font-handwritten text-xl text-terracotta">By {post.author}</p>
+                <p className="mb-6 font-sans leading-relaxed text-foreground/70">{post.excerpt}</p>
+                <Link href={`/connect/blog/${post.id}`} className="inline-flex border-2 border-terracotta px-6 py-2.5 font-sans text-sm font-bold uppercase tracking-wide text-terracotta transition-colors hover:bg-terracotta hover:text-white">
+                  Read More
+                </Link>
+              </article>
             ))}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            {posts.map((post) => (
-              <div key={post.id} className="bg-card rounded-[2rem] p-6 flex flex-col items-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-card-border/50">
-                
-                {/* Gradient Image Area */}
-                <div className={`w-full aspect-[4/3] rounded-2xl bg-gradient-to-br ${post.gradient} mb-6 relative overflow-hidden flex items-center justify-center`}>
-                  <div className="absolute inset-0 bg-white/10 mix-blend-overlay"></div>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="w-16 h-16 text-foreground/20">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                </div>
-
-                <div className="w-full flex flex-col flex-1">
-                  <h3 className="font-display italic font-semibold text-2xl text-foreground mb-1 leading-tight">
-                    {post.title}
-                  </h3>
-                  <p className="font-handwritten text-xl text-terracotta mb-4">
-                    By {post.author}
-                  </p>
-                  <p className="text-sm text-foreground/70 font-sans leading-relaxed mb-8 flex-1">
-                    {post.excerpt}
-                  </p>
-                  
-                  <Link href={`/connect/post/${post.id}`}>
-                    <button className="w-full border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-white font-sans font-bold px-6 py-2.5 rounded-full transition-colors text-sm uppercase tracking-wide">
-                      Read More
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        ) : null}
       </div>
 
       <PublishedSection section="blog" heading="From Our Students" className="mb-12" />

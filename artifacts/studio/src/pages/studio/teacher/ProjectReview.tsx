@@ -415,7 +415,7 @@ export default function ProjectReview() {
                   </CardHeader>
                   <CardContent>
                     <div className={`mx-auto min-h-48 rounded-lg border border-[#d5cabe] bg-white p-5 shadow-sm transition-all ${previewMode === 'mobile' ? 'max-w-xs' : 'w-full'}`}>
-                      <div className={publicationDraft.appearance.pageWidth === 'half' ? 'w-full md:w-1/2' : 'w-full'}>
+                      <div className={destinationSection !== 'blog' && publicationDraft.appearance.pageWidth === 'half' ? 'w-full md:w-1/2' : 'w-full'}>
                         <PublishedArticle
                           title={publicationDraft.title}
                           content={publicationDraft.content}
@@ -424,6 +424,7 @@ export default function ProjectReview() {
                           authorDisplay={authorDisplay || authorDisplayOptions[0] || ''}
                           projectId={projectId}
                           mediaUrl={(mediaId) => teacherPublicationMediaUrl(projectId, mediaId)}
+                          presentation={destinationSection === 'blog' ? 'blog' : 'default'}
                         />
                       </div>
                     </div>

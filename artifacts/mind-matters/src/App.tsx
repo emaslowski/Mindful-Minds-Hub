@@ -98,6 +98,7 @@ function PublicRouter() {
         {/* Connect Section */}
         <Route path="/connect" component={Connect} />
         <Route path="/connect/submit" component={SubmitPost} />
+        <Route path="/connect/blog/:id" component={BlogPost} />
         <Route path="/connect/post/:id" component={BlogPost} />
 
         {/* Move Section */}

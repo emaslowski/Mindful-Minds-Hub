@@ -1,90 +1,57 @@
 import { Link, useParams } from "wouter";
-import { WaveFooter } from "@/components/WaveFooter";
 import { useGetBlogPost, getGetBlogPostQueryKey } from "@workspace/api-client-react";
+import { PublishedArticle } from "@workspace/mind-matters-ds/components/PublishedArticle";
+import { Button } from "@workspace/mind-matters-ds/components/ui/button";
+import { WaveFooter } from "@/components/WaveFooter";
 
 export default function BlogPost() {
   const { id } = useParams<{ id: string }>();
-  
-  // Try to load from API
-  const { data: post, isLoading, isError } = useGetBlogPost(Number(id), { 
-    query: { 
-      enabled: !!id,
+  const postId = Number(id);
+  const { data: post, isLoading, isError, refetch } = useGetBlogPost(postId, {
+    query: {
+      enabled: Number.isFinite(postId) && postId > 0,
       retry: false,
-      queryKey: getGetBlogPostQueryKey(Number(id))
-    } 
+      queryKey: getGetBlogPostQueryKey(postId),
+    },
   });
-
-  // Fallback data if API fails or is not ready
-  const fallbackPost = {
-    title: "How I Deal with Test Anxiety",
-    author: "Anna",
-    content: "Math is definitely not my strongest subject. When I hear the teacher say, \"We have a test on Friday!\" I feel anxious the rest of the week!\n\nSome things that really helped me were studying a little bit every night instead of cramming, and taking deep breaths before the test starts. Remember, a test doesn't define who you are!\n\nI also found that talking to my teacher helped a lot. They actually gave me some extra practice problems to feel more confident. So don't be afraid to ask for help when you need it!",
-    submittedAt: new Date().toISOString(),
-  };
-
-  const displayPost = isError || (!isLoading && !post) ? fallbackPost : post;
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-4xl mx-auto px-4 mb-24 relative z-10">
-        
-        <Link href="/connect" className="text-terracotta hover:text-terracotta/80 font-sans font-medium mb-12 inline-block transition-colors">
+        <Link href="/connect" className="mb-8 inline-block font-sans font-medium text-terracotta transition-colors hover:text-terracotta/80">
           ← Back to Blog
         </Link>
 
         {isLoading ? (
-          <div className="bg-card rounded-[2rem] p-8 md:p-16 shadow-sm animate-pulse border border-card-border/50">
-            <div className="h-12 bg-card-border/30 rounded-xl w-3/4 mb-6"></div>
-            <div className="h-6 bg-card-border/30 rounded-md w-1/4 mb-16"></div>
-            <div className="space-y-4">
-              <div className="h-4 bg-card-border/30 rounded-md w-full"></div>
-              <div className="h-4 bg-card-border/30 rounded-md w-full"></div>
-              <div className="h-4 bg-card-border/30 rounded-md w-11/12"></div>
-              <div className="h-4 bg-card-border/30 rounded-md w-full"></div>
-              <div className="h-4 bg-card-border/30 rounded-md w-3/4"></div>
+          <div className="animate-pulse rounded-2xl border border-card-border/50 bg-card p-6 md:p-10" aria-label="Loading article">
+            <div className="mb-6 h-64 rounded-xl bg-card-border/30" />
+            <div className="mb-6 h-10 w-3/4 rounded-md bg-card-border/30" />
+            <div className="space-y-3">
+              <div className="h-4 rounded-md bg-card-border/30" />
+              <div className="h-4 rounded-md bg-card-border/30" />
+              <div className="h-4 w-3/4 rounded-md bg-card-border/30" />
             </div>
           </div>
-        ) : displayPost ? (
-          <div className="bg-card rounded-[2rem] p-8 md:p-16 shadow-lg border border-card-border relative overflow-hidden">
-            
-            {/* Decorative Botanical Corner */}
-            <div className="absolute -top-4 -right-4 text-sage opacity-20 pointer-events-none">
-              <svg width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
-              </svg>
-            </div>
-
-            <h1 className="text-5xl md:text-7xl font-display italic font-bold text-foreground mb-8 leading-tight drop-shadow-sm">
-              {displayPost.title}
-            </h1>
-            
-            <div className="flex items-center gap-4 mb-14 border-b border-card-border pb-8">
-              <div className="w-14 h-14 rounded-full bg-sage/20 flex items-center justify-center text-2xl text-sage border border-sage/30">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-handwritten text-2xl text-terracotta mb-1">
-                  By {displayPost.author}
-                </p>
-                <p className="text-sm text-foreground/50 font-sans tracking-wide">
-                  {new Date(displayPost.submittedAt).toLocaleDateString(undefined, { 
-                    year: 'numeric', month: 'long', day: 'numeric' 
-                  })}
-                </p>
-              </div>
-            </div>
-
-            <div className="prose prose-lg md:prose-xl max-w-none text-foreground/80 font-sans leading-relaxed whitespace-pre-wrap selection:bg-terracotta/20">
-              {displayPost.content}
-            </div>
-
+        ) : post ? (
+          <div className="rounded-2xl border border-card-border bg-card p-6 shadow-sm md:p-10">
+            <PublishedArticle
+              title={post.title}
+              content={post.content}
+              authorDisplay={post.author ? `By ${post.author}${post.submittedAt ? ` · ${new Date(post.submittedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}` : ""}` : undefined}
+              presentation="blog"
+            />
           </div>
-        ) : null}
+        ) : isError ? (
+          <div className="rounded-2xl border border-card-border/50 bg-card p-8 text-center">
+            <p className="mb-4 font-sans text-foreground/70" role="alert">This article could not be loaded.</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-card-border/50 bg-card p-8 text-center">
+            <p className="font-sans text-foreground/70">This article is not available.</p>
+          </div>
+        )}
       </div>
-
       <WaveFooter quote="Thanks for reading!" />
     </div>
   );

@@ -1,4 +1,5 @@
 import type { CSSProperties, ElementType, ReactNode } from "react";
+import defaultBlogCover from "../assets/blog-calm-lake.jpg";
 
 export type PublicationAppearance = {
   fontFamily: "serif" | "sans";
@@ -45,7 +46,10 @@ type PublishedArticleProps = {
   blocks?: PublicationBlock[];
   projectId?: number;
   mediaUrl?: (id: number) => string;
+  presentation?: "default" | "blog";
 };
+
+export const DEFAULT_BLOG_COVER = defaultBlogCover;
 
 const DEFAULT_APPEARANCE: PublicationAppearance = {
   fontFamily: "serif",
@@ -83,7 +87,20 @@ function inlineMarkdown(value: string, keyPrefix: string): ReactNode[] {
   return result;
 }
 
-function renderMarkdown(content: string): ReactNode[] {
+function stripBlogPlanningSections(content: string): string {
+  let omitSection = false;
+  return content.replace(/\r\n?/g, "\n").split("\n").filter((line) => {
+    const heading = /^\s*#{1,6}\s+(.+?)\s*$/.exec(line);
+    if (heading) {
+      const label = heading[1].replace(/[*_`]/g, "").trim().replace(/[?:]$/, "").toLowerCase();
+      omitSection = /^(?:article\s+)?topic$|^(?:target|intended)\s+(?:reader|audience)$|^(?:reader|audience)(?:\s+profile)?$|^(?:planning(?:\s+notes?)?|brainstorm(?:ing)?|writing\s+plan|outline)$|^(?:article\s+)?purpose$/.test(label);
+      return !omitSection;
+    }
+    return !omitSection;
+  }).join("\n");
+}
+
+function renderMarkdown(content: string, blogPresentation = false): ReactNode[] {
   const lines = content.replace(/\r\n?/g, "\n").split("\n");
   const blocks: ReactNode[] = [];
   let paragraph: string[] = [];
@@ -107,6 +124,7 @@ function renderMarkdown(content: string): ReactNode[] {
     const heading = /^(#{1,6})\s+(.+)$/.exec(trimmed);
     if (heading) {
       flushParagraph(); flushList();
+      if (blogPresentation) continue;
       const level = heading[1].length;
       const Heading = `h${level}` as ElementType;
       blocks.push(<Heading key={`h-${blocks.length}`}>{inlineMarkdown(heading[2], `h${blocks.length}`)}</Heading>);
@@ -175,18 +193,31 @@ function renderBlock(block: PublicationBlock, resolveMedia: (id: number) => stri
   return <figure className="published-media"><audio controls preload="metadata" src={media}>Your browser cannot play this audio. {mediaFallback}</audio>{block.caption && <figcaption>{block.caption}</figcaption>}{mediaFallback}</figure>;
 }
 
-export function PublishedArticle({ title, content, appearance, authorDisplay, blocks = [], projectId, mediaUrl }: PublishedArticleProps) {
+export function PublishedArticle({ title, content, appearance, authorDisplay, blocks = [], projectId, mediaUrl, presentation = "default" }: PublishedArticleProps) {
+  const isBlog = presentation === "blog";
   const style = { "--article-accent": colors[appearance?.accent ?? DEFAULT_APPEARANCE.accent] } as CSSProperties;
   const fontSize = { small: "0.9rem", medium: "1rem", large: "1.125rem" }[appearance?.fontSize ?? DEFAULT_APPEARANCE.fontSize];
   const lineHeight = { compact: 1.5, comfortable: 1.8, spacious: 2.05 }[appearance?.spacing ?? DEFAULT_APPEARANCE.spacing];
   const resolveMedia = mediaUrl ?? ((id: number) => projectId ? `/api/public/publications/${projectId}/media/${id}` : "");
+  const coverBlock = isBlog ? blocks.find((block) => block.type === "image") : undefined;
+  const blogText = isBlog
+    ? [content, ...blocks.filter((block) => block.type === "text").map((block) => block.text ?? "")]
+        .map(stripBlogPlanningSections)
+        .filter(Boolean)
+        .join("\n\n")
+    : content;
+  const visibleBlocks = isBlog
+    ? blocks.filter((block) => block !== coverBlock && block.type !== "text")
+    : blocks;
+  const coverUrl = (coverBlock?.mediaId ? resolveMedia(coverBlock.mediaId) : "") || defaultBlogCover;
   return (
-    <article style={{ ...style, overflowWrap: "anywhere", fontFamily: (appearance?.fontFamily ?? DEFAULT_APPEARANCE.fontFamily) === "serif" ? '"Cormorant Garamond", Georgia, serif' : 'Nunito, Arial, sans-serif', fontSize, lineHeight, textAlign: appearance?.alignment ?? DEFAULT_APPEARANCE.alignment, color: "#453329" }}>
+    <article className={isBlog ? "published-blog-article" : undefined} style={{ ...style, overflowWrap: "anywhere", fontFamily: (appearance?.fontFamily ?? DEFAULT_APPEARANCE.fontFamily) === "serif" ? '"Cormorant Garamond", Georgia, serif' : 'Nunito, Arial, sans-serif', fontSize, lineHeight, textAlign: appearance?.alignment ?? DEFAULT_APPEARANCE.alignment, color: "#453329" }}>
+      {isBlog && <figure className="published-blog-cover"><img src={coverUrl} alt={coverBlock?.alt ?? "A calm lake surrounded by a green landscape"} style={{ objectFit: coverBlock?.fit ?? "cover" }} />{coverBlock?.caption && <figcaption>{coverBlock.caption}</figcaption>}</figure>}
       <h1 style={{ color: "var(--article-accent)", fontSize: "2em", lineHeight: 1.15, margin: "0 0 0.35em", fontWeight: 700 }}>{title}</h1>
       {authorDisplay && <p style={{ fontSize: "0.82em", opacity: 0.72, margin: "0 0 1.5em" }}>{authorDisplay}</p>}
-      <div className="published-article-content" style={{ display: "grid", gap: "0.8em" }}>
-        {content && <div className="published-legacy-content">{renderMarkdown(content)}</div>}
-        {blocks.map((block) => <div key={block.id} className={`published-block published-block-${block.width}`}>{renderBlock(block, resolveMedia)}</div>)}
+      <div className={`published-article-content${isBlog ? " published-blog-content" : ""}`} style={{ display: "grid", gap: "0.8em" }}>
+        {blogText && <div className="published-legacy-content">{renderMarkdown(blogText, isBlog)}</div>}
+        {visibleBlocks.map((block) => <div key={block.id} className={`published-block published-block-${block.width}`}>{renderBlock(block, resolveMedia)}</div>)}
         {!content && blocks.length === 0 && <p style={{ opacity: 0.6, fontStyle: "italic" }}>Your article preview will appear here.</p>}
       </div>
       <style>{`
@@ -206,6 +237,14 @@ export function PublishedArticle({ title, content, appearance, authorDisplay, bl
           opacity: 0.9; font-style: italic;
         }
         .published-article-content { grid-template-columns: repeat(2, minmax(0, 1fr)); text-align: inherit; }
+        .published-blog-article { width: 100%; }
+        .published-blog-cover { margin: 0 0 1.5em; }
+        .published-blog-cover img { display: block; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; border-radius: var(--radius-md); }
+        .published-blog-cover figcaption { margin-top: 0.35em; opacity: 0.75; font-size: 0.85em; }
+        .published-blog-content { grid-template-columns: minmax(0, 1fr); }
+        .published-blog-content .published-legacy-content { display: grid; gap: inherit; }
+        .published-blog-content .published-legacy-content, .published-blog-content .published-block { grid-column: 1; }
+        .published-blog-content .published-block-half { grid-column: 1; }
         .published-legacy-content, .published-block-full { grid-column: 1 / -1; min-width: 0; }
         .published-block-half { grid-column: span 1; min-width: 0; }
         .published-media { margin: 0; }

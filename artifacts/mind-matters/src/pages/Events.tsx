@@ -131,7 +131,7 @@ export default function Events() {
         )}
 
       </div>
-      <PublishedSection section="events" heading="Student-Organized Events" className="mb-12" />
+      <PublishedSection section="events" heading="Events" className="mb-12" />
 
       <WaveFooter quote="Get involved and connect." />
     </div>
