@@ -1,5 +1,6 @@
 import { WaveFooter } from "@/components/WaveFooter";
 import { Phone, MessageSquare, Info, ShieldAlert, ExternalLink, BookOpen, Users, Heart } from "lucide-react";
+import { PublishedSection } from "@/components/PublishedSection";
 
 interface ParentResourceProps {
   href: string;
@@ -244,6 +245,7 @@ export default function Resources() {
         </div>
       </div>
       
+      <PublishedSection section="resources" heading="Resources from our student team" className="mb-12" />
       <WaveFooter quote="It's okay to ask for help." />
     </div>
   );

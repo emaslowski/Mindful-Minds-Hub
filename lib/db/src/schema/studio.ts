@@ -9,6 +9,7 @@ import {
   varchar,
   date,
   unique,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from './auth';
 
@@ -206,6 +207,61 @@ export const studioPublicationsTable = pgTable('studio_publications', {
   featured: boolean('featured').notNull().default(false),
   publishedAt: timestamp('published_at').notNull().defaultNow(),
   unpublishedAt: timestamp('unpublished_at'),
+});
+
+export interface PublicationBlock {
+  id: string;
+  type: 'text' | 'image' | 'video' | 'audio' | 'recipe';
+  width: 'full' | 'half';
+  text?: string;
+  mediaId?: number;
+  caption?: string;
+  alt?: string;
+  fit?: 'contain' | 'cover';
+  recipe?: {
+    name: string; description: string; servings: string; prepTime: string;
+    cookTime: string; ingredients: string; steps: string;
+  };
+}
+
+export interface PublicationEdition {
+  title: string;
+  content: string;
+  appearance: {
+    fontFamily: 'serif' | 'sans';
+    fontSize: 'small' | 'medium' | 'large';
+    alignment: 'left' | 'center';
+    accent: 'sage' | 'terracotta' | 'amber';
+    spacing: 'compact' | 'comfortable' | 'spacious';
+    pageWidth?: 'full' | 'half';
+  };
+  blocks?: PublicationBlock[];
+  pageOrder?: number;
+}
+
+// Teacher-owned website editions never overwrite student work. Saving a draft
+// does not change the public snapshot; only an explicit publish decision does.
+export const studioPublicationEditsTable = pgTable('studio_publication_edits', {
+  projectId: integer('project_id').primaryKey()
+    .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
+  draft: jsonb('draft').$type<PublicationEdition>().notNull(),
+  published: jsonb('published').$type<PublicationEdition>(),
+  version: integer('version').notNull().default(1),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const studioPublicationMediaTable = pgTable('studio_publication_media', {
+  id: serial('id').primaryKey(),
+  projectId: integer('project_id').notNull()
+    .references(() => studioProjectsTable.id, { onDelete: 'cascade' }),
+  kind: text('kind').$type<'image' | 'video' | 'audio'>().notNull(),
+  objectPath: text('object_path').notNull().unique(),
+  filename: text('filename').notNull(),
+  contentType: text('content_type').notNull(),
+  size: integer('size').notNull(),
+  status: text('status').$type<'pending' | 'ready'>().notNull().default('pending'),
+  expiresAt: timestamp('expires_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 // ── Safety Flags ───────────────────────────────────────────────────────────

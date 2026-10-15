@@ -178,6 +178,16 @@ export const teacherReview = {
     ),
   getProject: (id: number) =>
     studioFetch<TeacherProjectDetail>(`/teacher/projects/${id}`),
+  createProject: (data: { title: string; contentType: string }) =>
+    studioFetch<{ project: StudioProject }>('/teacher/projects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  savePublicationDraft: (id: number, data: { draft: PublicationEdition; version: number }) =>
+    studioFetch<{ draft: PublicationEdition; version: number }>(
+      `/teacher/projects/${id}/publication-draft`,
+      { method: 'PATCH', body: JSON.stringify(data) },
+    ),
   decide: (id: number, data: DecisionData) =>
     studioFetch(`/teacher/projects/${id}/decision`, { method: 'POST', body: JSON.stringify(data) }),
   delete: (id: number) =>
@@ -470,6 +480,59 @@ export interface TeacherProjectDetail {
   peerReviews: StudioPeerReview[];
   sources: StudioSource[];
   teacherReviews: Array<{ id: number; decision: string; feedback?: string | null; reviewedAt: string }>;
+  publicationDraft?: PublicationEdition;
+  publicationDraftVersion?: number;
+  publication?: { destinationSection: string; authorDisplay: string; publicationStatus: string } | null;
+}
+
+export interface PublicationAppearance {
+  fontFamily: 'serif' | 'sans';
+  fontSize: 'small' | 'medium' | 'large';
+  alignment: 'left' | 'center';
+  accent: 'sage' | 'terracotta' | 'amber';
+  spacing: 'compact' | 'comfortable' | 'spacious';
+  pageWidth?: 'full' | 'half';
+}
+
+export interface PublicationRecipe {
+  name: string;
+  description: string;
+  servings: string;
+  prepTime: string;
+  cookTime: string;
+  ingredients: string;
+  steps: string;
+}
+
+export interface PublicationBlock {
+  id: string;
+  type: 'text' | 'image' | 'video' | 'audio' | 'recipe';
+  width: 'full' | 'half';
+  text?: string;
+  mediaId?: number;
+  caption?: string;
+  alt?: string;
+  fit?: 'contain' | 'cover';
+  recipe?: PublicationRecipe;
+}
+
+export interface PublicationEdition {
+  title: string;
+  content: string;
+  appearance: PublicationAppearance;
+  blocks?: PublicationBlock[];
+  pageOrder?: number;
+}
+
+export interface PublicationMedia {
+  id: number;
+  projectId: number;
+  kind: 'image' | 'video' | 'audio';
+  filename: string;
+  contentType: string;
+  size: number;
+  status: 'pending' | 'ready';
+  url: string;
 }
 
 export interface DecisionData {
@@ -478,6 +541,8 @@ export interface DecisionData {
   destinationSection?: string;
   authorDisplay?: string;
   sendToVideoProducer?: boolean;
+  publicationDraft?: PublicationEdition;
+  publicationDraftVersion?: number;
 }
 
 export interface TeacherHandoff {

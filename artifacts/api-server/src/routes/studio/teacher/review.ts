@@ -10,10 +10,13 @@ import {
   studioSourcesTable,
   studioJobsTable,
   studioVideoProductionsTable,
+  studioPublicationEditsTable,
 } from '@workspace/db/schema';
 import { eq, desc, inArray, sql } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
+import { originalPublicationEdition, parsePublicationDraft, storePublicationEdition } from '../../../lib/publicationEditions';
+import { publicationMediaError } from '../../../lib/publicationMedia';
 
 const router = Router();
 
@@ -23,23 +26,22 @@ const router = Router();
  * teacher_review records. Resolve that legacy ID when it is available.
  */
 async function getTeacherReviewAuthorId(sessionUserId: string): Promise<string> {
-  if (/^\d+$/.test(sessionUserId)) return sessionUserId;
+  const column = await db.execute<{ data_type: string }>(sql`
+    SELECT data_type FROM information_schema.columns
+    WHERE table_schema = current_schema() AND table_name = 'studio_teacher_reviews' AND column_name = 'teacher_id'
+  `);
+  if (column.rows[0]?.data_type !== 'integer') return sessionUserId;
 
-  try {
-    const result = await db.execute<{ id: number }>(
-      sql`SELECT id FROM studio_accounts
-          WHERE role = 'teacher' AND account_status = 'active'
-          ORDER BY id
-          LIMIT 1`,
-    );
-    const legacyTeacherId = result.rows[0]?.id;
-    if (legacyTeacherId != null) return String(legacyTeacherId);
-  } catch {
-    // Newer databases do not have the legacy studio_accounts table. In that
-    // case, the current session user ID is the correct review author ID.
-  }
-
-  return sessionUserId;
+  // Password-based teacher sessions are synthetic. The live legacy accounts
+  // table can be completely empty, so looking up an existing teacher is not
+  // enough. This disabled, non-login identity is only an audit FK bridge.
+  const result = await db.execute<{ id: number }>(sql`
+    INSERT INTO studio_accounts (username, password_hash, display_name, role, account_status)
+    VALUES ('studio-teacher-review-audit', '!audit-only-no-password-login', 'Teacher Command Center', 'teacher', 'disabled')
+    ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username
+    RETURNING id
+  `);
+  return String(result.rows[0]!.id);
 }
 
 // GET /api/teacher/projects — all projects with full detail for teacher
@@ -164,6 +166,14 @@ router.get('/teacher/projects/:id', requireStudioRole('teacher'), async (req: Re
     .where(eq(studioTeacherReviewsTable.projectId, id))
     .orderBy(desc(studioTeacherReviewsTable.reviewedAt));
 
+  const [edition] = await db.select().from(studioPublicationEditsTable)
+    .where(eq(studioPublicationEditsTable.projectId, id));
+  const [publication] = await db.select({
+    destinationSection: studioPublicationsTable.destinationSection,
+    authorDisplay: studioPublicationsTable.authorDisplay,
+    publicationStatus: studioPublicationsTable.publicationStatus,
+  }).from(studioPublicationsTable).where(eq(studioPublicationsTable.projectId, id));
+
   res.json({
     project,
     student: student ?? null,
@@ -171,7 +181,29 @@ router.get('/teacher/projects/:id', requireStudioRole('teacher'), async (req: Re
     peerReviews,
     sources,
     teacherReviews,
+    publicationDraft: edition?.draft ?? originalPublicationEdition(project),
+    publicationDraftVersion: edition?.version ?? 0,
+    publication: publication ?? null,
   });
+});
+
+router.patch('/teacher/projects/:id/publication-draft', requireStudioRole('teacher'), async (req, res) => {
+  const id = Number(req.params.id);
+  const input = parsePublicationDraft(req.body);
+  if (!Number.isSafeInteger(id) || id <= 0 || !input) {
+    res.status(400).json({ error: 'Provide a title, valid appearance settings, and the current draft version.' }); return;
+  }
+  const result = await db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT pg_advisory_xact_lock(${id})`);
+    const [project] = await tx.select({ id: studioProjectsTable.id }).from(studioProjectsTable).where(eq(studioProjectsTable.id, id));
+    if (!project) return { error: 'Project not found', code: 404 };
+    const mediaError = await publicationMediaError(tx, id, input.draft, false);
+    if (mediaError) return { error: mediaError, code: 400 };
+    const saved = await storePublicationEdition(tx, id, input.draft, input.version, false);
+    return saved ?? { error: 'This website draft was changed in another session. Your edits have not been overwritten. Reload to review the saved version.', code: 409 };
+  });
+  if ('error' in result) { res.status(result.code).json({ error: result.error }); return; }
+  res.json(result);
 });
 
 // POST /api/teacher/projects/:id/decision — approve, publish, return, etc.
@@ -186,12 +218,16 @@ router.post(
       destinationSection,
       authorDisplay,
       sendToVideoProducer,
+      publicationDraft,
+      publicationDraftVersion,
     } = req.body as {
       decision?: string;
       feedback?: string;
       destinationSection?: string;
       authorDisplay?: string;
       sendToVideoProducer?: boolean;
+      publicationDraft?: unknown;
+      publicationDraftVersion?: unknown;
     };
 
     const validDecisions = ['approve', 'approve_and_publish', 'return_for_revision', 'save_for_later', 'archive'];
@@ -207,6 +243,15 @@ router.post(
     }
     if (decision === 'approve_and_publish' && !destinationSection?.trim()) {
       res.status(400).json({ error: 'destinationSection is required when publishing' }); return;
+    }
+    const editionInput = publicationDraft !== undefined
+      ? parsePublicationDraft({ draft: publicationDraft, version: publicationDraftVersion }) : null;
+    if (publicationDraft !== undefined && !editionInput) {
+      res.status(400).json({ error: 'Website draft settings are invalid. Check the title and formatting before publishing.' }); return;
+    }
+    const destinations = ['blog', 'podcast', 'learn', 'create', 'calm-corner', 'move', 'cooking', 'grow', 'events', 'resources'];
+    if (decision === 'approve_and_publish' && !destinations.includes(destinationSection!)) {
+      res.status(400).json({ error: 'Choose a supported destination page.' }); return;
     }
     const producerJobs = sendToVideoProducer ? await db.select({ id: studioJobsTable.id }).from(studioJobsTable)
       .where(sql`lower(trim(${studioJobsTable.title})) IN ('video producer', 'video producers', 'videographer', 'videographers')`) : [];
@@ -227,6 +272,18 @@ router.post(
       }
       if (decision === 'approve_and_publish' && production?.status === 'assigned') {
         return { error: 'Please wait for the video upload and review it before publishing.', code: 409 };
+      }
+      if (decision === 'approve_and_publish') {
+        const [existingEdition] = await tx.select().from(studioPublicationEditsTable)
+          .where(eq(studioPublicationEditsTable.projectId, id));
+        const draft = editionInput?.draft ?? existingEdition?.draft ?? originalPublicationEdition(project);
+        const mediaError = await publicationMediaError(tx, id, draft, true);
+        if (mediaError) return { error: mediaError, code: 400 };
+        const saved = await storePublicationEdition(
+          tx, id, draft,
+          editionInput?.version ?? existingEdition?.version ?? 0, true,
+        );
+        if (!saved) return { error: 'This website draft was changed in another session. Reload before publishing so you do not overwrite another teacher’s edits.', code: 409 };
       }
       await tx.insert(studioTeacherReviewsTable).values({
         projectId: id, teacherId,
@@ -252,15 +309,19 @@ router.post(
           .onConflictDoUpdate({ target: studioVideoProductionsTable.projectId, set: assignment });
       }
       if (decision === 'approve_and_publish') {
-        await tx.insert(studioPublicationsTable).values({
-          projectId: id, destinationSection: destinationSection!,
-          authorDisplay: authorDisplay ?? 'Mind Matters Student Team', publicationStatus: 'active',
-        }).onConflictDoUpdate({
-          target: studioPublicationsTable.projectId, set: {
-            destinationSection: destinationSection!, authorDisplay: authorDisplay ?? 'Mind Matters Student Team',
-            publicationStatus: 'active', publishedAt: new Date(),
-          },
-        });
+        // Explicit shared columns also support older live databases that do not
+        // have the optional slug/featured/unpublished_at columns.
+        await tx.execute(sql`
+          INSERT INTO studio_publications (project_id, destination_section, author_display, publication_status)
+          VALUES (${id}, ${destinationSection!}, ${authorDisplay ?? 'Middle School Matters Student Team'}, 'active')
+          ON CONFLICT (project_id) DO UPDATE SET
+            destination_section = EXCLUDED.destination_section, author_display = EXCLUDED.author_display,
+            publication_status = 'active', published_at = now()
+        `);
+      }
+      if (decision === 'archive') {
+        await tx.update(studioPublicationsTable).set({ publicationStatus: 'archived' })
+          .where(eq(studioPublicationsTable.projectId, id));
       }
       return { newStatus };
     });

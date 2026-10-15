@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useSearch } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherReview } from '@/lib/studioApi';
+import { CONTENT_TYPES, teacherReview } from '@/lib/studioApi';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,6 +20,9 @@ import { AlertCircle, ChevronRight, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const ALL_STATUSES = [
   'Assigned', 'Researching', 'Peer Review',
@@ -32,8 +35,12 @@ export default function AllProjects() {
   const [statusFilter, setStatusFilter] = useState('');
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [confirmTitle, setConfirmTitle] = useState('');
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newContentType, setNewContentType] = useState<string>('Blog article');
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const { data } = useQuery({
     queryKey: ['teacher-all-projects'],
@@ -55,6 +62,18 @@ export default function AllProjects() {
     },
   });
 
+  const { mutate: createWebsitePost, isPending: isCreating } = useMutation({
+    mutationFn: () => teacherReview.createProject({ title: newTitle.trim(), contentType: newContentType }),
+    onSuccess: ({ project }) => {
+      queryClient.invalidateQueries({ queryKey: ['teacher-all-projects'] });
+      setCreateOpen(false);
+      setNewTitle('');
+      toast({ title: 'Website post created', description: 'You can now build its website edition.' });
+      navigate(`/studio/teacher/review/${project.id}`);
+    },
+    onError: (error: Error) => toast({ title: 'Could not create website post', description: error.message, variant: 'destructive' }),
+  });
+
   if (isLoading || !user) return null;
 
   const all = data?.projects ?? [];
@@ -70,17 +89,22 @@ export default function AllProjects() {
         title="All Projects"
         subtitle={`${filtered.length} project${filtered.length !== 1 ? 's' : ''}`}
         action={
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-56 bg-white border-[#d5cabe] text-sm">
-              <SelectValue placeholder="All statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All statuses</SelectItem>
-              {ALL_STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" onClick={() => setCreateOpen(true)} className="bg-[#c4622d] text-white hover:bg-[#a85226] rounded-full">
+              New Website Post
+            </Button>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-56 bg-white border-[#d5cabe] text-sm">
+                <SelectValue placeholder="All statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All statuses</SelectItem>
+                {ALL_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         }
       >
         {filtered.length === 0 ? (
@@ -176,6 +200,33 @@ export default function AllProjects() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create a website post</DialogTitle>
+            <DialogDescription>Start a teacher-owned post directly in the website editor. It does not change a student submission.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(event) => { event.preventDefault(); if (newTitle.trim()) createWebsitePost(); }} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="new-website-post-title">Post title</Label>
+              <Input id="new-website-post-title" value={newTitle} onChange={(event) => setNewTitle(event.target.value)} placeholder="Title for the website post" required />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Post type</Label>
+              <Select value={newContentType} onValueChange={setNewContentType}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{CONTENT_TYPES.map((type) => <SelectItem key={type} value={type}>{type}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={isCreating || !newTitle.trim()} className="bg-[#688a52] text-white hover:bg-[#557a43]">
+                {isCreating ? 'Creating…' : 'Create and edit'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </StudioLayout>
   );
 }

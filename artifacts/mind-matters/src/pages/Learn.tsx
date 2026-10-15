@@ -1,45 +1,6 @@
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
-import { useGetPublishedContent } from "@workspace/api-client-react";
-import { Star } from "lucide-react";
-
-function PublishedLearnSection() {
-  const { data, isLoading } = useGetPublishedContent({ section: "learn" });
-  const items = data?.publications ?? [];
-  if (isLoading || items.length === 0) return null;
-
-  return (
-    <div className="w-full max-w-4xl mx-auto px-4 mb-12">
-      <div className="flex items-center justify-center gap-3 mb-8">
-        <div className="h-px flex-1 bg-sage/20 max-w-[100px]"></div>
-        <h2 className="font-display italic text-2xl text-foreground">From Our Students</h2>
-        <div className="h-px flex-1 bg-sage/20 max-w-[100px]"></div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="bg-sage/10 rounded-[2rem] p-6 flex flex-col border border-sage/20 shadow-sm"
-          >
-            <div className="flex items-center gap-1.5 mb-2">
-              <Star size={12} className="text-amber fill-amber" />
-              <span className="font-sans text-xs font-bold text-amber uppercase tracking-widest">
-                Student Strategy
-              </span>
-            </div>
-            <h3 className="font-display italic text-2xl text-foreground mb-2 leading-tight">{item.title}</h3>
-            {item.content && (
-              <p className="font-sans text-sm text-foreground/70 leading-relaxed line-clamp-4 flex-1">
-                {item.content}
-              </p>
-            )}
-            <span className="mt-3 font-sans text-xs text-foreground/50">{item.authorDisplay}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import { PublishedSection } from "@/components/PublishedSection";
 
 export default function Learn() {
   const activities = [
@@ -257,7 +218,7 @@ export default function Learn() {
         </div>
       </div>
       
-      <PublishedLearnSection />
+      <PublishedSection section="learn" heading="From Our Students" className="mb-12" />
       <WaveFooter quote="Even small steps move you forward." />
     </div>
   );

@@ -1,11 +1,11 @@
 import { WaveFooter } from "@/components/WaveFooter";
-import { Leaf, Star } from "lucide-react";
+import { Leaf } from "lucide-react";
 import { Link } from "wouter";
 import { useGetPublishedContent } from "@workspace/api-client-react";
-import { format } from "date-fns";
+import { PublishedArticle, type PublicationAppearance } from "@workspace/mind-matters-ds/components/PublishedArticle";
 
 export default function ListenMeditations() {
-  const { data, isLoading } = useGetPublishedContent({ section: "calm-corner" });
+  const { data, isLoading } = useGetPublishedContent({ section: "calm-corner" }, { query: { staleTime: 45_000, refetchOnWindowFocus: true } });
   const meditations = data?.publications ?? [];
 
   return (
@@ -44,31 +44,12 @@ export default function ListenMeditations() {
                 key={med.id}
                 className="bg-gradient-to-br from-sage/20 to-dusty-rose/20 rounded-[2rem] p-8 flex flex-col border border-white/40 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-2 bg-sage/20 rounded-full">
-                    <Leaf size={18} className="text-sage" />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Star size={12} className="text-amber fill-amber" />
-                    <span className="font-sans text-xs font-bold text-amber uppercase tracking-widest">
-                      Student Meditation
-                    </span>
-                  </div>
-                </div>
-                <h3 className="font-display italic text-2xl text-foreground mb-3 leading-tight">
-                  {med.title}
-                </h3>
-                {med.content && (
-                  <p className="font-sans text-sm text-foreground/70 leading-relaxed flex-1">
-                    {med.content}
-                  </p>
-                )}
-                <div className="flex items-center justify-between mt-4">
-                  <span className="font-sans text-xs text-foreground/50">{med.authorDisplay}</span>
-                  <span className="font-sans text-xs text-foreground/40">
-                    {format(new Date(med.publishedAt), "MMM d, yyyy")}
-                  </span>
-                </div>
+                <PublishedArticle
+                  title={med.title}
+                  content={med.content}
+                  appearance={(med as typeof med & { appearance?: PublicationAppearance }).appearance}
+                  authorDisplay={med.authorDisplay}
+                />
               </div>
             ))}
           </div>

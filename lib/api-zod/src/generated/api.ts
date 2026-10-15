@@ -542,12 +542,296 @@ export const GetEventsResponse = zod.array(GetEventsResponseItem)
 
 
 /**
+ * @summary Create a website post directly as a teacher
+ */
+export const createTeacherWebsiteProjectBodyTitleMax = 300;
+
+export const createTeacherWebsiteProjectBodyContentTypeMax = 100;
+
+
+
+export const CreateTeacherWebsiteProjectBody = zod.object({
+  "title": zod.string().min(1).max(createTeacherWebsiteProjectBodyTitleMax),
+  "contentType": zod.string().min(1).max(createTeacherWebsiteProjectBodyContentTypeMax)
+})
+
+export const CreateTeacherWebsiteProjectResponse = zod.void()
+
+
+/**
+ * @summary List private project media for the website editor
+ */
+export const GetTeacherPublicationMediaParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetTeacherPublicationMediaResponse = zod.object({
+  "media": zod.array(zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "kind": zod.enum(['image', 'video', 'audio']),
+  "filename": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number(),
+  "status": zod.enum(['pending', 'ready']),
+  "url": zod.string()
+}))
+})
+
+
+/**
+ * @summary Request a private image, video, or audio upload
+ */
+export const RequestPublicationMediaUploadParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const requestPublicationMediaUploadBodyFilenameMax = 255;
+
+export const requestPublicationMediaUploadBodySizeMax = 262144000;
+
+
+
+export const RequestPublicationMediaUploadBody = zod.object({
+  "filename": zod.string().min(1).max(requestPublicationMediaUploadBodyFilenameMax),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm']),
+  "size": zod.number().min(1).max(requestPublicationMediaUploadBodySizeMax)
+})
+
+export const RequestPublicationMediaUploadResponse = zod.object({
+  "mediaId": zod.number(),
+  "uploadUrl": zod.string()
+})
+
+
+/**
+ * @summary Verify the uploaded file before it can be used in a draft
+ */
+export const CompletePublicationMediaUploadParams = zod.object({
+  "id": zod.coerce.number(),
+  "mediaId": zod.coerce.number()
+})
+
+export const CompletePublicationMediaUploadResponse = zod.object({
+  "media": zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "kind": zod.enum(['image', 'video', 'audio']),
+  "filename": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number(),
+  "status": zod.enum(['pending', 'ready']),
+  "url": zod.string()
+})
+})
+
+
+/**
+ * @summary Add the completed student video to the teacher media library
+ */
+export const ImportPublicationProductionVideoParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ImportPublicationProductionVideoResponse = zod.object({
+  "media": zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "kind": zod.enum(['image', 'video', 'audio']),
+  "filename": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number(),
+  "status": zod.enum(['pending', 'ready']),
+  "url": zod.string()
+})
+})
+
+
+/**
+ * @summary Save a teacher-only website draft without changing student work or the live edition
+ */
+
+
+
+export const UpdateTeacherPublicationDraftParams = zod.object({
+  "id": zod.coerce.number().min(1)
+})
+
+export const updateTeacherPublicationDraftBodyDraftTitleMax = 300;
+
+export const updateTeacherPublicationDraftBodyDraftContentMax = 100000;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemIdMax = 64;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemTextMax = 30000;
+
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemCaptionMax = 500;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemAltMax = 300;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemRecipeNameMax = 300;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemRecipeDescriptionMax = 3000;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemRecipeServingsMax = 100;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemRecipePrepTimeMax = 100;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemRecipeCookTimeMax = 100;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemRecipeIngredientsMax = 20000;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksItemRecipeStepsMax = 30000;
+
+export const updateTeacherPublicationDraftBodyDraftBlocksMax = 40;
+
+export const updateTeacherPublicationDraftBodyDraftPageOrderMin = 0;
+export const updateTeacherPublicationDraftBodyDraftPageOrderMax = 10000;
+
+export const updateTeacherPublicationDraftBodyVersionMin = 0;
+
+
+
+export const UpdateTeacherPublicationDraftBody = zod.object({
+  "draft": zod.object({
+  "title": zod.string().min(1).max(updateTeacherPublicationDraftBodyDraftTitleMax),
+  "content": zod.string().max(updateTeacherPublicationDraftBodyDraftContentMax),
+  "appearance": zod.object({
+  "fontFamily": zod.enum(['serif', 'sans']),
+  "fontSize": zod.enum(['small', 'medium', 'large']),
+  "alignment": zod.enum(['left', 'center']),
+  "accent": zod.enum(['sage', 'terracotta', 'amber']),
+  "spacing": zod.enum(['compact', 'comfortable', 'spacious']),
+  "pageWidth": zod.enum(['full', 'half']).optional()
+}),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1).max(updateTeacherPublicationDraftBodyDraftBlocksItemIdMax),
+  "type": zod.enum(['text', 'image', 'video', 'audio', 'recipe']),
+  "width": zod.enum(['full', 'half']),
+  "text": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemTextMax).optional(),
+  "mediaId": zod.number().min(1).optional(),
+  "caption": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemCaptionMax).optional(),
+  "alt": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemAltMax).optional(),
+  "fit": zod.enum(['contain', 'cover']).optional(),
+  "recipe": zod.object({
+  "name": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemRecipeNameMax),
+  "description": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemRecipeDescriptionMax),
+  "servings": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemRecipeServingsMax),
+  "prepTime": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemRecipePrepTimeMax),
+  "cookTime": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemRecipeCookTimeMax),
+  "ingredients": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemRecipeIngredientsMax),
+  "steps": zod.string().max(updateTeacherPublicationDraftBodyDraftBlocksItemRecipeStepsMax)
+}).optional()
+})).max(updateTeacherPublicationDraftBodyDraftBlocksMax).optional(),
+  "pageOrder": zod.number().min(updateTeacherPublicationDraftBodyDraftPageOrderMin).max(updateTeacherPublicationDraftBodyDraftPageOrderMax).optional()
+}),
+  "version": zod.number().min(updateTeacherPublicationDraftBodyVersionMin)
+})
+
+export const updateTeacherPublicationDraftResponseDraftTitleMax = 300;
+
+export const updateTeacherPublicationDraftResponseDraftContentMax = 100000;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemIdMax = 64;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemTextMax = 30000;
+
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemCaptionMax = 500;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemAltMax = 300;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemRecipeNameMax = 300;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemRecipeDescriptionMax = 3000;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemRecipeServingsMax = 100;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemRecipePrepTimeMax = 100;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemRecipeCookTimeMax = 100;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemRecipeIngredientsMax = 20000;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksItemRecipeStepsMax = 30000;
+
+export const updateTeacherPublicationDraftResponseDraftBlocksMax = 40;
+
+export const updateTeacherPublicationDraftResponseDraftPageOrderMin = 0;
+export const updateTeacherPublicationDraftResponseDraftPageOrderMax = 10000;
+
+
+
+export const UpdateTeacherPublicationDraftResponse = zod.object({
+  "draft": zod.object({
+  "title": zod.string().min(1).max(updateTeacherPublicationDraftResponseDraftTitleMax),
+  "content": zod.string().max(updateTeacherPublicationDraftResponseDraftContentMax),
+  "appearance": zod.object({
+  "fontFamily": zod.enum(['serif', 'sans']),
+  "fontSize": zod.enum(['small', 'medium', 'large']),
+  "alignment": zod.enum(['left', 'center']),
+  "accent": zod.enum(['sage', 'terracotta', 'amber']),
+  "spacing": zod.enum(['compact', 'comfortable', 'spacious']),
+  "pageWidth": zod.enum(['full', 'half']).optional()
+}),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1).max(updateTeacherPublicationDraftResponseDraftBlocksItemIdMax),
+  "type": zod.enum(['text', 'image', 'video', 'audio', 'recipe']),
+  "width": zod.enum(['full', 'half']),
+  "text": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemTextMax).optional(),
+  "mediaId": zod.number().min(1).optional(),
+  "caption": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemCaptionMax).optional(),
+  "alt": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemAltMax).optional(),
+  "fit": zod.enum(['contain', 'cover']).optional(),
+  "recipe": zod.object({
+  "name": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemRecipeNameMax),
+  "description": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemRecipeDescriptionMax),
+  "servings": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemRecipeServingsMax),
+  "prepTime": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemRecipePrepTimeMax),
+  "cookTime": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemRecipeCookTimeMax),
+  "ingredients": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemRecipeIngredientsMax),
+  "steps": zod.string().max(updateTeacherPublicationDraftResponseDraftBlocksItemRecipeStepsMax)
+}).optional()
+})).max(updateTeacherPublicationDraftResponseDraftBlocksMax).optional(),
+  "pageOrder": zod.number().min(updateTeacherPublicationDraftResponseDraftPageOrderMin).max(updateTeacherPublicationDraftResponseDraftPageOrderMax).optional()
+}),
+  "version": zod.number()
+})
+
+
+/**
  * Returns publications joined to projects where publication_status = active. Never includes student PII.
  * @summary Get all active published student content
  */
 export const GetPublishedContentQueryParams = zod.object({
   "section": zod.coerce.string().optional().describe('Filter by destination_section (e.g. podcast, move, blog, meditation, wellness, recipe, events)')
 })
+
+export const getPublishedContentResponsePublicationsItemBlocksItemIdMax = 64;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemTextMax = 30000;
+
+
+export const getPublishedContentResponsePublicationsItemBlocksItemCaptionMax = 500;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemAltMax = 300;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemRecipeNameMax = 300;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemRecipeDescriptionMax = 3000;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemRecipeServingsMax = 100;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemRecipePrepTimeMax = 100;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemRecipeCookTimeMax = 100;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemRecipeIngredientsMax = 20000;
+
+export const getPublishedContentResponsePublicationsItemBlocksItemRecipeStepsMax = 30000;
+
+
 
 export const GetPublishedContentResponse = zod.object({
   "publications": zod.array(zod.object({
@@ -556,6 +840,34 @@ export const GetPublishedContentResponse = zod.object({
   "title": zod.string(),
   "contentType": zod.string(),
   "content": zod.string(),
+  "appearance": zod.object({
+  "fontFamily": zod.enum(['serif', 'sans']),
+  "fontSize": zod.enum(['small', 'medium', 'large']),
+  "alignment": zod.enum(['left', 'center']),
+  "accent": zod.enum(['sage', 'terracotta', 'amber']),
+  "spacing": zod.enum(['compact', 'comfortable', 'spacious']),
+  "pageWidth": zod.enum(['full', 'half']).optional()
+}).optional(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1).max(getPublishedContentResponsePublicationsItemBlocksItemIdMax),
+  "type": zod.enum(['text', 'image', 'video', 'audio', 'recipe']),
+  "width": zod.enum(['full', 'half']),
+  "text": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemTextMax).optional(),
+  "mediaId": zod.number().min(1).optional(),
+  "caption": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemCaptionMax).optional(),
+  "alt": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemAltMax).optional(),
+  "fit": zod.enum(['contain', 'cover']).optional(),
+  "recipe": zod.object({
+  "name": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemRecipeNameMax),
+  "description": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemRecipeDescriptionMax),
+  "servings": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemRecipeServingsMax),
+  "prepTime": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemRecipePrepTimeMax),
+  "cookTime": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemRecipeCookTimeMax),
+  "ingredients": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemRecipeIngredientsMax),
+  "steps": zod.string().max(getPublishedContentResponsePublicationsItemBlocksItemRecipeStepsMax)
+}).optional()
+})).optional(),
+  "pageOrder": zod.number().optional(),
   "destinationSection": zod.string(),
   "authorDisplay": zod.string(),
   "publishedAt": zod.string()

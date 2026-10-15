@@ -1,0 +1,27 @@
+---
+name: Teacher publication control
+description: Teacher-controlled website editions and separation from original student submissions.
+---
+
+Teachers must be able to edit how a project appears on its destination website
+page before publishing, and revise that public edition later.
+
+**Why:** The user said teacher Review & Publish would not publish, and asked to
+edit the project to make it look exactly how they want on the website page.
+They clarified that this includes "videos and pictures and recipes, etc.",
+not only article text and formatting.
+
+**How to apply:** Keep the students' original work intact. Teacher draft saves
+must not silently change an already published page; only an explicit publish
+or update action changes the public edition. Use the same rendering for the
+teacher preview and the website so formatting choices match.
+
+Verify all teacher decisions from the Teacher Reviewing state, not just the
+publish path. Clearly distinguish preview verification from a live-site fix.
+
+**Why:** The user reported that none of the review buttons worked after preview
+publishing had been verified, while the live site still ran the older code.
+
+**How to apply:** Check the live deployment and its errors when this recurs.
+Use disposable development projects to verify decisions; never change real
+student submissions merely to test the buttons.

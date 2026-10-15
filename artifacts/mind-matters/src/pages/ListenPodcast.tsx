@@ -1,11 +1,12 @@
 import { WaveFooter } from "@/components/WaveFooter";
-import { Mic, PlayCircle, Star } from "lucide-react";
+import { Mic, PlayCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useGetPublishedContent } from "@workspace/api-client-react";
 import { format } from "date-fns";
+import { PublishedArticle, type PublicationAppearance } from "@workspace/mind-matters-ds/components/PublishedArticle";
 
 export default function ListenPodcast() {
-  const { data, isLoading } = useGetPublishedContent({ section: "podcast" });
+  const { data, isLoading } = useGetPublishedContent({ section: "podcast" }, { query: { staleTime: 45_000, refetchOnWindowFocus: true } });
   const episodes = data?.publications ?? [];
 
   return (
@@ -54,20 +55,12 @@ export default function ListenPodcast() {
                       {format(new Date(ep.publishedAt), "MMM d, yyyy")}
                     </span>
                   </div>
-                  <h2 className="font-display italic text-2xl text-foreground mb-2 leading-tight">
-                    {ep.title}
-                  </h2>
-                  {ep.content && (
-                    <p className="font-sans text-sm text-foreground/70 leading-relaxed line-clamp-3">
-                      {ep.content}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-1.5 mt-3">
-                    <Star size={12} className="text-amber fill-amber" />
-                    <span className="font-sans text-xs text-foreground/60">
-                      {ep.authorDisplay}
-                    </span>
-                  </div>
+                  <PublishedArticle
+                    title={ep.title}
+                    content={ep.content}
+                    appearance={(ep as typeof ep & { appearance?: PublicationAppearance }).appearance}
+                    authorDisplay={ep.authorDisplay}
+                  />
                 </div>
               </div>
             ))}

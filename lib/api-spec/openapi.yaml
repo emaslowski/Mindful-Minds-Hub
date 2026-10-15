@@ -630,6 +630,152 @@ paths:
                 items:
                   $ref: "#/components/schemas/Event"
 
+  /teacher/projects:
+    post:
+      operationId: createTeacherWebsiteProject
+      tags: [teacher]
+      summary: Create a website post directly as a teacher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeacherWebsiteProjectInput"
+      responses:
+        "201":
+          description: Website project created
+        "400":
+          description: Invalid post
+        "403":
+          description: Teacher access required
+
+  /teacher/projects/{id}/publication-media:
+    get:
+      operationId: getTeacherPublicationMedia
+      tags: [teacher]
+      summary: List private project media for the website editor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Project media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicationMediaEnvelope"
+
+  /teacher/projects/{id}/publication-media/upload-url:
+    post:
+      operationId: requestPublicationMediaUpload
+      tags: [teacher]
+      summary: Request a private image, video, or audio upload
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicationMediaUploadInput"
+      responses:
+        "200":
+          description: Signed upload destination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicationMediaUploadDestination"
+        "400":
+          description: Unsupported format or size
+
+  /teacher/projects/{id}/publication-media/{mediaId}/complete:
+    post:
+      operationId: completePublicationMediaUpload
+      tags: [teacher]
+      summary: Verify the uploaded file before it can be used in a draft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: mediaId
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Verified media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicationMediaResult"
+        "400":
+          description: Missing, expired, or invalid uploaded file
+
+  /teacher/projects/{id}/publication-media/import-video:
+    post:
+      operationId: importPublicationProductionVideo
+      tags: [teacher]
+      summary: Add the completed student video to the teacher media library
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Video available for the website edition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicationMediaResult"
+        "409":
+          description: A finished production video is required
+
+  /teacher/projects/{id}/publication-draft:
+    patch:
+      operationId: updateTeacherPublicationDraft
+      tags: [teacher]
+      summary: Save a teacher-only website draft without changing student work or the live edition
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicationDraftInput"
+      responses:
+        "200":
+          description: Saved website draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicationDraftEnvelope"
+        "400":
+          description: Invalid draft
+        "403":
+          description: Teacher access required
+        "404":
+          description: Project not found
+        "409":
+          description: Another session changed this draft; refresh before overwriting it
+
   # Public published content (no auth required)
   /public/published:
     get:
@@ -1159,6 +1305,195 @@ components:
           type: string
       required: [id, title, eventDate, createdAt]
 
+    PublicationAppearance:
+      type: object
+      properties:
+        fontFamily:
+          type: string
+          enum: [serif, sans]
+        fontSize:
+          type: string
+          enum: [small, medium, large]
+        alignment:
+          type: string
+          enum: [left, center]
+        accent:
+          type: string
+          enum: [sage, terracotta, amber]
+        spacing:
+          type: string
+          enum: [compact, comfortable, spacious]
+        pageWidth:
+          type: string
+          enum: [full, half]
+      required: [fontFamily, fontSize, alignment, accent, spacing]
+    TeacherWebsiteProjectInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 300
+        contentType:
+          type: string
+          minLength: 1
+          maxLength: 100
+      required: [title, contentType]
+    PublicationMediaUploadInput:
+      type: object
+      properties:
+        filename:
+          type: string
+          minLength: 1
+          maxLength: 255
+        contentType:
+          type: string
+          enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mpeg, audio/mp4, audio/wav, audio/x-wav, audio/ogg, audio/webm]
+        size:
+          type: number
+          minimum: 1
+          maximum: 262144000
+      required: [filename, contentType, size]
+    PublicationMediaUploadDestination:
+      type: object
+      properties:
+        mediaId:
+          type: number
+        uploadUrl:
+          type: string
+      required: [mediaId, uploadUrl]
+    PublicationMedia:
+      type: object
+      properties:
+        id:
+          type: number
+        projectId:
+          type: number
+        kind:
+          type: string
+          enum: [image, video, audio]
+        filename:
+          type: string
+        contentType:
+          type: string
+        size:
+          type: number
+        status:
+          type: string
+          enum: [pending, ready]
+        url:
+          type: string
+      required: [id, projectId, kind, filename, contentType, size, status, url]
+    PublicationMediaEnvelope:
+      type: object
+      properties:
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationMedia"
+      required: [media]
+    PublicationMediaResult:
+      type: object
+      properties:
+        media:
+          $ref: "#/components/schemas/PublicationMedia"
+      required: [media]
+    PublicationRecipe:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 300
+        description:
+          type: string
+          maxLength: 3000
+        servings:
+          type: string
+          maxLength: 100
+        prepTime:
+          type: string
+          maxLength: 100
+        cookTime:
+          type: string
+          maxLength: 100
+        ingredients:
+          type: string
+          maxLength: 20000
+        steps:
+          type: string
+          maxLength: 30000
+      required: [name, description, servings, prepTime, cookTime, ingredients, steps]
+    PublicationBlock:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 64
+        type:
+          type: string
+          enum: [text, image, video, audio, recipe]
+        width:
+          type: string
+          enum: [full, half]
+        text:
+          type: string
+          maxLength: 30000
+        mediaId:
+          type: number
+          minimum: 1
+        caption:
+          type: string
+          maxLength: 500
+        alt:
+          type: string
+          maxLength: 300
+        fit:
+          type: string
+          enum: [contain, cover]
+        recipe:
+          $ref: "#/components/schemas/PublicationRecipe"
+      required: [id, type, width]
+    PublicationEdition:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 300
+        content:
+          type: string
+          maxLength: 100000
+        appearance:
+          $ref: "#/components/schemas/PublicationAppearance"
+        blocks:
+          type: array
+          maxItems: 40
+          items:
+            $ref: "#/components/schemas/PublicationBlock"
+        pageOrder:
+          type: number
+          minimum: 0
+          maximum: 10000
+      required: [title, content, appearance]
+    PublicationDraftInput:
+      type: object
+      properties:
+        draft:
+          $ref: "#/components/schemas/PublicationEdition"
+        version:
+          type: number
+          minimum: 0
+      required: [draft, version]
+    PublicationDraftEnvelope:
+      type: object
+      properties:
+        draft:
+          $ref: "#/components/schemas/PublicationEdition"
+        version:
+          type: number
+      required: [draft, version]
+
     # Public published content
     PublishedItem:
       type: object
@@ -1173,6 +1508,14 @@ components:
           type: string
         content:
           type: string
+        appearance:
+          $ref: "#/components/schemas/PublicationAppearance"
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicationBlock"
+        pageOrder:
+          type: number
         destinationSection:
           type: string
         authorDisplay:

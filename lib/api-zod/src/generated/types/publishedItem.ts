@@ -5,6 +5,8 @@
  * Mind Matters API
  * OpenAPI spec version: 0.1.0
  */
+import type { PublicationAppearance } from './publicationAppearance';
+import type { PublicationBlock } from './publicationBlock';
 
 export interface PublishedItem {
   id: number;
@@ -12,6 +14,9 @@ export interface PublishedItem {
   title: string;
   contentType: string;
   content: string;
+  appearance?: PublicationAppearance;
+  blocks?: PublicationBlock[];
+  pageOrder?: number;
   destinationSection: string;
   authorDisplay: string;
   publishedAt: string;

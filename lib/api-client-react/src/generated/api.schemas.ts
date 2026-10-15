@@ -394,12 +394,254 @@ export interface Event {
   createdAt: string;
 }
 
+export type PublicationAppearanceFontFamily = typeof PublicationAppearanceFontFamily[keyof typeof PublicationAppearanceFontFamily];
+
+
+export const PublicationAppearanceFontFamily = {
+  serif: 'serif',
+  sans: 'sans',
+} as const;
+
+export type PublicationAppearanceFontSize = typeof PublicationAppearanceFontSize[keyof typeof PublicationAppearanceFontSize];
+
+
+export const PublicationAppearanceFontSize = {
+  small: 'small',
+  medium: 'medium',
+  large: 'large',
+} as const;
+
+export type PublicationAppearanceAlignment = typeof PublicationAppearanceAlignment[keyof typeof PublicationAppearanceAlignment];
+
+
+export const PublicationAppearanceAlignment = {
+  left: 'left',
+  center: 'center',
+} as const;
+
+export type PublicationAppearanceAccent = typeof PublicationAppearanceAccent[keyof typeof PublicationAppearanceAccent];
+
+
+export const PublicationAppearanceAccent = {
+  sage: 'sage',
+  terracotta: 'terracotta',
+  amber: 'amber',
+} as const;
+
+export type PublicationAppearanceSpacing = typeof PublicationAppearanceSpacing[keyof typeof PublicationAppearanceSpacing];
+
+
+export const PublicationAppearanceSpacing = {
+  compact: 'compact',
+  comfortable: 'comfortable',
+  spacious: 'spacious',
+} as const;
+
+export type PublicationAppearancePageWidth = typeof PublicationAppearancePageWidth[keyof typeof PublicationAppearancePageWidth];
+
+
+export const PublicationAppearancePageWidth = {
+  full: 'full',
+  half: 'half',
+} as const;
+
+export interface PublicationAppearance {
+  fontFamily: PublicationAppearanceFontFamily;
+  fontSize: PublicationAppearanceFontSize;
+  alignment: PublicationAppearanceAlignment;
+  accent: PublicationAppearanceAccent;
+  spacing: PublicationAppearanceSpacing;
+  pageWidth?: PublicationAppearancePageWidth;
+}
+
+export interface TeacherWebsiteProjectInput {
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  contentType: string;
+}
+
+export type PublicationMediaUploadInputContentType = typeof PublicationMediaUploadInputContentType[keyof typeof PublicationMediaUploadInputContentType];
+
+
+export const PublicationMediaUploadInputContentType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/webp': 'image/webp',
+  'image/gif': 'image/gif',
+  'video/mp4': 'video/mp4',
+  'video/webm': 'video/webm',
+  'audio/mpeg': 'audio/mpeg',
+  'audio/mp4': 'audio/mp4',
+  'audio/wav': 'audio/wav',
+  'audio/x-wav': 'audio/x-wav',
+  'audio/ogg': 'audio/ogg',
+  'audio/webm': 'audio/webm',
+} as const;
+
+export interface PublicationMediaUploadInput {
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  filename: string;
+  contentType: PublicationMediaUploadInputContentType;
+  /**
+     * @minimum 1
+     * @maximum 262144000
+     */
+  size: number;
+}
+
+export interface PublicationMediaUploadDestination {
+  mediaId: number;
+  uploadUrl: string;
+}
+
+export type PublicationMediaKind = typeof PublicationMediaKind[keyof typeof PublicationMediaKind];
+
+
+export const PublicationMediaKind = {
+  image: 'image',
+  video: 'video',
+  audio: 'audio',
+} as const;
+
+export type PublicationMediaStatus = typeof PublicationMediaStatus[keyof typeof PublicationMediaStatus];
+
+
+export const PublicationMediaStatus = {
+  pending: 'pending',
+  ready: 'ready',
+} as const;
+
+export interface PublicationMedia {
+  id: number;
+  projectId: number;
+  kind: PublicationMediaKind;
+  filename: string;
+  contentType: string;
+  size: number;
+  status: PublicationMediaStatus;
+  url: string;
+}
+
+export interface PublicationMediaEnvelope {
+  media: PublicationMedia[];
+}
+
+export interface PublicationMediaResult {
+  media: PublicationMedia;
+}
+
+export interface PublicationRecipe {
+  /** @maxLength 300 */
+  name: string;
+  /** @maxLength 3000 */
+  description: string;
+  /** @maxLength 100 */
+  servings: string;
+  /** @maxLength 100 */
+  prepTime: string;
+  /** @maxLength 100 */
+  cookTime: string;
+  /** @maxLength 20000 */
+  ingredients: string;
+  /** @maxLength 30000 */
+  steps: string;
+}
+
+export type PublicationBlockType = typeof PublicationBlockType[keyof typeof PublicationBlockType];
+
+
+export const PublicationBlockType = {
+  text: 'text',
+  image: 'image',
+  video: 'video',
+  audio: 'audio',
+  recipe: 'recipe',
+} as const;
+
+export type PublicationBlockWidth = typeof PublicationBlockWidth[keyof typeof PublicationBlockWidth];
+
+
+export const PublicationBlockWidth = {
+  full: 'full',
+  half: 'half',
+} as const;
+
+export type PublicationBlockFit = typeof PublicationBlockFit[keyof typeof PublicationBlockFit];
+
+
+export const PublicationBlockFit = {
+  contain: 'contain',
+  cover: 'cover',
+} as const;
+
+export interface PublicationBlock {
+  /**
+     * @minLength 1
+     * @maxLength 64
+     */
+  id: string;
+  type: PublicationBlockType;
+  width: PublicationBlockWidth;
+  /** @maxLength 30000 */
+  text?: string;
+  /** @minimum 1 */
+  mediaId?: number;
+  /** @maxLength 500 */
+  caption?: string;
+  /** @maxLength 300 */
+  alt?: string;
+  fit?: PublicationBlockFit;
+  recipe?: PublicationRecipe;
+}
+
+export interface PublicationEdition {
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  title: string;
+  /** @maxLength 100000 */
+  content: string;
+  appearance: PublicationAppearance;
+  /** @maxItems 40 */
+  blocks?: PublicationBlock[];
+  /**
+     * @minimum 0
+     * @maximum 10000
+     */
+  pageOrder?: number;
+}
+
+export interface PublicationDraftInput {
+  draft: PublicationEdition;
+  /** @minimum 0 */
+  version: number;
+}
+
+export interface PublicationDraftEnvelope {
+  draft: PublicationEdition;
+  version: number;
+}
+
 export interface PublishedItem {
   id: number;
   projectId: number;
   title: string;
   contentType: string;
   content: string;
+  appearance?: PublicationAppearance;
+  blocks?: PublicationBlock[];
+  pageOrder?: number;
   destinationSection: string;
   authorDisplay: string;
   publishedAt: string;

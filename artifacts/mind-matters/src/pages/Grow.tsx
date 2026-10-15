@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
+import { PublishedSection } from "@/components/PublishedSection";
 import { Lock, BookOpen, Users, Heart } from "lucide-react";
 
 export default function Grow() {
@@ -129,6 +130,7 @@ export default function Grow() {
         </div>
       </div>
 
+      <PublishedSection section="grow" heading="Student Journaling & Growth" className="mb-12" />
       <WaveFooter quote="Your thoughts matter. You matter." />
     </div>
   );

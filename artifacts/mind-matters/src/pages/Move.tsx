@@ -1,56 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
-import { useGetPublishedContent } from "@workspace/api-client-react";
-import { Star } from "lucide-react";
-
-const MOVE_COLORS = [
-  "from-terracotta/20 to-amber/20",
-  "from-sage/20 to-dusty-rose/20",
-  "from-amber/20 to-sage/20",
-  "from-dusty-rose/20 to-terracotta/20",
-];
-
-function PublishedMovementSection() {
-  const { data, isLoading } = useGetPublishedContent({ section: "move" });
-  const items = data?.publications ?? [];
-
-  if (isLoading || items.length === 0) return null;
-
-  return (
-    <div className="mt-16 w-full">
-      <div className="flex items-center justify-center gap-3 mb-8">
-        <div className="h-px flex-1 bg-sage/20 max-w-[120px]"></div>
-        <h2 className="font-display italic text-2xl text-foreground">From Our Students</h2>
-        <div className="h-px flex-1 bg-sage/20 max-w-[120px]"></div>
-      </div>
-      <div className="flex flex-wrap justify-center gap-8 px-4">
-        {items.map((item, idx) => (
-          <div
-            key={item.id}
-            className={`bg-gradient-to-br ${MOVE_COLORS[idx % MOVE_COLORS.length]} rounded-[3rem] w-64 p-8 flex flex-col items-start border border-white/30 backdrop-blur-sm shadow-sm`}
-          >
-            <div className="flex items-center gap-1.5 mb-3">
-              <Star size={12} className="text-amber fill-amber" />
-              <span className="font-sans text-xs font-bold text-amber uppercase tracking-widest">
-                Student Activity
-              </span>
-            </div>
-            <h3 className="font-display italic font-semibold text-2xl text-foreground mb-3 leading-tight">
-              {item.title}
-            </h3>
-            {item.content && (
-              <p className="font-sans text-sm text-foreground/70 leading-relaxed line-clamp-4">
-                {item.content}
-              </p>
-            )}
-            <span className="mt-4 font-sans text-xs text-foreground/50">{item.authorDisplay}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import { PublishedSection } from "@/components/PublishedSection";
 
 export default function Move() {
   const [filter, setFilter] = useState<string>("All");
@@ -277,7 +228,7 @@ export default function Move() {
         </div>
 
         {/* Published student movement content */}
-        <PublishedMovementSection />
+        <PublishedSection section="move" heading="From Our Students" className="mt-16" />
       </div>
 
       <WaveFooter quote="Move your body. Boost your mind." />

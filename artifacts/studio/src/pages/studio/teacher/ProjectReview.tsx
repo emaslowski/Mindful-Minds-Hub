@@ -1,19 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherReview, teacherSettings, AUTHOR_DISPLAY_OPTIONS, DESTINATION_SECTIONS, type DecisionData } from '@/lib/studioApi';
+import { teacherReview, teacherSettings, AUTHOR_DISPLAY_OPTIONS, DESTINATION_SECTIONS, type DecisionData, type PublicationAppearance, type PublicationEdition } from '@/lib/studioApi';
+import { PublishedArticle } from '@workspace/mind-matters-ds/components/PublishedArticle';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, CheckCircle, RotateCcw, Bookmark, Archive, ExternalLink, Film, Download } from 'lucide-react';
+import { AlertCircle, CheckCircle, RotateCcw, Bookmark, Archive, ExternalLink, Film, Download, Bold, Italic, List, ListOrdered, Link2, Quote, Heading2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { videoProductions } from '@/lib/videoApi';
+import { PublicationBlockEditor, teacherPublicationMediaUrl } from '@/components/studio/PublicationBlockEditor';
+import { publicationMediaApi } from '@/lib/publicationMediaApi';
 
 // ── Structured content helpers ────────────────────────────────────────────────
 
@@ -90,6 +94,17 @@ const DESTINATION_OPTIONS = [
   { value: 'resources', label: 'Resources' },
 ];
 
+const DEFAULT_APPEARANCE: PublicationAppearance = {
+  fontFamily: 'serif',
+  fontSize: 'medium',
+  alignment: 'left',
+  accent: 'sage',
+  spacing: 'comfortable',
+  pageWidth: 'full',
+};
+
+const EMPTY_EDITION: PublicationEdition = { title: '', content: '', appearance: DEFAULT_APPEARANCE };
+
 export default function ProjectReview() {
   const { id } = useParams<{ id: string }>();
   const projectId = Number(id);
@@ -129,17 +144,113 @@ export default function ProjectReview() {
   const replacementUnavailable = production?.status === 'uploaded'
     && (projectStatusKey === 'published' || projectStatusKey === 'archived');
 
-  const authorDisplayOptions = settingsData?.authorDisplayOptions ?? AUTHOR_DISPLAY_OPTIONS;
+  const { data: publicationMediaData, isLoading: publicationMediaLoading, isError: publicationMediaError } = useQuery({
+    queryKey: ['teacher-publication-media', projectId],
+    queryFn: () => publicationMediaApi.list(projectId),
+    enabled: !!user && Number.isFinite(projectId) && projectId > 0,
+  });
+
+  const authorDisplayOptions = Array.from(new Set([
+    ...(settingsData?.authorDisplayOptions ?? AUTHOR_DISPLAY_OPTIONS),
+    ...(data?.publication?.authorDisplay ? [data.publication.authorDisplay] : []),
+  ]));
 
   const [feedback, setFeedback] = useState('');
   const [destinationSection, setDestinationSection] = useState('');
   const [authorDisplay, setAuthorDisplay] = useState('');
+  const [publicationDraft, setPublicationDraft] = useState<PublicationEdition>(EMPTY_EDITION);
+  const [draftVersion, setDraftVersion] = useState(0);
+  const [savedDraft, setSavedDraft] = useState<PublicationEdition>(EMPTY_EDITION);
+  const [hasPersistedDraft, setHasPersistedDraft] = useState(false);
+  const [draftInitialized, setDraftInitialized] = useState(false);
+  const [draftError, setDraftError] = useState('');
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const initializedId = useRef<number | null>(null);
+  const bodyEditorRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!data || initializedId.current === projectId) return;
+    initializedId.current = projectId;
+    const initial = data.publicationDraft ?? {
+      title: data.project.title ?? '',
+      content: data.project.content ?? '',
+      appearance: DEFAULT_APPEARANCE,
+    };
+    setPublicationDraft(initial);
+    setSavedDraft(initial);
+    setHasPersistedDraft((data.publicationDraftVersion ?? 0) > 0);
+    setDraftVersion(data.publicationDraftVersion ?? 0);
+    setDestinationSection(data.publication?.destinationSection ?? DESTINATION_SECTIONS[data.project.contentType] ?? 'blog');
+    setAuthorDisplay(data.publication?.authorDisplay ?? '');
+    setDraftInitialized(true);
+  }, [data, projectId]);
+
+  const isDraftDirty = draftInitialized && (!hasPersistedDraft || JSON.stringify(publicationDraft) !== JSON.stringify(savedDraft));
+
+  const { mutate: saveDraft, isPending: isSavingDraft } = useMutation({
+    mutationFn: (input: { draft: PublicationEdition; version: number }) => teacherReview.savePublicationDraft(projectId, input),
+    onSuccess: (result, input) => {
+      setDraftVersion(result.version);
+      setPublicationDraft((current) => JSON.stringify(current) === JSON.stringify(input.draft) ? result.draft : current);
+      setSavedDraft(result.draft);
+      setHasPersistedDraft(true);
+      setDraftError('');
+      queryClient.setQueryData(['teacher-project', projectId], (old: typeof data | undefined) =>
+        old ? { ...old, publicationDraft: result.draft, publicationDraftVersion: result.version } : old);
+      toast({ title: 'Website draft saved', description: 'The published page is unchanged until you publish your update.' });
+    },
+    onError: (error: Error & { status?: number }) => {
+      const conflict = error.message.includes('409') || error.message.toLowerCase().includes('conflict') || error.status === 409;
+      setDraftError(conflict
+        ? 'This draft changed elsewhere. Your unsaved edits are still here; reload the latest project before saving again.'
+        : error.message || 'Could not save the website draft. Your edits are still here.');
+    },
+  });
+
+  const changeAppearance = (key: keyof PublicationAppearance, value: string) => {
+    setPublicationDraft((current) => ({
+      ...current,
+      appearance: { ...current.appearance, [key]: value } as PublicationAppearance,
+    }));
+  };
+
+  const insertMarkup = (before: string, after = before) => {
+    const editor = bodyEditorRef.current;
+    if (!editor) return;
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const selected = publicationDraft.content.slice(start, end);
+    const content = `${publicationDraft.content.slice(0, start)}${before}${selected || 'text'}${after}${publicationDraft.content.slice(end)}`;
+    setPublicationDraft((current) => ({ ...current, content }));
+    requestAnimationFrame(() => {
+      editor.focus();
+      editor.setSelectionRange(start + before.length, start + before.length + (selected || 'text').length);
+    });
+  };
 
   const { mutate: decide, isPending } = useMutation({
     mutationFn: (decisionData: DecisionData) =>
       teacherReview.decide(projectId, decisionData),
     onSuccess: (_, vars) => {
+      if (vars.decision === 'approve_and_publish' && vars.publicationDraft) {
+        // Reopening immediately must not initialize the editor from a stale,
+        // pre-publish cached version while the background refetch is in flight.
+        queryClient.setQueryData(['teacher-project', projectId], (old: typeof data | undefined) =>
+          old ? {
+            ...old,
+            project: { ...old.project, status: 'Published' },
+            publicationDraft: { ...vars.publicationDraft!, title: vars.publicationDraft!.title.trim() },
+            publicationDraftVersion: (vars.publicationDraftVersion ?? 0) + 1,
+            publication: {
+              destinationSection: vars.destinationSection!,
+              authorDisplay: vars.authorDisplay!,
+              publicationStatus: 'active',
+            },
+          } : old);
+      }
       queryClient.invalidateQueries({ queryKey: ['teacher-review-queue'] });
+      queryClient.invalidateQueries({ queryKey: ['teacher-all-projects'] });
+      queryClient.invalidateQueries({ queryKey: ['teacher-analytics'] });
       queryClient.invalidateQueries({ queryKey: ['teacher-project', projectId] });
       queryClient.invalidateQueries({ queryKey: ['studio-video-productions'] });
       queryClient.invalidateQueries({ queryKey: ['studio-video-production', projectId] });
@@ -162,6 +273,15 @@ export default function ProjectReview() {
 
   const { project, student, safetyFlags, peerReviews, sources, teacherReviews } = data;
   const suggestedDestination = DESTINATION_SECTIONS[project.contentType] ?? 'blog';
+  const mediaBlocks = (publicationDraft.blocks ?? []).filter((block) => ['image', 'video', 'audio'].includes(block.type));
+  const missingMediaBlock = mediaBlocks.find((block) => {
+    if (!block.mediaId) return true;
+    return !publicationMediaData?.media.some((media) => media.id === block.mediaId && media.status === 'ready');
+  });
+  const mediaPublishIssue = mediaBlocks.length === 0 ? ''
+    : publicationMediaLoading ? 'Checking that each media block is ready…'
+      : publicationMediaError ? 'Media library could not be checked. Retry the media library before publishing.'
+        : missingMediaBlock ? `Block ${missingMediaBlock.type} is empty or its media is not ready. Choose an uploaded, ready file before publishing.` : '';
 
   return (
     <StudioLayout>
@@ -185,14 +305,143 @@ export default function ProjectReview() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: project content */}
-          <div className="lg:col-span-2 space-y-4">
-            <Tabs defaultValue="content">
-              <TabsList className="bg-[#eee6d8] border border-[#d5cabe]">
-                <TabsTrigger value="content">Content</TabsTrigger>
+          <div className="min-w-0 lg:col-span-2 space-y-4">
+            <Tabs defaultValue="publication">
+              <TabsList className="h-auto flex-wrap justify-start bg-[#eee6d8] border border-[#d5cabe]">
+                <TabsTrigger value="publication">Website Edition</TabsTrigger>
+                <TabsTrigger value="content">Student Original</TabsTrigger>
                 <TabsTrigger value="sources">Sources ({sources.length})</TabsTrigger>
                 <TabsTrigger value="peer-review">Peer Review ({peerReviews.length})</TabsTrigger>
                 <TabsTrigger value="history">History</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="publication" className="mt-3 space-y-4">
+                <Card className="bg-[#eee6d8] border-[#d5cabe]">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="font-serif text-base text-[#453329]">Edit the public edition</CardTitle>
+                    <p className="text-sm text-[#688a52]">Changes here never alter the student’s original submission. Save a website draft or publish it explicitly.</p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="publication-title">Website title</Label>
+                      <Textarea id="publication-title" rows={1} value={publicationDraft.title} onChange={(event) => setPublicationDraft((current) => ({ ...current, title: event.target.value }))} className="min-h-10 resize-y bg-white border-[#d5cabe]" placeholder="Title shown on the public page" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="publication-content">Article body</Label>
+                      <div className="flex flex-wrap gap-1 rounded-t-md border border-b-0 border-[#d5cabe] bg-white p-2">
+                        {[
+                          { label: 'Bold', icon: <Bold className="h-4 w-4" />, before: '**', after: '**' },
+                          { label: 'Italic', icon: <Italic className="h-4 w-4" />, before: '*', after: '*' },
+                          { label: 'Heading', icon: <Heading2 className="h-4 w-4" />, before: '## ', after: '' },
+                          { label: 'Bulleted list', icon: <List className="h-4 w-4" />, before: '- ', after: '' },
+                          { label: 'Numbered list', icon: <ListOrdered className="h-4 w-4" />, before: '1. ', after: '' },
+                          { label: 'Quote', icon: <Quote className="h-4 w-4" />, before: '> ', after: '' },
+                          { label: 'Link', icon: <Link2 className="h-4 w-4" />, before: '[', after: '](https://)' },
+                        ].map((action) => (
+                          <Button key={action.label} type="button" variant="outline" size="sm" aria-label={action.label} title={action.label} onClick={() => insertMarkup(action.before, action.after)} className="h-8 px-2">
+                            {action.icon}<span className="sr-only">{action.label}</span>
+                          </Button>
+                        ))}
+                      </div>
+                      <Textarea
+                        id="publication-content"
+                        ref={bodyEditorRef}
+                        value={publicationDraft.content}
+                        onChange={(event) => setPublicationDraft((current) => ({ ...current, content: event.target.value }))}
+                        className="min-h-64 rounded-t-none border-[#d5cabe] bg-white font-mono text-sm"
+                        placeholder="Write the full article. Markdown headings, bold, italic, lists, quotes and links are supported."
+                      />
+                    </div>
+                    <PublicationBlockEditor
+                      projectId={projectId}
+                      draft={publicationDraft}
+                      onChange={setPublicationDraft}
+                      canImportVideo={production?.status === 'uploaded'}
+                    />
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="publication-page-order">Order in section</Label>
+                        <Input
+                          id="publication-page-order"
+                          type="number"
+                          min={0}
+                          max={10000}
+                          value={publicationDraft.pageOrder ?? 0}
+                          onChange={(event) => setPublicationDraft((current) => ({
+                            ...current,
+                            pageOrder: Math.min(10000, Math.max(0, Number(event.target.value) || 0)),
+                          }))}
+                        />
+                        <p className="text-xs text-[#688a52]">Lower numbers appear first in the selected website section.</p>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>Article card width</Label>
+                        <Select value={publicationDraft.appearance.pageWidth ?? 'full'} onValueChange={(value) => changeAppearance('pageWidth', value)}>
+                          <SelectTrigger className="bg-white border-[#d5cabe]"><SelectValue /></SelectTrigger>
+                          <SelectContent><SelectItem value="full">Full width</SelectItem><SelectItem value="half">Half width</SelectItem></SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {([
+                        ['fontFamily', 'Typeface', [['serif', 'Serif'], ['sans', 'Sans serif']]],
+                        ['fontSize', 'Text size', [['small', 'Small'], ['medium', 'Medium'], ['large', 'Large']]],
+                        ['alignment', 'Alignment', [['left', 'Left'], ['center', 'Centered']]],
+                        ['accent', 'Accent color', [['sage', 'Sage'], ['terracotta', 'Terracotta'], ['amber', 'Amber']]],
+                        ['spacing', 'Paragraph spacing', [['compact', 'Compact'], ['comfortable', 'Comfortable'], ['spacious', 'Spacious']]],
+                      ] as const).map(([key, label, options]) => (
+                        <div key={key} className="space-y-1.5">
+                          <Label>{label}</Label>
+                          <Select value={publicationDraft.appearance[key]} onValueChange={(value) => changeAppearance(key, value)}>
+                            <SelectTrigger className="bg-white border-[#d5cabe]"><SelectValue /></SelectTrigger>
+                            <SelectContent>{options.map(([value, text]) => <SelectItem key={value} value={value}>{text}</SelectItem>)}</SelectContent>
+                          </Select>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-[#eee6d8] border-[#d5cabe]">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <div>
+                      <CardTitle className="font-serif text-base text-[#453329]">Live preview</CardTitle>
+                      <p className="mt-1 text-xs text-[#688a52]">This is the same renderer used on the public website.</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button type="button" size="sm" variant={previewMode === 'desktop' ? 'secondary' : 'outline'} onClick={() => setPreviewMode('desktop')}>Desktop</Button>
+                      <Button type="button" size="sm" variant={previewMode === 'mobile' ? 'secondary' : 'outline'} onClick={() => setPreviewMode('mobile')}>Mobile</Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className={`mx-auto min-h-48 rounded-lg border border-[#d5cabe] bg-white p-5 shadow-sm transition-all ${previewMode === 'mobile' ? 'max-w-xs' : 'w-full'}`}>
+                      <div className={publicationDraft.appearance.pageWidth === 'half' ? 'w-full md:w-1/2' : 'w-full'}>
+                        <PublishedArticle
+                          title={publicationDraft.title}
+                          content={publicationDraft.content}
+                          blocks={publicationDraft.blocks}
+                          appearance={publicationDraft.appearance}
+                          authorDisplay={authorDisplay || authorDisplayOptions[0] || ''}
+                          projectId={projectId}
+                          mediaUrl={(mediaId) => teacherPublicationMediaUrl(projectId, mediaId)}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="flex flex-col items-start justify-between gap-3 rounded-lg border border-[#d5cabe] bg-white p-3 sm:flex-row sm:items-center">
+                  <div>
+                    <p className="text-sm font-medium text-[#453329]" role="status" data-testid="status-publication-draft">
+                      {isSavingDraft ? 'Saving website draft…' : isDraftDirty ? hasPersistedDraft ? 'Unsaved website edits' : 'Website draft not saved yet' : 'Website draft saved'}
+                    </p>
+                    {draftError && <p className="mt-1 text-sm text-red-700" role="alert" data-testid="error-publication-draft">{draftError}</p>}
+                  </div>
+                  <Button type="button" variant="outline" onClick={() => { setDraftError(''); saveDraft({ draft: publicationDraft, version: draftVersion }); }} disabled={!isDraftDirty || isSavingDraft || isPending} data-testid="button-save-publication-draft">
+                    {isSavingDraft ? 'Saving…' : 'Save Website Draft'}
+                  </Button>
+                </div>
+              </TabsContent>
 
               <TabsContent value="content" className="mt-3">
                 <Card className="bg-[#eee6d8] border-[#d5cabe]">
@@ -394,6 +643,11 @@ export default function ProjectReview() {
                   This project is currently assigned for video production. Approve &amp; Publish is unavailable until the producer returns the video for your final review.
                 </p>
               )}
+              {mediaPublishIssue && (
+                <p className="rounded-lg border border-[#c4622d] bg-white p-3 text-xs leading-relaxed text-[#453329]" role="alert">
+                  {mediaPublishIssue}
+                </p>
+              )}
               {replacementUnavailable && (
                 <p className="rounded-lg border border-[#d5cabe] bg-[#eee6d8] p-3 text-xs leading-relaxed text-[#453329]">
                   A replacement video can only be requested for an unpublished project that has not been archived.
@@ -401,10 +655,17 @@ export default function ProjectReview() {
               )}
               <Button
                 className="w-full bg-[#688a52] hover:bg-[#557a43] text-white rounded-full gap-2"
-                onClick={() => decide({ decision: 'approve_and_publish', feedback, destinationSection: destinationSection || suggestedDestination, authorDisplay: authorDisplay || authorDisplayOptions[0] || AUTHOR_DISPLAY_OPTIONS[0] })}
-                disabled={isPending || productionLoading || productionError || productionActive}
+                onClick={() => decide({
+                  decision: 'approve_and_publish',
+                  feedback,
+                  destinationSection: destinationSection || data.publication?.destinationSection || suggestedDestination,
+                  authorDisplay: authorDisplay || data.publication?.authorDisplay || authorDisplayOptions[0] || AUTHOR_DISPLAY_OPTIONS[0],
+                  publicationDraft,
+                  publicationDraftVersion: draftVersion,
+                })}
+                disabled={isPending || isSavingDraft || !draftInitialized || productionLoading || productionError || productionActive || Boolean(mediaPublishIssue)}
               >
-                <CheckCircle className="h-4 w-4" /> Approve &amp; Publish
+                <CheckCircle className="h-4 w-4" /> {data.publication ? 'Update Published Project' : 'Approve & Publish'}
               </Button>
               <Button
                 variant="outline"

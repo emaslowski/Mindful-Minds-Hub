@@ -17,3 +17,4 @@
 - [Editorial teacher workflow](editorial-teacher-workflow.md) — compliment-sandwich peer feedback goes to the teacher for decisions; no separate drafting stage.
 - [Video production workflow](video-production-workflow.md) — optional teacher-approved handoff to Video Producers; uploads return for final teacher review.
 - [Video playback verification](video-playback-verification.md) — test browser codec support separately from successful private video storage and streaming.
+- [Teacher publication control](teacher-publication-control.md) — teachers control website editions; draft saves preserve student originals and do not silently update live pages.

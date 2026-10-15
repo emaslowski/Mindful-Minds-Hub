@@ -154,6 +154,11 @@ export default function CommandCenter() {
   return (
     <StudioLayout>
       <StudioPage title="Command Center" subtitle="Middle School Matters Teacher Dashboard">
+        <div className="mb-5 flex justify-end">
+          <Link href="/studio/teacher/projects" className="inline-flex items-center justify-center rounded-full bg-[#c4622d] px-4 py-2 text-sm font-medium text-white hover:bg-[#a85226]">
+            New Website Post
+          </Link>
+        </div>
         {/* Summary cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           {summaryCards.map((c) => (
@@ -457,7 +462,7 @@ export default function CommandCenter() {
         {queue.length === 0 ? (
           <Card className="bg-[#eee6d8] border-[#d5cabe]">
             <CardContent className="p-8 text-center text-sm text-[#688a52]">
-              No submissions awaiting review. 🎉
+              No submissions awaiting review.
             </CardContent>
           </Card>
         ) : (

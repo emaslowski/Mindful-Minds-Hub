@@ -48,10 +48,17 @@ import type {
   JournalEntryInput,
   LogoutBrowserSessionParams,
   PageViewInput,
+  PublicationDraftEnvelope,
+  PublicationDraftInput,
+  PublicationMediaEnvelope,
+  PublicationMediaResult,
+  PublicationMediaUploadDestination,
+  PublicationMediaUploadInput,
   PublishedContentEnvelope,
   Review,
   ReviewInput,
   SubmissionResult,
+  TeacherWebsiteProjectInput,
   TodayPrompt,
   VideoCompletionInput,
   VideoProductionEnvelope,
@@ -2621,6 +2628,442 @@ export function useGetEvents<TData = Awaited<ReturnType<typeof getEvents>>, TErr
 
 
 
+
+export const getCreateTeacherWebsiteProjectUrl = () => {
+
+
+
+
+  return `/api/teacher/projects`
+}
+
+/**
+ * @summary Create a website post directly as a teacher
+ */
+export const createTeacherWebsiteProject = async (teacherWebsiteProjectInput: TeacherWebsiteProjectInput, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getCreateTeacherWebsiteProjectUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(teacherWebsiteProjectInput)
+  }
+);}
+
+
+
+
+
+export const getCreateTeacherWebsiteProjectMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTeacherWebsiteProject>>, TError,{data: BodyType<TeacherWebsiteProjectInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTeacherWebsiteProject>>, TError,{data: BodyType<TeacherWebsiteProjectInput>}, TContext> => {
+
+const mutationKey = ['createTeacherWebsiteProject'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTeacherWebsiteProject>>, {data: BodyType<TeacherWebsiteProjectInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTeacherWebsiteProject(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTeacherWebsiteProjectMutationResult = NonNullable<Awaited<ReturnType<typeof createTeacherWebsiteProject>>>
+    export type CreateTeacherWebsiteProjectMutationBody = BodyType<TeacherWebsiteProjectInput>
+    export type CreateTeacherWebsiteProjectMutationError = ErrorType<void>
+
+    /**
+ * @summary Create a website post directly as a teacher
+ */
+export const useCreateTeacherWebsiteProject = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTeacherWebsiteProject>>, TError,{data: BodyType<TeacherWebsiteProjectInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createTeacherWebsiteProject>>,
+        TError,
+        {data: BodyType<TeacherWebsiteProjectInput>},
+        TContext
+      > => {
+      return useMutation(getCreateTeacherWebsiteProjectMutationOptions(options));
+    }
+
+export const getGetTeacherPublicationMediaUrl = (id: number,) => {
+
+
+
+
+  return `/api/teacher/projects/${id}/publication-media`
+}
+
+/**
+ * @summary List private project media for the website editor
+ */
+export const getTeacherPublicationMedia = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<PublicationMediaEnvelope> => {
+
+  return customFetch<PublicationMediaEnvelope>(getGetTeacherPublicationMediaUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTeacherPublicationMediaQueryKey = (id: number,) => {
+    return [
+    `/api/teacher/projects/${id}/publication-media`
+    ] as const;
+    }
+
+
+export const getGetTeacherPublicationMediaQueryOptions = <TData = Awaited<ReturnType<typeof getTeacherPublicationMedia>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTeacherPublicationMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTeacherPublicationMediaQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTeacherPublicationMedia>>> = ({ signal }) => getTeacherPublicationMedia(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTeacherPublicationMedia>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTeacherPublicationMediaQueryResult = NonNullable<Awaited<ReturnType<typeof getTeacherPublicationMedia>>>
+export type GetTeacherPublicationMediaQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List private project media for the website editor
+ */
+
+export function useGetTeacherPublicationMedia<TData = Awaited<ReturnType<typeof getTeacherPublicationMedia>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTeacherPublicationMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTeacherPublicationMediaQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRequestPublicationMediaUploadUrl = (id: number,) => {
+
+
+
+
+  return `/api/teacher/projects/${id}/publication-media/upload-url`
+}
+
+/**
+ * @summary Request a private image, video, or audio upload
+ */
+export const requestPublicationMediaUpload = async (id: number,
+    publicationMediaUploadInput: PublicationMediaUploadInput, options?: Parameters<typeof customFetch>[1]): Promise<PublicationMediaUploadDestination> => {
+
+  return customFetch<PublicationMediaUploadDestination>(getRequestPublicationMediaUploadUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(publicationMediaUploadInput)
+  }
+);}
+
+
+
+
+
+export const getRequestPublicationMediaUploadMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestPublicationMediaUpload>>, TError,{id: number;data: BodyType<PublicationMediaUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestPublicationMediaUpload>>, TError,{id: number;data: BodyType<PublicationMediaUploadInput>}, TContext> => {
+
+const mutationKey = ['requestPublicationMediaUpload'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestPublicationMediaUpload>>, {id: number;data: BodyType<PublicationMediaUploadInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  requestPublicationMediaUpload(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestPublicationMediaUploadMutationResult = NonNullable<Awaited<ReturnType<typeof requestPublicationMediaUpload>>>
+    export type RequestPublicationMediaUploadMutationBody = BodyType<PublicationMediaUploadInput>
+    export type RequestPublicationMediaUploadMutationError = ErrorType<void>
+
+    /**
+ * @summary Request a private image, video, or audio upload
+ */
+export const useRequestPublicationMediaUpload = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestPublicationMediaUpload>>, TError,{id: number;data: BodyType<PublicationMediaUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestPublicationMediaUpload>>,
+        TError,
+        {id: number;data: BodyType<PublicationMediaUploadInput>},
+        TContext
+      > => {
+      return useMutation(getRequestPublicationMediaUploadMutationOptions(options));
+    }
+
+export const getCompletePublicationMediaUploadUrl = (id: number,
+    mediaId: number,) => {
+
+
+
+
+  return `/api/teacher/projects/${id}/publication-media/${mediaId}/complete`
+}
+
+/**
+ * @summary Verify the uploaded file before it can be used in a draft
+ */
+export const completePublicationMediaUpload = async (id: number,
+    mediaId: number, options?: Parameters<typeof customFetch>[1]): Promise<PublicationMediaResult> => {
+
+  return customFetch<PublicationMediaResult>(getCompletePublicationMediaUploadUrl(id,mediaId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCompletePublicationMediaUploadMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completePublicationMediaUpload>>, TError,{id: number;mediaId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completePublicationMediaUpload>>, TError,{id: number;mediaId: number}, TContext> => {
+
+const mutationKey = ['completePublicationMediaUpload'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completePublicationMediaUpload>>, {id: number;mediaId: number}> = (props) => {
+          const {id,mediaId} = props ?? {};
+
+          return  completePublicationMediaUpload(id,mediaId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompletePublicationMediaUploadMutationResult = NonNullable<Awaited<ReturnType<typeof completePublicationMediaUpload>>>
+
+    export type CompletePublicationMediaUploadMutationError = ErrorType<void>
+
+    /**
+ * @summary Verify the uploaded file before it can be used in a draft
+ */
+export const useCompletePublicationMediaUpload = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completePublicationMediaUpload>>, TError,{id: number;mediaId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof completePublicationMediaUpload>>,
+        TError,
+        {id: number;mediaId: number},
+        TContext
+      > => {
+      return useMutation(getCompletePublicationMediaUploadMutationOptions(options));
+    }
+
+export const getImportPublicationProductionVideoUrl = (id: number,) => {
+
+
+
+
+  return `/api/teacher/projects/${id}/publication-media/import-video`
+}
+
+/**
+ * @summary Add the completed student video to the teacher media library
+ */
+export const importPublicationProductionVideo = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<PublicationMediaResult> => {
+
+  return customFetch<PublicationMediaResult>(getImportPublicationProductionVideoUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getImportPublicationProductionVideoMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importPublicationProductionVideo>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof importPublicationProductionVideo>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['importPublicationProductionVideo'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof importPublicationProductionVideo>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  importPublicationProductionVideo(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ImportPublicationProductionVideoMutationResult = NonNullable<Awaited<ReturnType<typeof importPublicationProductionVideo>>>
+
+    export type ImportPublicationProductionVideoMutationError = ErrorType<void>
+
+    /**
+ * @summary Add the completed student video to the teacher media library
+ */
+export const useImportPublicationProductionVideo = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importPublicationProductionVideo>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof importPublicationProductionVideo>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getImportPublicationProductionVideoMutationOptions(options));
+    }
+
+export const getUpdateTeacherPublicationDraftUrl = (id: number,) => {
+
+
+
+
+  return `/api/teacher/projects/${id}/publication-draft`
+}
+
+/**
+ * @summary Save a teacher-only website draft without changing student work or the live edition
+ */
+export const updateTeacherPublicationDraft = async (id: number,
+    publicationDraftInput: PublicationDraftInput, options?: Parameters<typeof customFetch>[1]): Promise<PublicationDraftEnvelope> => {
+
+  return customFetch<PublicationDraftEnvelope>(getUpdateTeacherPublicationDraftUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(publicationDraftInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateTeacherPublicationDraftMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTeacherPublicationDraft>>, TError,{id: number;data: BodyType<PublicationDraftInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTeacherPublicationDraft>>, TError,{id: number;data: BodyType<PublicationDraftInput>}, TContext> => {
+
+const mutationKey = ['updateTeacherPublicationDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTeacherPublicationDraft>>, {id: number;data: BodyType<PublicationDraftInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateTeacherPublicationDraft(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTeacherPublicationDraftMutationResult = NonNullable<Awaited<ReturnType<typeof updateTeacherPublicationDraft>>>
+    export type UpdateTeacherPublicationDraftMutationBody = BodyType<PublicationDraftInput>
+    export type UpdateTeacherPublicationDraftMutationError = ErrorType<void>
+
+    /**
+ * @summary Save a teacher-only website draft without changing student work or the live edition
+ */
+export const useUpdateTeacherPublicationDraft = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTeacherPublicationDraft>>, TError,{id: number;data: BodyType<PublicationDraftInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTeacherPublicationDraft>>,
+        TError,
+        {id: number;data: BodyType<PublicationDraftInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateTeacherPublicationDraftMutationOptions(options));
+    }
 
 export const getGetPublishedContentUrl = (params?: GetPublishedContentParams,) => {
   const normalizedParams = new URLSearchParams();

@@ -242,6 +242,10 @@ importers:
         version: 3.1.0
 
   artifacts/mind-matters:
+    dependencies:
+      '@workspace/mind-matters-ds':
+        specifier: workspace:*
+        version: link:../mind-matters-ds
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0
@@ -801,6 +805,10 @@ importers:
         version: 3.25.76
 
   artifacts/studio:
+    dependencies:
+      '@workspace/mind-matters-ds':
+        specifier: workspace:*
+        version: link:../mind-matters-ds
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0

@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
+import { PublishedSection } from "@/components/PublishedSection";
 
 export default function Create() {
   const sections = [
@@ -105,6 +106,7 @@ export default function Create() {
         </div>
       </div>
       
+      <PublishedSection section="create" heading="Creative work from our students" className="mb-12" />
       <WaveFooter quote="There is no wrong way to create." />
     </div>
   );
