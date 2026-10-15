@@ -126,17 +126,7 @@ export default function Events() {
                   </div>
                 </div>
               ))
-            ) : (
-              <div className="col-span-full flex flex-col items-center justify-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl border border-dashed border-sage/50">
-                <div className="w-64 h-64 bg-amber/10 rounded-sm shadow-sm border border-amber/20 transform rotate-3 flex flex-col items-center justify-center p-8 text-center relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-terracotta rounded-full shadow-sm"></div>
-                  <CalendarIcon size={48} className="text-amber/40 mb-4" />
-                  <p className="font-handwritten text-3xl text-terracotta">
-                    Events coming soon! Check back each month.
-                  </p>
-                </div>
-              </div>
-            )}
+            ) : null}
           </div>
         )}
 
