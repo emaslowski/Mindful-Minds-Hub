@@ -9,12 +9,20 @@ const router = Router();
 const SETTINGS_KEY_AUTHOR_OPTIONS = 'author_display_options';
 
 const DEFAULT_AUTHOR_OPTIONS = [
-  'Mind Matters Student Team',
-  'Mind Matters Blog Team',
+  'Middle School Matters Team',
+  'Middle School Matters Blog Team',
   'Student Wellness Team',
-  'Grade 5 Mind Matters Team',
+  'Grade 5 Middle School Matters Team',
   'Anonymous Student Contributor',
 ];
+
+const LEGACY_AUTHOR_LABELS: Record<string, string> = {
+  'Mind Matter Team': 'Middle School Matters Team',
+  'Mind Matters Team': 'Middle School Matters Team',
+  'Mind Matters Student Team': 'Middle School Matters Team',
+  'Mind Matters Blog Team': 'Middle School Matters Blog Team',
+  'Grade 5 Mind Matters Team': 'Grade 5 Middle School Matters Team',
+};
 
 async function getAuthorDisplayOptions(): Promise<string[]> {
   const row = await db
@@ -27,7 +35,9 @@ async function getAuthorDisplayOptions(): Promise<string[]> {
   if (!row) return DEFAULT_AUTHOR_OPTIONS;
   try {
     const parsed = JSON.parse(row.value);
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed as string[];
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return (parsed as string[]).map(option => LEGACY_AUTHOR_LABELS[option] ?? option);
+    }
   } catch {
     // fall through to default
   }
