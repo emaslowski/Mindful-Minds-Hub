@@ -32,7 +32,7 @@ export function ContentPreview({ title, contentType, content }: ContentPreviewPr
           <div className="w-3 h-3 rounded-full bg-green-400/70" />
         </div>
         <div className="flex-1 bg-[#2a1e16] rounded-md px-3 py-1 text-xs text-[#8a6a55] font-mono">
-          Middle School Matters / {contentType.toLowerCase().replace(/ /g, '-')}
+          The Brightside Project / {contentType.toLowerCase().replace(/ /g, '-')}
         </div>
       </div>
 
@@ -40,7 +40,7 @@ export function ContentPreview({ title, contentType, content }: ContentPreviewPr
       <div className="bg-white border border-[#d5cabe] rounded-b-xl overflow-hidden shadow-sm">
         {/* Site nav mock */}
         <div className="bg-[#eee6d8] px-6 py-3 flex items-center justify-between border-b border-[#d5cabe]">
-          <span className="font-display italic text-[#453329] text-lg">Middle School Matters</span>
+          <span className="font-display italic text-[#453329] text-lg">The Brightside Project</span>
           <div className="flex gap-4 text-xs text-[#688a52]">
             <span>Grow</span><span>Learn</span><span>Create</span><span>Move</span>
           </div>
@@ -57,7 +57,7 @@ export function ContentPreview({ title, contentType, content }: ContentPreviewPr
               {title || <span className="text-[#d5cabe]">Untitled Project</span>}
             </h1>
             <div className="flex items-center gap-2 text-xs text-[#8a6a55]">
-              <span className="bg-[#eee6d8] rounded-full px-2 py-0.5">Middle School Matters Student Team</span>
+              <span className="bg-[#eee6d8] rounded-full px-2 py-0.5">The Brightside Project Student Team</span>
             </div>
           </div>
 
@@ -89,7 +89,7 @@ export function ContentPreview({ title, contentType, content }: ContentPreviewPr
 
           {/* Footer mock */}
           <div className="mt-10 pt-5 border-t border-[#eee6d8] flex items-center justify-between text-xs text-[#d5cabe]">
-            <span>Middle School Matters School Wellness</span>
+            <span>The Brightside Project School Wellness</span>
             <span>Student Team</span>
           </div>
         </div>

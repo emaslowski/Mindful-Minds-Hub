@@ -21,7 +21,7 @@ const CHECKLIST = [
   { key: 'checklistLanguageRespectful', label: 'The language is respectful and kind' },
   { key: 'checklistNoPrivateInfo', label: 'No private information about any student is included' },
   { key: 'checklistGrammarChecked', label: 'Grammar and spelling appear to have been checked' },
-  { key: 'checklistFitsMission', label: 'The content fits the Mind Matters mission' },
+  { key: 'checklistFitsMission', label: 'The content fits The Brightside Project mission' },
 ] as const;
 
 type ChecklistKey = typeof CHECKLIST[number]['key'];

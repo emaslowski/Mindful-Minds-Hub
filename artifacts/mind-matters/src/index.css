@@ -1,179 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Caveat:wght@400;700&family=Nunito:wght@400;500;600&display=swap');
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@plugin "@tailwindcss/typography";
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Caveat:wght@400;700&family=Nunito:wght@400;500;600;700&display=swap");
+@import "@workspace/mind-matters-ds/styles.css";
 
-@custom-variant dark (&:is(.dark *));
+@source "./**/*.{js,ts,jsx,tsx}";
 
+/* Compatibility names are aliases to design-system roles used by existing pages. */
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-border: hsl(var(--card-border));
-
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-popover-border: hsl(var(--popover-border));
-
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-
-  --color-terracotta: hsl(var(--terracotta));
-  --color-sage: hsl(var(--sage));
-  --color-dusty-rose: hsl(var(--dusty-rose));
-  --color-amber: hsl(var(--amber));
-  --color-warm-sand: hsl(var(--warm-sand));
-  --color-deep-brown: hsl(var(--deep-brown));
-
-  --font-sans: 'Nunito', sans-serif;
-  --font-display: 'Cormorant Garamond', serif;
-  --font-handwritten: 'Caveat', cursive;
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-}
-
-:root {
-  --background: 36 45% 95%;           
-  --foreground: 20 35% 20%;           
-
-  --border: 30 25% 80%;
-  --input: 30 25% 80%;
-  --ring: 16 65% 48%;
-
-  --card: 34 40% 91%;                 
-  --card-foreground: 20 35% 20%;
-  --card-border: 30 25% 78%;
-
-  --popover: 34 40% 91%;
-  --popover-foreground: 20 35% 20%;
-  --popover-border: 30 25% 78%;
-
-  --primary: 16 65% 48%;              
-  --primary-foreground: 36 45% 95%;
-
-  --secondary: 100 22% 45%;           
-  --secondary-foreground: 36 45% 95%;
-
-  --muted: 350 28% 75%;               
-  --muted-foreground: 20 35% 20%;
-
-  --accent: 36 68% 62%;               
-  --accent-foreground: 20 35% 20%;
-
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 36 45% 95%;
-
-  --terracotta: 16 65% 48%;
-  --sage: 100 22% 45%;
-  --dusty-rose: 350 28% 75%;
-  --amber: 36 68% 62%;
-  --warm-sand: 34 40% 91%;
-  --deep-brown: 20 35% 20%;
-
-  --radius: 1.25rem;
-}
-
-.dark {
-  /* Enforce light mode for this app by replicating light vars */
-  --background: 36 45% 95%;           
-  --foreground: 20 35% 20%;           
-  --border: 30 25% 80%;
-  --input: 30 25% 80%;
-  --ring: 16 65% 48%;
-  --card: 34 40% 91%;                 
-  --card-foreground: 20 35% 20%;
-  --card-border: 30 25% 78%;
-  --popover: 34 40% 91%;
-  --popover-foreground: 20 35% 20%;
-  --popover-border: 30 25% 78%;
-  --primary: 16 65% 48%;              
-  --primary-foreground: 36 45% 95%;
-  --secondary: 100 22% 45%;           
-  --secondary-foreground: 36 45% 95%;
-  --muted: 350 28% 75%;               
-  --muted-foreground: 20 35% 20%;
-  --accent: 36 68% 62%;               
-  --accent-foreground: 20 35% 20%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 36 45% 95%;
-  --terracotta: 16 65% 48%;
-  --sage: 100 22% 45%;
-  --dusty-rose: 350 28% 75%;
-  --amber: 36 68% 62%;
-  --warm-sand: 34 40% 91%;
-  --deep-brown: 20 35% 20%;
+  --color-terracotta: hsl(var(--primary));
+  --color-sage: hsl(var(--secondary));
+  --color-dusty-rose: hsl(var(--muted));
+  --color-amber: hsl(var(--accent));
+  --color-warm-sand: hsl(var(--card));
+  --color-deep-brown: hsl(var(--foreground));
+  --font-display: var(--app-font-serif);
+  --font-handwritten: var(--app-font-mono);
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
-    @apply font-sans antialiased bg-background text-foreground selection:bg-primary/30;
+    @apply bg-background font-sans text-foreground antialiased;
     background-image:
-      radial-gradient(circle at 8% 12%, hsl(var(--accent) / 0.16), transparent 24%),
-      radial-gradient(circle at 92% 18%, hsl(var(--muted) / 0.14), transparent 22%),
-      radial-gradient(circle at 50% 100%, hsl(var(--secondary) / 0.12), transparent 28%);
+      radial-gradient(circle at 8% 12%, hsl(var(--accent) / 0.09), transparent 24%),
+      radial-gradient(circle at 92% 18%, hsl(var(--muted) / 0.08), transparent 22%);
     background-attachment: fixed;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-     opacity: 0.045;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 128px 128px;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-wide;
-  }
-
-  a, button, input, textarea, select {
+  a,
+  button,
+  input,
+  textarea,
+  select {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
 }
 
-.font-display {
-  font-family: var(--font-display);
-}
-
-.font-handwritten {
-  font-family: var(--font-handwritten);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+  *,
+  *::before,
+  *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

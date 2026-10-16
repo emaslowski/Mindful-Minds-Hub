@@ -149,25 +149,25 @@ async function sendAccessRequestEmail(
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to: teacherEmails.join(', '),
-    subject: 'New private journal access request — Mind Matters',
+    subject: 'New private journal access request — The Brightside Project',
     text: [
-      'A student requested private access to the Mind Matters journal and gratitude journal.',
+      'A student requested private access to The Brightside Project journal and gratitude journal.',
       '',
       `Student: ${request.firstName} ${request.lastName}`,
       `Grade: ${request.grade}`,
       `Student email: ${request.studentEmail}`,
       `Request ID: ${request.requestCode}`,
       '',
-      'Open Mind Matters Studio → Anonymous Access to approve the request and issue a code and password.',
+      'Open The Brightside Project Studio → Anonymous Access to approve the request and issue a code and password.',
     ].join('\n'),
     html: `
       <h2 style="color:#453329">New anonymous access request</h2>
-      <p>A student requested private access to the Mind Matters journal and gratitude journal.</p>
+      <p>A student requested private access to The Brightside Project journal and gratitude journal.</p>
       <p><strong>Student:</strong> ${escapeHtml(request.firstName)} ${escapeHtml(request.lastName)}</p>
       <p><strong>Grade:</strong> ${escapeHtml(request.grade)}</p>
       <p><strong>Student email:</strong> <a href="mailto:${escapeHtml(request.studentEmail)}">${escapeHtml(request.studentEmail)}</a></p>
       <p><strong>Request ID:</strong> ${escapeHtml(request.requestCode)}</p>
-      <p>Open <strong>Mind Matters Studio → Anonymous Access</strong> to approve the request and issue a code and password.</p>
+      <p>Open <strong>The Brightside Project Studio → Anonymous Access</strong> to approve the request and issue a code and password.</p>
     `,
   });
 }
@@ -203,24 +203,24 @@ async function sendCredentialsEmail(
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to: details.studentEmail,
-    subject: 'Your Mind Matters private access details',
+    subject: 'Your Brightside Project private access details',
     text: [
       `Hi ${details.firstName},`,
       '',
-      'Your teacher approved your private Mind Matters journal and gratitude journal access.',
+      'Your teacher approved your private Brightside Project journal and gratitude journal access.',
       '',
       `Access code: ${details.accessCode}`,
       `Password: ${details.password}`,
       '',
-      'Keep these details private. Use them on the Mind Matters private access page to open your journal.',
+      'Keep these details private. Use them on The Brightside Project private access page to open your journal.',
     ].join('\n'),
     html: `
-      <h2 style="color:#453329">Your Mind Matters private access details</h2>
+      <h2 style="color:#453329">Your Brightside Project private access details</h2>
       <p>Hi ${escapeHtml(details.firstName)},</p>
-      <p>Your teacher approved your private Mind Matters journal and gratitude journal access.</p>
+      <p>Your teacher approved your private Brightside Project journal and gratitude journal access.</p>
       <p><strong>Access code:</strong> ${escapeHtml(details.accessCode)}</p>
       <p><strong>Password:</strong> ${escapeHtml(details.password)}</p>
-      <p><em>Keep these details private. Use them on the Mind Matters private access page to open your journal.</em></p>
+      <p><em>Keep these details private. Use them on The Brightside Project private access page to open your journal.</em></p>
     `,
   });
 }

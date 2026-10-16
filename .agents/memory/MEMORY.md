@@ -12,7 +12,7 @@
 - [Student friendship matching](student-friendship-matching.md) — real matches belong below Connect’s blog; opt-in enrolled individuals only, with limited traits and no direct contact
 - [School coding restrictions](scratch-editor-embedding.md) — user requested removing the coding playground because iboss blocked it on their school account.
 - [Student workflow recovery](student-workflow-recovery.md) — returning after accidental research-stage advancement corrects the stage without restarting or discarding work.
-- [Content preview branding](content-preview-branding.md) — student content-creation previews should say Middle School Matters, not Mind Matters.
+- [Brightside Project branding](content-preview-branding.md) — user chose The Brightside Project illustrated redesign; retain Student Studio, saved work, and teacher publishing.
 - [Student project visibility](student-project-visibility.md) — student dashboards show only their own working projects; switching group logins must not reuse another group's cached data.
 - [Editorial teacher workflow](editorial-teacher-workflow.md) — compliment-sandwich peer feedback goes to the teacher for decisions; no separate drafting stage.
 - [Video production workflow](video-production-workflow.md) — optional teacher-approved handoff to Video Producers; uploads return for final teacher review.

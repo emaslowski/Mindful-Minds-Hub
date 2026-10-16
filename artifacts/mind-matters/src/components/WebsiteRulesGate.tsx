@@ -6,7 +6,7 @@ import {
   AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@workspace/mind-matters-ds/components/ui/alert-dialog';
 
 const ACKNOWLEDGMENT_KEY = 'middle-school-matters-website-rules-v1';
 
@@ -47,7 +47,7 @@ export function WebsiteRulesGate() {
       >
         <AlertDialogHeader className="text-left">
           <AlertDialogTitle className="font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-            Middle School Matters Website Rules
+            The Brightside Project Website Rules
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm leading-relaxed text-foreground/80">
             Please read these rules before entering the website.

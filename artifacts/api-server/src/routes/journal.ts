@@ -197,7 +197,7 @@ async function sendRedFlagAlert(
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to: teacherEmails.join(", "),
-    subject: "⚠️ URGENT: Concerning Journal Entry — Mind Matters",
+    subject: "⚠️ URGENT: Concerning Journal Entry — The Brightside Project",
     text: `A student has written something that may need immediate attention.\n\nPrompt: ${prompt}\n\nEntry:\n${content}\n\nStudent identity: ${studentIdentity}\n\nPlease check in with this student as soon as possible.`,
     html: `<h2 style="color:red">⚠️ URGENT: Concerning Student Journal Entry</h2>
       <p>A student has written something that may need immediate attention.</p>

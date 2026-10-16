@@ -1,257 +1,180 @@
+import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "wouter";
-import { ImpactStats } from "@/components/ImpactStats";
-import { Languages, Puzzle, Sprout } from "lucide-react";
+import { Button } from "@workspace/mind-matters-ds/components/ui/button";
+import { Card } from "@workspace/mind-matters-ds/components/ui/card";
+import { WaveFooter } from "@/components/WaveFooter";
+
+const centers = [
+  { title: "Student Stories & Blogs", description: "Ideas, encouragement, and student voices.", href: "/connect", image: "tile-1.jpg", color: "bg-muted/30" },
+  { title: "Podcasts & Videos", description: "Listen, watch, and learn from peers.", href: "/listen/podcast", image: "tile-2.jpg", color: "bg-secondary/20" },
+  { title: "Art & Drawing Studio", description: "Create art and follow drawing tutorials.", href: "/create", image: "tile-3.jpg", color: "bg-accent/25" },
+  { title: "Games & Challenges", description: "Try quizzes, activities, and fun challenges.", href: "/games", image: "tile-4.jpg", color: "bg-accent/25" },
+  { title: "Calm & Coping Corner", description: "Explore simple ways to pause and reset.", href: "/learn", image: "tile-5.jpg", color: "bg-secondary/20" },
+  { title: "Journaling Center", description: "Reflect with private writing prompts.", href: "/grow/journal", image: "tile-6.jpg", color: "bg-muted/30" },
+  { title: "Movement & Sports", description: "Stretch, move, and learn new skills.", href: "/move", image: "tile-7.jpg", color: "bg-secondary/20" },
+  { title: "Music & Mindful Moments", description: "Find sounds and guided pauses.", href: "/listen", image: "tile-8.jpg", color: "bg-muted/30" },
+  { title: "Cooking & Healthy Recipes", description: "Discover recipes and kitchen creativity.", href: "/create/cooking", image: "tile-9.jpg", color: "bg-accent/25" },
+  { title: "Language Corner", description: "Explore words, languages, and cultures.", href: "/language-corner", image: "tile-10.jpg", color: "bg-secondary/20" },
+  { title: "Friendship & Belonging", description: "Practice kindness, teamwork, and inclusion.", href: "/connect", image: "tile-11.jpg", color: "bg-muted/30" },
+  { title: "School & Community Events", description: "Discover events, clubs, and activities.", href: "/events", image: "tile-12.jpg", color: "bg-accent/25" },
+  { title: "Groups & Connections", description: "Find teacher-approved ways to join in.", href: "/connect", image: "tile-13.jpg", color: "bg-secondary/20" },
+  { title: "Student Resources", description: "Find helpful tools and trusted information.", href: "/resources", image: "tile-14.jpg", color: "bg-muted/30" },
+  { title: "Connect with a Trusted Adult", description: "Learn how to contact school support.", href: "/contact", image: "tile-15.jpg", color: "bg-secondary/20" },
+];
+
+const creatorRoles = [
+  "Writers", "Researchers", "Artists", "Podcasters", "Video Creators", "Designers", "Community Reporters",
+];
+
+const processSteps = [
+  { title: "Listen to student ideas", image: "step-1.jpg" },
+  { title: "Research", image: "step-2.jpg" },
+  { title: "Create", image: "step-3.jpg" },
+  { title: "Collaborate", image: "step-4.jpg" },
+  { title: "Revise", image: "step-5.jpg" },
+  { title: "Teacher review", image: "step-6.jpg" },
+  { title: "Share", image: "step-7.jpg" },
+];
+
+function SectionHeading({ children, id }: { children: string; id?: string }) {
+  return (
+    <div className="mb-5 flex items-center justify-center gap-3 text-center">
+      <span aria-hidden="true" className="text-primary text-2xl">⌁</span>
+      <h2 id={id} className="font-serif text-3xl font-bold text-foreground md:text-4xl">{children}</h2>
+      <span aria-hidden="true" className="text-primary text-2xl">⌁</span>
+    </div>
+  );
+}
 
 export default function Home() {
-  const categories = [
-    {
-      name: "Create",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full text-terracotta">
-          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-          <path d="M7.5 12.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z" />
-          <path d="M12 16.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z" />
-          <path d="M16.5 12.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z" />
-          <path d="M12 8.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z" />
-        </svg>
-      ),
-      path: "/create"
-    },
-    {
-      name: "Connect",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full text-dusty-rose">
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-        </svg>
-      ),
-      path: "/connect"
-    },
-    {
-      name: "Move",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full text-amber">
-          <path d="M12 4a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-          <path d="M15 22v-5l-1.5-3-1.5 3v5" />
-          <path d="M9 22v-5l1.5-3 1.5 3v5" />
-          <path d="M12 14v-4" />
-          <path d="M6 11l4.5-2.5 3 2.5L18 11" />
-        </svg>
-      ),
-      path: "/move"
-    },
-    {
-      name: "Listen",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full text-sage">
-          <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
-          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
-        </svg>
-      ),
-      path: "/listen"
-    },
-    {
-      name: "Grow",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full text-terracotta">
-          <path d="M12 22V8" />
-          <path d="M5 13.5a4 4 0 0 0 7-1.5 4 4 0 0 0-7 1.5z" />
-          <path d="M19 11.5a4 4 0 0 1-7-1.5 4 4 0 0 1 7 1.5z" />
-          <path d="M12 2a3 3 0 0 0-3 3v2a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
-        </svg>
-      ),
-      path: "/grow"
-    },
-    {
-      name: "Gardening",
-      icon: <Sprout className="w-full h-full text-sage" strokeWidth={1.5} />,
-      path: "/gardening"
-    },
-    {
-      name: "Language Corner",
-      icon: <Languages className="w-full h-full text-terracotta" strokeWidth={1.5} />,
-      path: "/language-corner"
-    },
-    {
-      name: "Games",
-      icon: <Puzzle className="w-full h-full text-amber" strokeWidth={1.5} />,
-      path: "/games"
-    },
-  ];
-
   return (
-    <div className="w-full flex flex-col min-h-[calc(100dvh-100px)] pt-12 md:pt-24 relative">
-
-      {/* ── Full-bleed decoration layer — breaks out of max-w container ── */}
-      <div className="absolute inset-0 pointer-events-none -z-10" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
-
-        {/* Sun Mandala — left edge */}
-        <div className="absolute top-8 -left-20 animate-[spin_120s_linear_infinite] opacity-95">
-          <svg width="320" height="320" viewBox="0 0 100 100">
-             {Array.from({length: 16}).map((_, i) => (
-               <polygon key={i} points="50,5 47,18 53,18" fill="hsl(var(--accent))"
-                 transform={`rotate(${i * 22.5} 50 50)`} opacity="0.9"/>
-            ))}
-             <circle cx="50" cy="50" r="30" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.7"/>
-             <circle cx="50" cy="50" r="24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" strokeDasharray="2 4" opacity="0.6"/>
-             <circle cx="50" cy="50" r="22" fill="hsl(var(--accent))" opacity="0.95"/>
-             <circle cx="50" cy="50" r="14" fill="hsl(var(--primary))" opacity="0.8"/>
-             <circle cx="50" cy="50" r="7" fill="hsl(var(--primary-foreground))" opacity="0.95"/>
-          </svg>
+    <div className="home-page w-full pb-8">
+      <section className="mx-auto grid w-full max-w-6xl items-center gap-5 px-2 pb-8 pt-5 md:grid-cols-2 md:gap-8 md:pb-10 md:pt-8" aria-labelledby="home-title">
+        <div className="order-2 md:order-1">
+          <h1 id="home-title" className="max-w-xl font-serif text-5xl font-bold leading-[0.93] tracking-tight text-foreground sm:text-6xl md:text-7xl">
+            A brighter school starts with us.
+          </h1>
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-foreground/85 sm:text-lg">
+            A student-created community hub to learn, create, connect, and feel a sense of belonging.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Button asChild size="sm" variant="secondary" data-testid="link-explore-centers">
+              <a href="#bright-spots">Explore the Centers <ArrowDown aria-hidden="true" /></a>
+            </Button>
+            <Button asChild size="sm" variant="outline" data-testid="link-meet-creators">
+              <a href="#student-creators">Meet Our Creators <ArrowRight aria-hidden="true" /></a>
+            </Button>
+          </div>
         </div>
+        <Card className="order-1 overflow-hidden border-0 bg-transparent shadow-none md:order-2">
+          <img
+            src="/assets/bright/hero.jpg"
+            alt="Students work together on a school project at a table covered with books and creative supplies"
+            className="h-auto w-full object-contain"
+            fetchPriority="high"
+          />
+        </Card>
+      </section>
 
-        {/* Crescent moon + stars — top right edge */}
-         <div className="absolute top-2 right-0 opacity-80">
-          <svg width="200" height="180" viewBox="0 0 200 180">
-             <path d="M155 20 Q178 48 168 80 Q152 108 122 104 Q146 96 150 72 Q158 46 140 18 Q147 14 155 20Z" fill="hsl(var(--accent))" opacity="0.95"/>
-             <path d="M55 22 L57.5 31 L67 33 L57.5 35 L55 44 L52.5 35 L43 33 L52.5 31Z" fill="hsl(var(--muted))" opacity="0.95"/>
-             <path d="M28 65 L29.5 71 L36 72.5 L29.5 74 L28 80 L26.5 74 L20 72.5 L26.5 71Z" fill="hsl(var(--accent))" opacity="0.95"/>
-             <path d="M82 12 L83 16 L87 17 L83 18 L82 22 L81 18 L77 17 L81 16Z" fill="hsl(var(--secondary))" opacity="0.95"/>
-             <circle cx="100" cy="50" r="3.5" fill="hsl(var(--primary))" opacity="0.75"/>
-             <circle cx="38" cy="42" r="2.5" fill="hsl(var(--accent))" opacity="0.9"/>
-             <circle cx="70" cy="75" r="2" fill="hsl(var(--muted))" opacity="0.8"/>
-          </svg>
+      <div className="mx-auto mb-8 flex w-full max-w-6xl flex-col items-start gap-3 border-y border-border px-3 py-4 sm:flex-row sm:items-center md:mb-10 md:px-6">
+        <div className="hidden shrink-0 items-center md:flex" aria-hidden="true">
+          <img src="/assets/bright/tile-13.jpg" alt="" className="h-12 w-14 object-cover" />
         </div>
-
-        {/* Botanical branch — right edge, mid height */}
-         <div className="absolute top-56 right-0 opacity-55 rotate-6">
-          <svg width="120" height="200" viewBox="0 0 120 200">
-             <path d="M60 200 Q62 120 70 60 Q78 20 85 5" stroke="hsl(var(--secondary))" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-            <path d="M68 160 Q45 140 30 120" stroke="#688A52" strokeWidth="1.8" strokeLinecap="round"/>
-            <path d="M70 125 Q48 108 35 88" stroke="#688A52" strokeWidth="1.8" strokeLinecap="round"/>
-            <path d="M73 90 Q95 72 108 52" stroke="#688A52" strokeWidth="1.8" strokeLinecap="round"/>
-            <path d="M76 58 Q54 42 44 22" stroke="#688A52" strokeWidth="1.8" strokeLinecap="round"/>
-            <ellipse cx="31" cy="120" rx="14" ry="6" fill="#688A52" opacity="0.55" transform="rotate(-35 31 120)"/>
-            <ellipse cx="36" cy="88" rx="13" ry="6" fill="#688A52" opacity="0.55" transform="rotate(-30 36 88)"/>
-            <ellipse cx="107" cy="52" rx="13" ry="6" fill="#688A52" opacity="0.55" transform="rotate(32 107 52)"/>
-            <ellipse cx="45" cy="22" rx="11" ry="5" fill="#688A52" opacity="0.55" transform="rotate(-38 45 22)"/>
-            <circle cx="32" cy="118" r="4" fill="#C4622D" opacity="0.6"/>
-            <circle cx="108" cy="50" r="3.5" fill="#C4829A" opacity="0.6"/>
-            <circle cx="46" cy="20" r="3" fill="#C4622D" opacity="0.6"/>
-          </svg>
-        </div>
-
-        {/* Wildflower bunch — bottom left edge */}
-         <div className="absolute bottom-36 left-4 opacity-60">
-          <svg width="100" height="140" viewBox="0 0 100 140">
-            <path d="M40 140 Q38 100 35 70 Q32 45 28 20" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M50 140 Q50 95 50 60 Q50 35 50 10" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M60 140 Q62 100 65 70 Q68 45 72 20" stroke="#688A52" strokeWidth="2" strokeLinecap="round"/>
-            <ellipse cx="34" cy="90" rx="12" ry="5" fill="#688A52" opacity="0.6" transform="rotate(-30 34 90)"/>
-            <ellipse cx="64" cy="95" rx="12" ry="5" fill="#688A52" opacity="0.6" transform="rotate(28 64 95)"/>
-            <ellipse cx="48" cy="75" rx="10" ry="4.5" fill="#688A52" opacity="0.5" transform="rotate(-15 48 75)"/>
-            <circle cx="28" cy="20" r="12" fill="#C4829A" opacity="0.5"/>
-            <circle cx="28" cy="8" r="4.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="28" cy="32" r="4.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="16" cy="20" r="4.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="40" cy="20" r="4.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="20" cy="12" r="4.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="36" cy="12" r="4.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="28" cy="20" r="7" fill="#D4A44C"/>
-            <circle cx="50" cy="10" r="10" fill="#C4622D" opacity="0.45"/>
-            <circle cx="50" cy="0" r="4" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="50" cy="20" r="4" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="40" cy="10" r="4" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="60" cy="10" r="4" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="50" cy="10" r="6" fill="#D4A44C"/>
-            <circle cx="72" cy="20" r="9" fill="#C4829A" opacity="0.4"/>
-            <circle cx="72" cy="11" r="3.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="72" cy="29" r="3.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="63" cy="20" r="3.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="81" cy="20" r="3.5" fill="#FAF3E3" opacity="0.8"/>
-            <circle cx="72" cy="20" r="5.5" fill="#C4622D" opacity="0.7"/>
-          </svg>
-        </div>
-
-        {/* Butterfly — bottom right edge */}
-         <div className="absolute bottom-52 right-12 opacity-55 -rotate-12">
-          <svg width="90" height="80" viewBox="0 0 90 80">
-            <path d="M45 40 Q15 12 2 22 Q-2 42 22 52 Q36 57 45 40Z" fill="#C4829A" opacity="0.7"/>
-            <path d="M45 40 Q14 50 8 66 Q18 82 38 72 Q50 62 45 40Z" fill="#D4A44C" opacity="0.6"/>
-            <path d="M45 40 Q75 12 88 22 Q92 42 68 52 Q54 57 45 40Z" fill="#D4A44C" opacity="0.7"/>
-            <path d="M45 40 Q76 50 82 66 Q72 82 52 72 Q40 62 45 40Z" fill="#C4829A" opacity="0.6"/>
-            <ellipse cx="45" cy="44" rx="3" ry="16" fill="#5A3A1A" opacity="0.5"/>
-            <path d="M45 28 Q38 16 34 10" stroke="#5A3A1A" strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
-            <circle cx="34" cy="10" r="2.5" fill="#C4622D" opacity="0.5"/>
-            <path d="M45 28 Q52 16 56 10" stroke="#5A3A1A" strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
-            <circle cx="56" cy="10" r="2.5" fill="#C4622D" opacity="0.5"/>
-            <circle cx="25" cy="34" r="5" fill="#FAF3E3" opacity="0.4"/>
-            <circle cx="65" cy="34" r="5" fill="#FAF3E3" opacity="0.4"/>
-          </svg>
-        </div>
-
-        {/* Sparkle cluster — upper center area */}
-         <div className="absolute top-32 left-[28%] opacity-60">
-          <svg width="100" height="80" viewBox="0 0 100 80">
-            <path d="M18 12 L20 20 L28 22 L20 24 L18 32 L16 24 L8 22 L16 20Z" fill="#D4A44C" opacity="0.8"/>
-            <path d="M75 40 L76.5 46 L83 47.5 L76.5 49 L75 55 L73.5 49 L67 47.5 L73.5 46Z" fill="#C4829A" opacity="0.8"/>
-            <path d="M50 5 L51 8.5 L55 9.5 L51 10.5 L50 14 L49 10.5 L45 9.5 L49 8.5Z" fill="#688A52" opacity="0.8"/>
-            <circle cx="88" cy="18" r="4" fill="#C4622D" opacity="0.5"/>
-            <circle cx="35" cy="55" r="3" fill="#C4829A" opacity="0.6"/>
-            <circle cx="60" cy="70" r="2.5" fill="#D4A44C" opacity="0.7"/>
-            <circle cx="10" cy="55" r="2" fill="#688A52" opacity="0.6"/>
-          </svg>
-        </div>
-
-        {/* Mushroom — left side mid */}
-         <div className="absolute top-[52%] left-8 opacity-50 -rotate-6">
-          <svg width="55" height="65" viewBox="0 0 55 65">
-            <path d="M27 32 Q8 32 6 20 Q8 4 27 4 Q46 4 48 20 Q46 32 27 32Z" fill="#C4622D"/>
-            <circle cx="18" cy="16" r="4" fill="white" opacity="0.55"/>
-            <circle cx="32" cy="11" r="3" fill="white" opacity="0.55"/>
-            <circle cx="36" cy="22" r="2.5" fill="white" opacity="0.55"/>
-            <rect x="21" y="32" width="12" height="24" rx="4" fill="#FAF3E3"/>
-            <path d="M17 46 Q27 51 37 46" stroke="#D4A44C" strokeWidth="1" fill="none"/>
-            <path d="M19 40 Q27 44 35 40" stroke="#D4A44C" strokeWidth="1" fill="none"/>
-          </svg>
-        </div>
-
-      </div>{/* end full-bleed decoration layer */}
-
-      {/* Hero Text */}
-      <div className="flex-1 flex flex-col items-center pb-12 relative z-10 w-full max-w-5xl mx-auto">
-        <h1 className="text-6xl md:text-[96px] lg:text-[112px] font-display text-foreground text-center leading-[0.9] mt-8 mb-6 drop-shadow-sm">
-          <span className="italic block mb-2">Middle School</span>
-          <span>Matters</span>
-        </h1>
-        
-        <p className="font-handwritten text-3xl md:text-5xl text-primary text-center max-w-2xl mb-12">
-          A hub for 5th grade wellness and connection.
+        <p className="font-serif text-lg font-semibold leading-snug md:w-2/5 md:text-xl">
+          Created by students.<br />Connected by kindness.
         </p>
-        
-        <p className="font-sans font-medium text-lg md:text-xl text-foreground/85 text-center leading-relaxed max-w-4xl mx-auto border-t border-b border-primary/40 py-5 px-4 mb-8">
-          <span className="font-bold text-terracotta">Our Goal:</span>{" "}
-          To create a student-run website that builds a stronger, kinder, and more connected middle school community by sharing helpful resources, ideas, and student voices.
+        <div className="hidden h-10 w-px bg-border md:block" aria-hidden="true" />
+        <p className="text-sm leading-relaxed text-foreground/80 md:flex-1">
+          Students practice research, digital citizenship, collaboration, and creative communication while making useful content for our school community.
         </p>
       </div>
 
-      {/* Category buttons — above the hills */}
-      <div className="w-full flex justify-center px-4 md:px-12 pb-10 relative z-10">
-        <div className="flex flex-wrap justify-center gap-6 md:gap-10 max-w-6xl w-full">
-           {categories.map((cat) => (
-             <Link key={cat.path} href={cat.path} className="group relative">
-              <div data-testid={`link-category-${cat.name.toLowerCase()}`} className="w-28 h-28 md:w-36 md:h-36 bg-card rounded-full flex flex-col items-center justify-center p-4 transition-all duration-500 shadow-md group-hover:-translate-y-4 group-hover:shadow-2xl group-hover:bg-primary/15 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 border-2 border-primary/25 group-hover:border-primary/70">
-                <div className="w-10 h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-110 mb-2">
-                  {cat.icon}
-                </div>
-                 <div className={`font-display italic text-foreground font-semibold text-center leading-tight ${cat.name === "Language Corner" ? "text-sm md:text-base" : "text-lg md:text-xl"}`}>
-                  {cat.name}
-                </div>
-              </div>
+      <section id="bright-spots" className="mx-auto w-full max-w-6xl scroll-mt-6 px-1" aria-labelledby="bright-spots-title">
+        <SectionHeading id="bright-spots-title">Find your bright spot</SectionHeading>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {centers.map((center, index) => (
+            <Link
+              key={center.title}
+              href={center.href}
+              data-testid={`link-center-${index + 1}`}
+              className="group rounded-2xl focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Card className={`flex min-h-24 items-center gap-3 border-border/70 ${center.color} p-3 transition-transform group-hover:-translate-y-0.5 group-hover:shadow-md`}>
+                <img
+                  src={`/assets/bright/${center.image}`}
+                  alt=""
+                  className="h-16 w-20 shrink-0 rounded-xl object-cover sm:h-20 sm:w-24"
+                  loading="lazy"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block font-serif text-lg font-bold leading-tight group-hover:text-primary sm:text-xl">{center.title}</span>
+                  <span className="mt-1 block text-xs leading-snug text-foreground/75 sm:text-sm">{center.description}</span>
+                </span>
+                <ArrowUpRight aria-hidden="true" className="h-5 w-5 shrink-0 text-primary transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </Card>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Our Impact */}
-      <ImpactStats />
+      <section id="student-creators" className="mx-auto mt-10 w-full max-w-6xl scroll-mt-6" aria-labelledby="creators-title">
+        <SectionHeading id="creators-title">Behind every bright idea is a student creator</SectionHeading>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-7">
+          {creatorRoles.map((role, index) => (
+            <div key={role} className="text-center">
+              <Card className="overflow-hidden border-border bg-card">
+                <img
+                  src={`/assets/bright/creator-${index + 1}.jpg`}
+                  alt={`Illustration of a student ${role.toLowerCase()}`}
+                  className="h-24 w-full object-cover sm:h-28"
+                  loading="lazy"
+                />
+              </Card>
+              <p className="mt-1 inline-block rounded-full bg-muted/30 px-3 py-1 text-xs font-bold sm:text-sm">{role}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* Hills — full-bleed, no buttons inside */}
-      <div className="relative z-20 mt-auto" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)' }}>
-        <svg viewBox="0 0 1440 220" preserveAspectRatio="none" className="w-full h-[160px] md:h-[220px] block">
-           <path d="M0,100 C240,40 480,170 720,100 C960,30 1200,150 1440,70 L1440,220 L0,220 Z" fill="hsl(var(--secondary))" opacity="0.55"/>
-           <path d="M0,130 C200,60 400,190 600,120 C800,50 1000,170 1200,100 C1350,50 1420,130 1440,110 L1440,220 L0,220 Z" fill="hsl(var(--secondary))"/>
-        </svg>
-      </div>
+      <section className="mx-auto mt-10 w-full max-w-6xl" aria-labelledby="process-title">
+        <SectionHeading id="process-title">How we create</SectionHeading>
+        <ol className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+          {processSteps.map((step, index) => (
+            <li key={step.title} className="relative flex flex-col items-center rounded-2xl bg-card/70 px-2 py-3 text-center">
+              <img src={`/assets/bright/${step.image}`} alt="" className="h-14 w-16 object-contain sm:h-16 sm:w-20" loading="lazy" />
+              <span className="mt-1 text-xs font-bold leading-tight sm:text-sm">{step.title}</span>
+              {index < processSteps.length - 1 && (
+                <ArrowRight aria-hidden="true" className="absolute -right-3 top-1/2 z-10 hidden h-5 w-5 text-primary lg:block" />
+              )}
+            </li>
+          ))}
+        </ol>
+        <p className="mt-3 text-center text-sm text-foreground/75">Every student contribution is reviewed by a teacher before it is shared.</p>
+      </section>
+
+      <section className="mx-auto mt-8 grid w-full max-w-6xl gap-3 md:grid-cols-2" aria-label="More ways to belong">
+        <Link href="/review" data-testid="link-voice-matters" className="group rounded-2xl focus-visible:ring-2 focus-visible:ring-ring">
+          <Card className="flex items-center gap-3 border-border bg-muted/25 p-3 transition-transform group-hover:-translate-y-0.5">
+            <img src="/assets/bright/voice.jpg" alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" loading="lazy" />
+            <span className="flex-1">
+              <span className="block font-serif text-xl font-bold">Your voice matters</span>
+              <span className="mt-1 block text-sm text-foreground/80">Student interest surveys and feedback help shape what comes next.</span>
+            </span>
+            <ArrowUpRight aria-hidden="true" className="h-5 w-5 text-primary" />
+          </Card>
+        </Link>
+        <Link href="/resources" data-testid="link-welcoming-space" className="group rounded-2xl focus-visible:ring-2 focus-visible:ring-ring">
+          <Card className="flex items-center gap-3 border-border bg-secondary/15 p-3 transition-transform group-hover:-translate-y-0.5">
+            <img src="/assets/bright/welcome.jpg" alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" loading="lazy" />
+            <span className="flex-1">
+              <span className="block font-serif text-xl font-bold">A welcoming digital space</span>
+              <span className="mt-1 block text-sm text-foreground/80">Kind communication. Privacy respected. Helpful information you can trust.</span>
+            </span>
+            <ArrowUpRight aria-hidden="true" className="h-5 w-5 text-primary" />
+          </Card>
+        </Link>
+      </section>
+      <WaveFooter />
     </div>
   );
 }

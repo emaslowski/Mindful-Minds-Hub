@@ -117,7 +117,7 @@ router.post("/blog-submissions", async (req, res) => {
         await transporter.sendMail({
           from: process.env.SMTP_USER,
           to: MODERATOR_EMAIL,
-          subject: `[Mind Matters] New Blog Post Submission: "${title}"`,
+          subject: `[The Brightside Project] New Blog Post Submission: "${title}"`,
           html: `
             <h2>New Blog Post Submission</h2>
             <p><strong>Title:</strong> ${title}</p>
@@ -125,7 +125,7 @@ router.post("/blog-submissions", async (req, res) => {
             <hr />
             <p>${content.replace(/\n/g, "<br />")}</p>
             <hr />
-            <p><em>Log into Mind Matters Command Center to authorize or leave this post pending.</em></p>
+            <p><em>Log into The Brightside Project Command Center to authorize or leave this post pending.</em></p>
           `,
         });
       } catch (emailErr) {

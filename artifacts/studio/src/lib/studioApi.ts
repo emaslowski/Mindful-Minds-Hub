@@ -673,9 +673,9 @@ export const STATUS_COLORS: Record<string, string> = {
 };
 
 export const AUTHOR_DISPLAY_OPTIONS = [
-  'Middle School Matters Team',
-  'Middle School Matters Blog Team',
+  'The Brightside Project Team',
+  'The Brightside Project Blog Team',
   'Student Wellness Team',
-  'Grade 5 Middle School Matters Team',
+  'Grade 5 Brightside Project Team',
   'Anonymous Student Contributor',
 ];

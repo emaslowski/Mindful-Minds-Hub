@@ -72,7 +72,7 @@ export default function AboutUs() {
             About Us
           </h1>
           <p className="text-2xl md:text-3xl text-sage font-display font-medium max-w-3xl mx-auto leading-relaxed bg-white/60 p-6 rounded-3xl backdrop-blur-sm border border-white/50 shadow-sm">
-            Middle School Matters is a student-created website made to support and inspire our school community.
+            The Brightside Project is a student-created website made to support and inspire our school community.
           </p>
         </div>
 
