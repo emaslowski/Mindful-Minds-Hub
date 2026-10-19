@@ -58,9 +58,6 @@ export default function Home() {
             <Button asChild size="sm" variant="secondary" data-testid="link-explore-centers">
               <a href="#bright-spots">Explore the Centers <ArrowDown aria-hidden="true" /></a>
             </Button>
-            <Button asChild size="sm" variant="outline" data-testid="link-meet-creators">
-              <a href="#student-creators">Meet Our Creators <ArrowRight aria-hidden="true" /></a>
-            </Button>
           </div>
         </div>
         <Card className="order-1 overflow-hidden border-0 bg-transparent shadow-none md:order-2">
