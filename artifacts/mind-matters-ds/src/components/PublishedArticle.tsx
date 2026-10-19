@@ -87,7 +87,7 @@ function inlineMarkdown(value: string, keyPrefix: string): ReactNode[] {
   return result;
 }
 
-function stripBlogPlanningSections(content: string): string {
+export function stripBlogPlanningSections(content: string): string {
   let omitSection = false;
   return content.replace(/\r\n?/g, "\n").split("\n").filter((line) => {
     const heading = /^\s*#{1,6}\s+(.+?)\s*$/.exec(line);

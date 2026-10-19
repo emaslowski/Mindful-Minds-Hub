@@ -1,6 +1,7 @@
 import { useGetPublishedContent } from "@workspace/api-client-react";
 import { PublishedArticle, type PublicationAppearance, type PublicationBlock } from "@workspace/mind-matters-ds/components/PublishedArticle";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
+import { BlogStoryPreview } from "./BlogStoryPreview";
 
 type PublishedSectionProps = {
   section: string;
@@ -49,7 +50,9 @@ export function PublishedSection({ section, heading = "From Our Students", class
         <div className="h-px max-w-[120px] flex-1 bg-sage/20" />
       </div>
       <div className={`grid grid-cols-1 gap-6 ${section === "blog" ? "" : "md:grid-cols-2"}`}>
-        {items.map((item) => (
+        {items.map((item) => section === "blog" ? (
+          <BlogStoryPreview key={item.id} {...item} projectId={item.projectId ?? item.id} />
+        ) : (
           <div key={item.id} className={`w-full rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm ${section !== "blog" && item.appearance?.pageWidth === "full" ? "md:col-span-2" : ""}`}>
             <PublishedArticle
               title={item.title}

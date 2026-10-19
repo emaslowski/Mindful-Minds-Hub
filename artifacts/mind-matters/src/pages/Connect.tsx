@@ -3,7 +3,7 @@ import { WaveFooter } from "@/components/WaveFooter";
 import { useGetBlogPosts } from "@workspace/api-client-react";
 import { FriendshipMatchmaker } from "@/components/FriendshipMatchmaker";
 import { PublishedSection } from "@/components/PublishedSection";
-import { DEFAULT_BLOG_COVER } from "@workspace/mind-matters-ds/components/PublishedArticle";
+import { BlogStoryPreview } from "@/components/BlogStoryPreview";
 
 export default function Connect() {
   const { data: apiPosts, isLoading } = useGetBlogPosts();
@@ -99,7 +99,7 @@ export default function Connect() {
         {isLoading ? (
           <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 text-left" aria-label="Loading blog posts">
             {[0, 1].map((i) => <div key={i} className="animate-pulse rounded-2xl border border-card-border/50 bg-card p-6">
-              <div className="mb-6 h-56 w-full rounded-2xl bg-card-border/30" />
+              <div className="mb-6 h-36 w-full rounded-2xl bg-card-border/30" />
               <div className="mb-3 h-6 w-3/4 rounded-md bg-card-border/30" />
               <div className="h-4 w-full rounded-md bg-card-border/30" />
             </div>)}
@@ -107,15 +107,7 @@ export default function Connect() {
         ) : apiPosts?.length ? (
           <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 text-left">
             {apiPosts.map((post) => (
-              <article key={post.id} className="rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm">
-                <img src={DEFAULT_BLOG_COVER} alt="A calm lake surrounded by a green landscape" className="mb-6 max-h-96 w-full rounded-2xl object-cover" />
-                <h2 className="mb-2 font-display text-3xl italic leading-tight text-foreground">{post.title}</h2>
-                <p className="mb-4 font-handwritten text-xl text-terracotta">By {post.author}</p>
-                <p className="mb-6 font-sans leading-relaxed text-foreground/70">{post.excerpt}</p>
-                <Link href={`/connect/blog/${post.id}`} className="inline-flex border-2 border-terracotta px-6 py-2.5 font-sans text-sm font-bold uppercase tracking-wide text-terracotta transition-colors hover:bg-terracotta hover:text-white">
-                  Read More
-                </Link>
-              </article>
+              <BlogStoryPreview key={post.id} title={post.title} content="" authorDisplay={`By ${post.author}`} excerpt={post.excerpt ?? undefined} href={`/connect/blog/${post.id}`} />
             ))}
           </div>
         ) : null}
