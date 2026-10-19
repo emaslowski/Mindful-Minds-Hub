@@ -4,6 +4,7 @@ description: Approved website identity and preservation of Student Studio during
 ---
 
 Use “The Brightside Project” for the public website, Student Studio, student content previews, and system team branding.
+This includes older saved system bylines and branded team labels displayed in Studio, but not student-authored text or account names.
 The user explicitly chose this name over “Middle School Matters” when approving the illustrated reference website redesign.
 Keep Student Studio and its existing student work, teacher reviews, and publishing controls.
 Retain the reference-based illustrated design when making local refinements.
@@ -19,5 +20,14 @@ They explicitly requested smaller circles and a left-to-right process.
 They explicitly asked to remove those three Bright Spot buttons.
 They asked to remove student-created wording from the Events section.
 They explicitly requested those three top navigation buttons and removal of About Us.
+They reiterated that Student Studio should replace “Middle School Matters” anywhere it is used as product branding.
 
 **How to apply:** Keep the public website and Studio consistent without changing student-authored content, saved work, existing logins, or service URLs.
+
+## Requested public domain
+
+The user wants `thebrightside.net` as the website’s public domain.
+
+**Why:** The user explicitly requested this address as part of the Brightside branding.
+
+**How to apply:** Treat this as the intended domain, not proof of ownership or connection. Check deployment metadata for the actual live URL before changing domain-dependent settings.

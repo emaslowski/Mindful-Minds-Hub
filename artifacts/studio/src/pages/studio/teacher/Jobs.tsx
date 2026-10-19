@@ -96,7 +96,7 @@ function JobForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="bg-white border-[#d5cabe] font-mono"
-            placeholder={isEdit ? (hasPassword ? 'Type new password to change' : 'Set a password') : 'e.g. mindmatters2025'}
+            placeholder={isEdit ? (hasPassword ? 'Type new password to change' : 'Set a password') : 'Choose a strong password'}
             autoComplete="new-password"
           />
         </div>

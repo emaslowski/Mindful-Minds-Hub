@@ -2,6 +2,7 @@
  * Studio API helpers — used by all student and teacher dashboard pages.
  * Uses relative /api paths which are proxied to the API server by Replit.
  */
+import { normalizeStudioBranding } from './studioBranding';
 
 export interface StudioUser {
   id: number;
@@ -45,7 +46,8 @@ export async function studioFetch<T = unknown>(
     throw new StudioApiError(res.status, body.error ?? `Request failed: ${res.status}`);
   }
 
-  return res.json() as Promise<T>;
+  const data: T = await res.json();
+  return normalizeStudioBranding(data, /^\/teacher\/teams(?:\/|$)/.test(path));
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
