@@ -2,14 +2,12 @@ import type { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
-import { CheckCircle, LogIn, LogOut, PenLine, Star, Sun, User } from "lucide-react";
+import { CheckCircle, Home, LogIn, LogOut, PenLine, Star, Sun, User } from "lucide-react";
 
 const mainLinks = [
-  { href: "/learn", label: "Explore" },
-  { href: "/create", label: "Create" },
-  { href: "/connect", label: "Connect" },
-  { href: "/about", label: "About" },
+  { href: "/", label: "Home" },
   { href: "/events", label: "Events" },
+  { href: "/contact", label: "Contact Us" },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -87,6 +85,16 @@ export function Layout({ children }: { children: ReactNode }) {
       </div>
 
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 pb-10 md:px-6">
+        {location !== "/" && (
+          <div className="mt-4 mb-2 flex w-full justify-start">
+            <Button asChild size="sm" variant="outline">
+              <Link href="/" data-testid="link-return-home" onClick={() => window.scrollTo(0, 0)}>
+                <Home aria-hidden="true" />
+                Return to Home
+              </Link>
+            </Button>
+          </div>
+        )}
         {children}
       </main>
     </div>

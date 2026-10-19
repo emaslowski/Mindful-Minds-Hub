@@ -30,7 +30,7 @@ export function WaveFooter({ quote = "Learn. Create. Connect. Belong." }: WaveFo
       </div>
       <nav aria-label="Footer navigation" className="flex flex-wrap justify-center gap-1 pb-3">
           {[
-            { href: "/about", label: "About" },
+            { href: "/", label: "Home" },
             { href: "/events", label: "Events" },
             { href: "/resources", label: "Resources" },
             { href: "/contact", label: "Contact" },

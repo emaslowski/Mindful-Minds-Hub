@@ -44,6 +44,8 @@ response instead.
 
 **How to apply:** reconcile the generated migration with the development database
 when practical. Until then, use explicit compatible projections for legacy tables.
+Before one-off data imports, inspect the actual destination columns through
+`information_schema` rather than assuming every declared column exists.
 
 ## Adding details to existing requests
 When evolving a request table that may already contain student submissions,

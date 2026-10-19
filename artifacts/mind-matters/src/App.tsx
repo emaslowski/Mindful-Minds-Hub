@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import {
   Route,
+  Redirect,
   Switch,
   useLocation,
   Router as WouterRouter,
@@ -29,7 +30,6 @@ import GrowCollab from '@/pages/GrowCollab';
 import BlankTemplate from '@/pages/BlankTemplate';
 import BlogPost from '@/pages/BlogPost';
 import SubmitPost from '@/pages/SubmitPost';
-import AboutUs from '@/pages/AboutUs';
 import Resources from '@/pages/Resources';
 import Events from '@/pages/Events';
 import CheckIn from '@/pages/CheckIn';
@@ -64,7 +64,7 @@ function PublicRouter() {
         <Route path="/games" component={GamesPage} />
 
         {/* Top Nav */}
-        <Route path="/about" component={AboutUs} />
+        <Route path="/about"><Redirect to="/" /></Route>
         <Route path="/resources" component={Resources} />
         <Route path="/events" component={Events} />
         <Route path="/contact" component={Contact} />

@@ -9,7 +9,6 @@ const centers = [
   { title: "Podcasts & Videos", description: "Listen, watch, and learn from peers.", href: "/listen/podcast", image: "tile-2.jpg", color: "bg-secondary/20" },
   { title: "Art & Drawing Studio", description: "Create art and follow drawing tutorials.", href: "/create", image: "tile-3.jpg", color: "bg-accent/25" },
   { title: "Games & Challenges", description: "Try quizzes, activities, and fun challenges.", href: "/games", image: "tile-4.jpg", color: "bg-accent/25" },
-  { title: "Calm & Coping Corner", description: "Explore simple ways to pause and reset.", href: "/learn", image: "tile-5.jpg", color: "bg-secondary/20" },
   { title: "Journaling Center", description: "Reflect with private writing prompts.", href: "/grow/journal", image: "tile-6.jpg", color: "bg-muted/30" },
   { title: "Movement & Sports", description: "Stretch, move, and learn new skills.", href: "/move", image: "tile-7.jpg", color: "bg-secondary/20" },
   { title: "Music & Mindful Moments", description: "Find sounds and guided pauses.", href: "/listen", image: "tile-8.jpg", color: "bg-muted/30" },
@@ -18,8 +17,6 @@ const centers = [
   { title: "Friendship & Belonging", description: "Practice kindness, teamwork, and inclusion.", href: "/connect", image: "tile-11.jpg", color: "bg-muted/30" },
   { title: "School & Community Events", description: "Discover events, clubs, and activities.", href: "/events", image: "tile-12.jpg", color: "bg-accent/25" },
   { title: "Groups & Connections", description: "Find teacher-approved ways to join in.", href: "/connect", image: "tile-13.jpg", color: "bg-secondary/20" },
-  { title: "Student Resources", description: "Find helpful tools and trusted information.", href: "/resources", image: "tile-14.jpg", color: "bg-muted/30" },
-  { title: "Connect with a Trusted Adult", description: "Learn how to contact school support.", href: "/contact", image: "tile-15.jpg", color: "bg-secondary/20" },
 ];
 
 const creatorRoles = [
@@ -138,18 +135,19 @@ export default function Home() {
 
       <section className="mx-auto mt-10 w-full max-w-6xl" aria-labelledby="process-title">
         <SectionHeading id="process-title">How we create</SectionHeading>
-        <ol className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+        <div className="w-full overflow-x-auto pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" role="region" aria-label="Creation process, scroll left to right" tabIndex={0}>
+        <ol className="flex min-w-max items-center justify-center gap-8 px-1 py-2" aria-label="Our creation process, in order">
           {processSteps.map((step, index) => (
-            <li key={step.title} className="relative flex flex-col items-center rounded-2xl bg-card/70 px-2 py-3 text-center">
-              <img src={`/assets/bright/${step.image}`} alt="" className="h-14 w-16 object-contain sm:h-16 sm:w-20" loading="lazy" />
-              <span className="mt-1 text-xs font-bold leading-tight sm:text-sm">{step.title}</span>
+            <li key={step.title} className="relative flex size-24 shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-secondary/30 bg-card/70 p-2 text-center">
+              <img src={`/assets/bright/${step.image}`} alt="" className="h-8 w-10 rounded-full object-contain" loading="lazy" />
+              <span className="text-xs font-bold leading-tight">{step.title}</span>
               {index < processSteps.length - 1 && (
-                <ArrowRight aria-hidden="true" className="absolute -right-3 top-1/2 z-10 hidden h-5 w-5 text-primary lg:block" />
+                <ArrowRight aria-hidden="true" className="absolute left-full top-1/2 ml-1 h-6 w-6 -translate-y-1/2 text-primary" />
               )}
             </li>
           ))}
         </ol>
-        <p className="mt-3 text-center text-sm text-foreground/75">Every student contribution is reviewed by a teacher before it is shared.</p>
+        </div>
       </section>
 
       <section className="mx-auto mt-8 grid w-full max-w-6xl gap-3 md:grid-cols-2" aria-label="More ways to belong">
@@ -163,7 +161,7 @@ export default function Home() {
             <ArrowUpRight aria-hidden="true" className="h-5 w-5 text-primary" />
           </Card>
         </Link>
-        <Link href="/resources" data-testid="link-welcoming-space" className="group rounded-2xl focus-visible:ring-2 focus-visible:ring-ring">
+        <Link href="/grow/collab" data-testid="link-welcoming-space" className="group rounded-2xl focus-visible:ring-2 focus-visible:ring-ring">
           <Card className="flex items-center gap-3 border-border bg-secondary/15 p-3 transition-transform group-hover:-translate-y-0.5">
             <img src="/assets/bright/welcome.jpg" alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" loading="lazy" />
             <span className="flex-1">

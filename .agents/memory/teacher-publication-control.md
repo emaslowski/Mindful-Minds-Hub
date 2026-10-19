@@ -25,3 +25,16 @@ publishing had been verified, while the live site still ran the older code.
 **How to apply:** Check the live deployment and its errors when this recurs.
 Use disposable development projects to verify decisions; never change real
 student submissions merely to test the buttons.
+
+## Preview copies of live publications
+
+When the user requests preview copies, copy only the already-published edition,
+not private student drafts, accounts, or assignments. Give copied media its own
+storage object rather than sharing the live object's path.
+
+**Why:** The user wanted existing live work visible in the redesign preview
+without changing the originals. Independent media prevents later preview edits
+or deletions from affecting a live image.
+
+**How to apply:** Import into development only, keep the published text and
+appearance intact, and verify both the copied media and the unchanged live piece.
