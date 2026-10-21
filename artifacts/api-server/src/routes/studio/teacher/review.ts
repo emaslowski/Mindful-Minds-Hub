@@ -249,7 +249,12 @@ router.post(
     if (publicationDraft !== undefined && !editionInput) {
       res.status(400).json({ error: 'Website draft settings are invalid. Check the title and formatting before publishing.' }); return;
     }
-    const destinations = ['blog', 'podcast', 'learn', 'create', 'calm-corner', 'move', 'cooking', 'grow', 'events', 'resources'];
+    const destinations = [
+      'blog', 'podcast', 'learn', 'create', 'calm-corner', 'move', 'cooking', 'grow', 'events', 'resources',
+      'move-morning-stretch', 'move-soccer-skills', 'move-basketball-drills',
+      'move-yoga-for-calm', 'move-stretch-break', 'move-active-challenge',
+      'directed-draws',
+    ];
     if (decision === 'approve_and_publish' && !destinations.includes(destinationSection!)) {
       res.status(400).json({ error: 'Choose a supported destination page.' }); return;
     }

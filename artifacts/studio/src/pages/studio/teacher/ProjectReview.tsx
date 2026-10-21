@@ -5,14 +5,14 @@ import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/Studi
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
 import { teacherReview, teacherSettings, AUTHOR_DISPLAY_OPTIONS, DESTINATION_SECTIONS, type DecisionData, type PublicationAppearance, type PublicationEdition } from '@/lib/studioApi';
 import { PublishedArticle } from '@workspace/mind-matters-ds/components/PublishedArticle';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/mind-matters-ds/components/ui/card';
+import { Button } from '@workspace/mind-matters-ds/components/ui/button';
+import { Textarea } from '@workspace/mind-matters-ds/components/ui/textarea';
+import { Input } from '@workspace/mind-matters-ds/components/ui/input';
+import { Label } from '@workspace/mind-matters-ds/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/mind-matters-ds/components/ui/select';
+import { Badge } from '@workspace/mind-matters-ds/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/mind-matters-ds/components/ui/tabs';
 import { AlertCircle, CheckCircle, RotateCcw, Bookmark, Archive, ExternalLink, Film, Download, Bold, Italic, List, ListOrdered, Link2, Quote, Heading2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { videoProductions } from '@/lib/videoApi';
@@ -88,6 +88,13 @@ const DESTINATION_OPTIONS = [
   { value: 'create', label: 'Creative Activities' },
   { value: 'calm-corner', label: 'Calm Corner (Meditation)' },
   { value: 'move', label: 'Move Your Mind' },
+  { value: 'move-morning-stretch', label: 'Move · Morning Stretch' },
+  { value: 'move-soccer-skills', label: 'Move · Soccer Skills' },
+  { value: 'move-basketball-drills', label: 'Move · Basketball Drills' },
+  { value: 'move-yoga-for-calm', label: 'Move · Yoga for Calm' },
+  { value: 'move-stretch-break', label: 'Move · Stretch Break' },
+  { value: 'move-active-challenge', label: 'Move · Active Challenge' },
+  { value: 'directed-draws', label: 'Directed Draws · Easel' },
   { value: 'cooking', label: 'Healthy Habits / Recipes' },
   { value: 'grow', label: 'Grow / Journaling' },
   { value: 'events', label: 'Community Events' },
@@ -180,7 +187,14 @@ export default function ProjectReview() {
     setSavedDraft(initial);
     setHasPersistedDraft((data.publicationDraftVersion ?? 0) > 0);
     setDraftVersion(data.publicationDraftVersion ?? 0);
-    setDestinationSection(data.publication?.destinationSection ?? DESTINATION_SECTIONS[data.project.contentType] ?? 'blog');
+    const requestedDestination = new URLSearchParams(window.location.search).get('destination');
+    setDestinationSection(
+      data.publication?.destinationSection
+      ?? (DESTINATION_OPTIONS.some((option) => option.value === requestedDestination)
+        ? requestedDestination!
+        : DESTINATION_SECTIONS[data.project.contentType])
+      ?? 'blog',
+    );
     setAuthorDisplay(data.publication?.authorDisplay ?? '');
     setDraftInitialized(true);
   }, [data, projectId]);
@@ -613,6 +627,11 @@ export default function ProjectReview() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {destinationSection === 'directed-draws' && (
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      Add the video in this website edition, save the draft, then publish it. Published drawing videos appear directly on the Directed Draws easel.
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-[#453329]">Author display name</Label>

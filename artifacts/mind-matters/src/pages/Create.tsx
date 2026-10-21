@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
+import { DirectedDrawsEasel, TeacherDrawingPostLink } from "@/components/DirectedDrawsEasel";
 import { PublishedSection } from "@/components/PublishedSection";
 
 export default function Create() {
@@ -81,7 +82,7 @@ export default function Create() {
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-8 bg-[#8B5A2B] rounded-t-sm z-0 opacity-90 shadow-inner"></div>
                 
                 {/* The Canvas */}
-                <Link href={section.path} className="block w-full h-full outline-none">
+                <div className="w-full h-full">
                   <div className="w-full h-full bg-[#FAF3E3] shadow-lg relative z-20 transition-transform duration-500 group-hover:-translate-y-2 flex items-center justify-center"
                        style={{
                          border: '1px solid rgba(200, 150, 120, 0.3)',
@@ -90,8 +91,15 @@ export default function Create() {
                     {/* Dashed organic border inside canvas */}
                     <div className="absolute inset-3 border-2 border-dashed border-terracotta/20 rounded-sm"></div>
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-terracotta"></div>
+                    {section.title === "Directed Draws" ? (
+                      <div className="absolute inset-5 z-20 flex min-h-0 items-center justify-center">
+                        <DirectedDrawsEasel />
+                      </div>
+                    ) : (
+                      <Link href={section.path} aria-label={`Open ${section.title}`} className="absolute inset-0 z-20" />
+                    )}
                   </div>
-                </Link>
+                </div>
 
                 {/* Easel Bottom Shelf */}
                 <div className="absolute -bottom-4 left-[-10%] w-[120%] h-4 bg-[#8B5A2B] shadow-md z-30 rounded-sm opacity-90 border-t border-white/20"></div>
@@ -101,6 +109,11 @@ export default function Create() {
                 <div className="absolute -bottom-24 right-[15%] w-4 h-24 bg-[#8B5A2B] -rotate-[18deg] z-10 origin-top opacity-90 rounded-b-sm shadow-md"></div>
                 <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-4 h-20 bg-[#6A4420] z-0 origin-top opacity-80 rounded-b-sm"></div>
               </div>
+              {section.title === "Directed Draws" && (
+                <div className="mt-28 flex w-full justify-center">
+                  <TeacherDrawingPostLink />
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -22,6 +22,8 @@ import Create from '@/pages/Create';
 import Cooking from '@/pages/Cooking';
 import Connect from '@/pages/Connect';
 import Move from '@/pages/Move';
+import MoveActivity from '@/pages/MoveActivity';
+import DirectedDraws from '@/pages/DirectedDraws';
 import Listen from '@/pages/Listen';
 import Grow from '@/pages/Grow';
 import GrowJournal from '@/pages/GrowJournal';
@@ -84,6 +86,7 @@ function PublicRouter() {
 
         {/* Create Section */}
         <Route path="/create" component={Create} />
+        <Route path="/create/directed-draws" component={DirectedDraws} />
         <Route path="/create/cooking" component={Cooking} />
         <Route path="/create/cooking/videos">
           {() => <BlankTemplate title="Cooking Videos" subtitle="Grab your apron! Videos coming soon." />}
@@ -103,9 +106,7 @@ function PublicRouter() {
 
         {/* Move Section */}
         <Route path="/move" component={Move} />
-        <Route path="/move/:category">
-          {() => <BlankTemplate title="Let's Move" subtitle="New workouts and challenges coming soon. Students can add content here!" />}
-        </Route>
+        <Route path="/move/:category" component={MoveActivity} />
 
         {/* Listen Section */}
         <Route path="/listen" component={Listen} />

@@ -16,6 +16,16 @@ must not silently change an already published page; only an explicit publish
 or update action changes the public edition. Use the same rendering for the
 teacher preview and the website so formatting choices match.
 
+Teachers want to post separately in each Movement drill/activity section.
+Directed Draws videos should play directly on the illustrated easel, not require
+opening a separate story first.
+
+**Why:** The user asked to post in each different Movement drill section and
+to put a video right on the Directed Draws easel.
+
+**How to apply:** Preserve section-specific placement and the normal explicit
+teacher publishing step; uploading or saving alone must not expose a draft.
+
 Verify all teacher decisions from the Teacher Reviewing state, not just the
 publish path. Clearly distinguish preview verification from a live-site fix.
 

@@ -3,9 +3,9 @@ import { Link, useLocation } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
 import { CONTENT_TYPES, teacherReview } from '@/lib/studioApi';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from '@workspace/mind-matters-ds/components/ui/card';
+import { Button } from '@workspace/mind-matters-ds/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/mind-matters-ds/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,14 +15,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@workspace/mind-matters-ds/components/ui/alert-dialog';
 import { AlertCircle, ChevronRight, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@workspace/mind-matters-ds/components/ui/dialog';
+import { Input } from '@workspace/mind-matters-ds/components/ui/input';
+import { Label } from '@workspace/mind-matters-ds/components/ui/label';
 
 const ALL_STATUSES = [
   'Assigned', 'Researching', 'Peer Review',
@@ -32,12 +32,17 @@ const ALL_STATUSES = [
 
 export default function AllProjects() {
   const { user, isLoading } = useRequireStudioRole('teacher');
+  const routeParams = new URLSearchParams(window.location.search);
+  const requestedDestination = routeParams.get('destination') ?? '';
+  const requestedContentType = routeParams.get('contentType') ?? '';
   const [statusFilter, setStatusFilter] = useState('');
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [confirmTitle, setConfirmTitle] = useState('');
-  const [createOpen, setCreateOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newContentType, setNewContentType] = useState<string>('Blog article');
+  const [createOpen, setCreateOpen] = useState(requestedDestination === 'directed-draws');
+  const [newTitle, setNewTitle] = useState(requestedDestination === 'directed-draws' ? 'Directed drawing activity' : '');
+  const [newContentType, setNewContentType] = useState<string>(
+    CONTENT_TYPES.includes(requestedContentType as (typeof CONTENT_TYPES)[number]) ? requestedContentType : 'Blog article',
+  );
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [, navigate] = useLocation();
@@ -69,7 +74,8 @@ export default function AllProjects() {
       setCreateOpen(false);
       setNewTitle('');
       toast({ title: 'Website post created', description: 'You can now build its website edition.' });
-      navigate(`/studio/teacher/review/${project.id}`);
+      const destinationQuery = requestedDestination ? `?destination=${encodeURIComponent(requestedDestination)}` : '';
+      navigate(`/studio/teacher/review/${project.id}${destinationQuery}`);
     },
     onError: (error: Error) => toast({ title: 'Could not create website post', description: error.message, variant: 'destructive' }),
   });
