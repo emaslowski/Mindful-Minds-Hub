@@ -3,11 +3,16 @@ import { Mic, PlayCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useGetPublishedContent } from "@workspace/api-client-react";
 import { format } from "date-fns";
-import { PublishedArticle, type PublicationAppearance } from "@workspace/mind-matters-ds/components/PublishedArticle";
+import { PublishedArticle, type PublicationAppearance, type PublicationBlock } from "@workspace/mind-matters-ds/components/PublishedArticle";
 
 export default function ListenPodcast() {
   const { data, isLoading } = useGetPublishedContent({ section: "podcast" }, { query: { staleTime: 45_000, refetchOnWindowFocus: true } });
-  const episodes = data?.publications ?? [];
+  const episodes = (data?.publications ?? []) as Array<
+    NonNullable<typeof data>["publications"][number] & {
+      appearance?: PublicationAppearance;
+      blocks?: PublicationBlock[];
+    }
+  >;
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
@@ -58,8 +63,10 @@ export default function ListenPodcast() {
                   <PublishedArticle
                     title={ep.title}
                     content={ep.content}
-                    appearance={(ep as typeof ep & { appearance?: PublicationAppearance }).appearance}
+                    appearance={ep.appearance}
                     authorDisplay={ep.authorDisplay}
+                    blocks={ep.blocks}
+                    projectId={ep.projectId}
                   />
                 </div>
               </div>
