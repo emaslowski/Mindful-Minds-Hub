@@ -7,6 +7,7 @@ type PublishedSectionProps = {
   section: string;
   heading?: string;
   className?: string;
+  excludeProjectIds?: number[];
 };
 
 type PublicEditionItem = {
@@ -20,12 +21,14 @@ type PublicEditionItem = {
   projectId?: number;
 };
 
-export function PublishedSection({ section, heading = "From Our Students", className = "" }: PublishedSectionProps) {
+export function PublishedSection({ section, heading = "From Our Students", className = "", excludeProjectIds = [] }: PublishedSectionProps) {
   const { data, isLoading, isError, refetch } = useGetPublishedContent(
     { section },
     { query: { staleTime: 45_000, refetchOnWindowFocus: true } },
   );
-  const items = [...((data?.publications ?? []) as PublicEditionItem[])].sort(
+  const items = ((data?.publications ?? []) as PublicEditionItem[]).filter(
+    (item) => !excludeProjectIds.includes(item.projectId ?? item.id),
+  ).sort(
     (a, b) => (a.pageOrder ?? 0) - (b.pageOrder ?? 0),
   );
 

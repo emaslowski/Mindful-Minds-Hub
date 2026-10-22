@@ -2,19 +2,25 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
 import { PublishedSection } from "@/components/PublishedSection";
+import { useGetPublishedContent } from "@workspace/api-client-react";
+import { PublishedArticle, type PublicationEdition } from "@workspace/mind-matters-ds/components/PublishedArticle";
+import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 
 export default function Cooking() {
   const [activeTab, setActiveTab] = useState<"videos" | "recipes">("recipes");
+  const { data, isLoading, isError, refetch } = useGetPublishedContent(
+    { section: "cooking" },
+    { query: { staleTime: 45_000, refetchOnWindowFocus: true } },
+  );
+  const publications = (data?.publications ?? []) as Array<PublicationEdition & {
+    projectId: number;
+    authorDisplay?: string;
+  }>;
+  const featuredRecipe = publications.find((item) =>
+    /\byogurt\s+pops(?:icles)?\b/i.test(item.title),
+  );
 
   const recipes = [
-    {
-      id: 1,
-      title: "Yogurt Pops",
-      category: "Snack",
-      desc: "A cool and fruity treat for any day!",
-      time: "10 min",
-      colors: "from-dusty-rose/30 to-amber/20"
-    },
     {
       id: 2,
       title: "Apples & Peanut Butter",
@@ -102,6 +108,24 @@ export default function Cooking() {
 
             {/* Right side: Recipes Grid */}
             <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <section aria-labelledby="recipe-of-the-month" className="sm:col-span-2 overflow-hidden rounded-2xl border border-card-border/50 bg-card shadow-sm">
+                <h2 id="recipe-of-the-month" className="border-b border-card-border/40 px-5 py-3 text-center font-handwritten text-xl text-terracotta">
+                  Recipe of the Month
+                </h2>
+                <div className="p-6">
+                  {isLoading ? <p role="status" className="font-sans text-foreground/70">Loading this month's recipe…</p>
+                    : isError ? <div role="alert"><p className="mb-3 font-sans text-foreground/70">This month's recipe could not be loaded.</p><Button variant="outline" onClick={() => refetch()}>Try again</Button></div>
+                    : featuredRecipe ? <PublishedArticle
+                      title={featuredRecipe.title}
+                      content={featuredRecipe.content}
+                      appearance={featuredRecipe.appearance}
+                      authorDisplay={featuredRecipe.authorDisplay}
+                      blocks={featuredRecipe.blocks}
+                      projectId={featuredRecipe.projectId}
+                    />
+                    : <p className="font-sans text-foreground/70">This month's recipe will appear here when it is published.</p>}
+                </div>
+              </section>
               {recipes.map(recipe => (
                 <Link key={recipe.id} href={`/create/cooking/recipes/${recipe.id}`}>
                   <div className="flex flex-col bg-card rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full cursor-pointer group border border-card-border/50 relative">
@@ -113,10 +137,6 @@ export default function Cooking() {
                       </svg>
                     </div>
 
-                    <div className="px-5 py-3 text-center text-sm font-handwritten text-terracotta border-b border-card-border/40 bg-white/40 text-xl">
-                      Recipe of the Month
-                    </div>
-                    
                     {/* Earthy Image Gradient Area */}
                     <div className={`w-full h-40 bg-gradient-to-br ${recipe.colors} opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center`}>
                       <span className="text-4xl opacity-50 font-display italic mix-blend-overlay">Fresh</span>
@@ -158,7 +178,7 @@ export default function Cooking() {
         )}
       </div>
 
-      <PublishedSection section="cooking" heading="Student Recipes" className="mb-12" />
+      <PublishedSection section="cooking" heading="Student Recipes" className="mb-12" excludeProjectIds={featuredRecipe ? [featuredRecipe.projectId] : []} />
       <WaveFooter quote="Nourish to flourish." />
     </div>
   );
