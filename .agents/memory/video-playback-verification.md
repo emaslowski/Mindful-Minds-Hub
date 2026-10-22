@@ -8,3 +8,16 @@ When a video player's media error occurs during automated testing, test the same
 **Why:** The development test browser rejected a valid H.264 MP4 both from its authenticated streaming endpoint and as a local data URL. The uploaded and original bytes matched, and authenticated range requests succeeded. Playback was therefore not verified despite successful upload and retrieval.
 
 **How to apply:** Treat upload persistence, access control, byte delivery, and codec playback as separate checks. Use a browser-supported video encoding for future playback verification, and report unverified playback honestly rather than claiming the full media experience passed.
+
+Keep browser byte-range responses bounded, and use chunked transfer for full
+large-media downloads rather than advertising a huge fixed Content-Length.
+
+**Why:** A valid 186 MB H.264/AAC meditation upload could be read from storage
+but repeatedly aborted on the published site, while a 13 MB video worked.
+Cloud Run limits non-chunked HTTP/1 responses to 32 MiB. Browsers often request
+an open-ended range, which otherwise becomes one response for the entire file.
+
+**How to apply:** Test open-ended and explicit large ranges, continuation,
+tail metadata, and full downloads above 32 MiB—not just tiny range requests.
+Preserve authentication and the active-publication media checks; do not replace
+private serving with public storage URLs to work around playback failures.

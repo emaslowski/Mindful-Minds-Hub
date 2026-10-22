@@ -16,6 +16,6 @@
 - [Student project visibility](student-project-visibility.md) — student dashboards show only their own working projects; switching group logins must not reuse another group's cached data.
 - [Editorial teacher workflow](editorial-teacher-workflow.md) — compliment-sandwich peer feedback goes to the teacher for decisions; no separate drafting stage.
 - [Video production workflow](video-production-workflow.md) — optional teacher-approved handoff to Video Producers; uploads return for final teacher review.
-- [Video playback verification](video-playback-verification.md) — test browser codec support separately from successful private video storage and streaming.
+- [Video playback verification](video-playback-verification.md) — separate codec and transport checks; bound video ranges and chunk large downloads to avoid hosting response limits.
 - [Teacher publication control](teacher-publication-control.md) — teachers control website editions; draft saves preserve student originals and do not silently update live pages.
 - [Blog publication style](blog-publication-style.md) — calming cover image, continuous writing without worksheet headings, and no sample articles.

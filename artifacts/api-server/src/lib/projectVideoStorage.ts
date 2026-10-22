@@ -4,6 +4,10 @@ import { ObjectStorageService } from './objectStorage';
 
 export const videoStorage = new ObjectStorageService();
 export const MAX_VIDEO_BYTES = 250 * 1024 * 1024;
+// Browsers commonly start with "bytes=0-". Do not turn that into a single
+// 250 MiB fixed-length response: production proxies can reject responses over
+// 32 MiB before the browser receives even the first frame.
+export const MAX_VIDEO_CHUNK_BYTES = 4 * 1024 * 1024;
 
 export async function verifyVideoFile(file: File, mimeType: string, expectedSize: number) {
   const [metadata] = await file.getMetadata();
@@ -34,12 +38,19 @@ export async function streamProjectVideo(file: File, req: Request, res: Response
   res.setHeader('Cache-Control', 'private, no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Accept-Ranges', 'bytes');
+  if (req.method === 'HEAD') {
+    res.setHeader('Content-Length', size);
+    res.status(200).end();
+    return;
+  }
   const range = req.headers.range;
   let start = 0;
   let end = size - 1;
   if (range) {
     const match = /^bytes=(\d*)-(\d*)$/.exec(range);
-    if (!match || (!match[1] && !match[2])) {
+    if (!match || (!match[1] && !match[2]) ||
+      (match[1] && !Number.isSafeInteger(Number(match[1]))) ||
+      (match[2] && !Number.isSafeInteger(Number(match[2])))) {
       res.setHeader('Content-Range', `bytes */${size}`);
       res.status(416).end();
       return;
@@ -55,10 +66,15 @@ export async function streamProjectVideo(file: File, req: Request, res: Response
       res.status(416).end();
       return;
     }
+    end = Math.min(end, start + MAX_VIDEO_CHUNK_BYTES - 1);
     res.status(206);
     res.setHeader('Content-Range', `bytes ${start}-${end}/${size}`);
+    res.setHeader('Content-Length', end - start + 1);
+  } else if (size <= MAX_VIDEO_CHUNK_BYTES) {
+    res.setHeader('Content-Length', size);
   }
-  res.setHeader('Content-Length', end - start + 1);
+  // For a full large download, omit Content-Length so Node uses chunked
+  // transfer encoding rather than exceeding the production response limit.
   const stream = file.createReadStream({ start, end });
   stream.on('error', () => {
     if (!res.headersSent) res.status(502).end();
