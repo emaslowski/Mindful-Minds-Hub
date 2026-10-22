@@ -1,5 +1,6 @@
 import type { CSSProperties, ElementType, ReactNode } from "react";
 import defaultBlogCover from "../assets/blog-calm-lake.jpg";
+import { PublicationVideo } from "./PublicationVideo";
 
 export type PublicationAppearance = {
   fontFamily: "serif" | "sans";
@@ -188,7 +189,7 @@ function renderBlock(block: PublicationBlock, resolveMedia: (id: number) => stri
     return <figure className="published-media"><img src={media} alt={block.alt ?? ""} style={{ objectFit: block.fit ?? "contain" }} />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>;
   }
   if (block.type === "video") {
-    return <figure className="published-media"><video controls preload="metadata" playsInline src={media}>{mediaFallback}Your browser cannot play this video. {mediaFallback}</video>{block.caption && <figcaption>{block.caption}</figcaption>}{mediaFallback}</figure>;
+    return <figure className="published-media"><PublicationVideo key={media} src={media} />{block.caption && <figcaption>{block.caption}</figcaption>}{mediaFallback}</figure>;
   }
   return <figure className="published-media"><audio controls preload="metadata" src={media}>Your browser cannot play this audio. {mediaFallback}</audio>{block.caption && <figcaption>{block.caption}</figcaption>}{mediaFallback}</figure>;
 }

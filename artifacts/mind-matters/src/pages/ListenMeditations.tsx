@@ -47,6 +47,8 @@ export default function ListenMeditations() {
                 <PublishedArticle
                   title={med.title}
                   content={med.content}
+                  blocks={med.blocks}
+                  projectId={med.projectId}
                   appearance={(med as typeof med & { appearance?: PublicationAppearance }).appearance}
                   authorDisplay={med.authorDisplay}
                 />
