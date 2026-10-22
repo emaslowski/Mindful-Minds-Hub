@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
 import { DirectedDrawsEasel, TeacherDrawingPostLink } from "@/components/DirectedDrawsEasel";
 import { PublishedSection } from "@/components/PublishedSection";
+import { ArtworkGallery } from "@/components/ArtworkGallery";
 
 export default function Create() {
   const sections = [
@@ -117,6 +118,7 @@ export default function Create() {
             </div>
           ))}
         </div>
+        <ArtworkGallery />
       </div>
       
       <PublishedSection section="create" heading="Creative work from our students" className="mb-12" />

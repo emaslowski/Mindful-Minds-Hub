@@ -8,6 +8,127 @@
 import * as zod from 'zod';
 
 
+export const ListArtworkResponse = zod.object({
+  "artworks": zod.array(zod.object({
+  "id": zod.number(),
+  "artistName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})),
+  "featured": zod.union([zod.object({
+  "id": zod.number(),
+  "artistName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+}),zod.null()]),
+  "month": zod.string()
+})
+
+
+export const ListMyArtworkResponseItem = zod.object({
+  "id": zod.number(),
+  "artistName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+export const ListMyArtworkResponse = zod.array(ListMyArtworkResponseItem)
+
+
+export const requestArtworkUploadBodyArtistNameMax = 40;
+
+export const requestArtworkUploadBodyTitleMax = 100;
+
+export const requestArtworkUploadBodyFilenameMax = 255;
+
+export const requestArtworkUploadBodySizeMax = 10485760;
+
+
+
+export const RequestArtworkUploadBody = zod.object({
+  "artistName": zod.string().min(1).max(requestArtworkUploadBodyArtistNameMax),
+  "title": zod.string().min(1).max(requestArtworkUploadBodyTitleMax),
+  "filename": zod.string().min(1).max(requestArtworkUploadBodyFilenameMax),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp']),
+  "size": zod.number().min(1).max(requestArtworkUploadBodySizeMax),
+  "consent": zod.boolean()
+})
+
+export const RequestArtworkUploadResponse = zod.object({
+  "id": zod.number(),
+  "uploadUrl": zod.string()
+})
+
+
+export const CompleteArtworkParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CompleteArtworkResponse = zod.object({
+  "id": zod.number(),
+  "artistName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+
+
+export const DeleteArtworkParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteArtworkResponse = zod.void()
+
+
+export const GetArtworkImageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetArtworkImageResponse = zod.unknown()
+
+
+export const ListTeacherArtworkResponseItem = zod.object({
+  "id": zod.number(),
+  "artistName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+export const ListTeacherArtworkResponse = zod.array(ListTeacherArtworkResponseItem)
+
+
+export const UpdateArtworkParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateArtworkBody = zod.object({
+  "status": zod.enum(['approved', 'rejected']).optional(),
+  "featuredMonth": zod.string().nullish()
+})
+
+export const UpdateArtworkResponse = zod.object({
+  "id": zod.number(),
+  "artistName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+
+
 export const ListVideoProductionsResponse = zod.object({
   "productions": zod.array(zod.object({
   "projectId": zod.number(),

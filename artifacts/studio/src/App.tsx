@@ -30,6 +30,7 @@ import Handoffs from '@/pages/studio/teacher/Handoffs';
 import Analytics from '@/pages/studio/teacher/Analytics';
 import Settings from '@/pages/studio/teacher/Settings';
 import AnonymousAccess from '@/pages/studio/teacher/AnonymousAccess';
+import TeacherArtwork from '@/pages/studio/teacher/Artwork';
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ function StudioRouter() {
       <Route path="/studio" component={StudentDashboard} />
 
       {/* Teacher routes */}
+      <Route path="/studio/teacher/artwork" component={TeacherArtwork} />
       <Route path="/studio/teacher/review/:id" component={ProjectReview} />
       <Route path="/studio/teacher/review" component={ReviewQueue} />
       <Route path="/studio/teacher/projects" component={AllProjects} />

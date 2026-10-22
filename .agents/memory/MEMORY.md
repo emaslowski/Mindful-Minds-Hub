@@ -19,3 +19,4 @@
 - [Video playback verification](video-playback-verification.md) — separate codec and transport checks; bound video ranges and chunk large downloads to avoid hosting response limits.
 - [Teacher publication control](teacher-publication-control.md) — teachers control website editions; draft saves preserve student originals and do not silently update live pages.
 - [Blog publication style](blog-publication-style.md) — calming cover image, continuous writing without worksheet headings, and no sample articles.
+- [Language learning content](language-learning-content.md) — Spanish and ASL activity-center scope; verified handshapes, movement-aware instruction, and optional audio.

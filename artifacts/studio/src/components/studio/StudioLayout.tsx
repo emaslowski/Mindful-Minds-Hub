@@ -8,7 +8,7 @@ import { isEditorialGroup } from '@/lib/editorialRole';
 import {
   LayoutDashboard, FolderOpen, Users, Star, Send, BookOpen,
   LogOut, Globe, ClipboardCheck, BarChart3, RefreshCw,
-  Briefcase, CalendarDays, ChevronRight, Settings, KeyRound, Menu, X, Film,
+  Briefcase, CalendarDays, ChevronRight, Settings, KeyRound, Menu, X, Film, Image,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { isVideoProducer } from '@/lib/videoApi';
@@ -31,6 +31,7 @@ const STUDENT_NAV: NavItem[] = [
 const TEACHER_NAV: NavItem[] = [
   { href: '/studio/teacher', label: 'Command Center', icon: <LayoutDashboard className="h-4 w-4" /> },
   { href: '/studio/teacher/review', label: 'Review Submissions', icon: <ClipboardCheck className="h-4 w-4" /> },
+  { href: '/studio/teacher/artwork', label: 'Student Artwork', icon: <Image className="h-4 w-4" /> },
   { href: '/studio/teacher/projects', label: 'All Projects', icon: <FolderOpen className="h-4 w-4" /> },
   { href: '/studio/teacher/students', label: 'Students', icon: <Users className="h-4 w-4" /> },
   { href: '/studio/teacher/jobs', label: 'Jobs', icon: <Briefcase className="h-4 w-4" /> },

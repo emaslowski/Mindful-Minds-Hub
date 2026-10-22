@@ -5,3 +5,4 @@ export * from "./mindMatters";
 export * from "./friendship";
 export * from "./studio";
 export * from "./studioVideoProductions";
+export * from "./artwork";

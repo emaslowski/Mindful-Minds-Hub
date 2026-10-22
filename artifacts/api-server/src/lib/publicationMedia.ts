@@ -19,7 +19,7 @@ export function serializePublicationMedia(row: typeof media.$inferSelect) {
   };
 }
 
-export async function verifyPublicationFile(file: File, row: typeof media.$inferSelect): Promise<void> {
+export async function verifyPublicationFile(file: File, row: Pick<typeof media.$inferSelect, 'kind' | 'contentType' | 'size'>): Promise<void> {
   if (row.kind === 'video') {
     await verifyVideoFile(file, row.contentType, row.size);
     return;

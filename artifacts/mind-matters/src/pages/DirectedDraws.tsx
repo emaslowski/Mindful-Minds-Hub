@@ -2,6 +2,7 @@ import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Link } from "wouter";
 import { PublishedSection } from "@/components/PublishedSection";
 import { WaveFooter } from "@/components/WaveFooter";
+import { ArtworkGallery } from "@/components/ArtworkGallery";
 
 export default function DirectedDraws() {
   return (
@@ -13,6 +14,7 @@ export default function DirectedDraws() {
         <p className="mx-auto mt-3 max-w-2xl text-lg text-foreground/75">Follow a drawing lesson, pause whenever you need, and add your own creative details.</p>
       </header>
       <PublishedSection section="directed-draws" heading="Drawing lessons and editions" className="mb-12" />
+      <ArtworkGallery />
       <WaveFooter quote="There is no wrong way to create." />
     </div>
   );

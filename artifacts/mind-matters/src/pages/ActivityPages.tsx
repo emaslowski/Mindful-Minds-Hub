@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   GardeningSection,
-  LanguageSection,
 } from "@/components/HomeActivitySections";
+import LanguageCenter from "@/components/language/LanguageCenter";
 import { SnakeGame } from "@/components/SnakeGame";
 import { HangmanGame } from "@/components/games/HangmanGame";
 import { ScrabbleGame } from "@/components/games/ScrabbleGame";
@@ -26,7 +26,7 @@ export function GardeningPage() {
 }
 
 export function LanguageCornerPage() {
-  return <ActivityPage><LanguageSection /></ActivityPage>;
+  return <LanguageCenter />;
 }
 
 export function GamesPage() {

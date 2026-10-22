@@ -13,7 +13,7 @@ const centers = [
   { title: "Movement & Sports", description: "Stretch, move, and learn new skills.", href: "/move", image: "tile-7.jpg", color: "bg-secondary/20" },
   { title: "Music & Mindful Moments", description: "Find sounds and guided pauses.", href: "/listen", image: "tile-8.jpg", color: "bg-muted/30" },
   { title: "Cooking & Healthy Recipes", description: "Discover recipes and kitchen creativity.", href: "/create/cooking", image: "tile-9.jpg", color: "bg-accent/25" },
-  { title: "Language Corner", description: "Explore words, languages, and cultures.", href: "/language-corner", image: "tile-10.jpg", color: "bg-secondary/20" },
+  { title: "Language Corner", description: "Play Spanish vocabulary and ASL handshape games.", href: "/language-corner", image: "tile-10.jpg", color: "bg-secondary/20" },
   { title: "Friendship & Belonging", description: "Practice kindness, teamwork, and inclusion.", href: "/connect", image: "tile-11.jpg", color: "bg-muted/30" },
   { title: "School & Community Events", description: "Discover events, clubs, and activities.", href: "/events", image: "tile-12.jpg", color: "bg-accent/25" },
   { title: "Groups & Connections", description: "Find teacher-approved ways to join in.", href: "/connect", image: "tile-13.jpg", color: "bg-secondary/20" },

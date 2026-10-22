@@ -48,3 +48,16 @@ or deletions from affecting a live image.
 
 **How to apply:** Import into development only, keep the published text and
 appearance intact, and verify both the copied media and the unchanged live piece.
+
+## Student artwork and monthly recognition
+
+Students can submit photos of their artwork beneath the directed draw videos.
+Keep posting directions beside the submission form. Each month's winner is
+the website's Featured Artist of the Month.
+
+**Why:** The user requested student artwork uploads under the directed draws,
+instructions for posting, and a featured artist each month.
+
+**How to apply:** Preserve teacher approval before student photos appear
+publicly, and teacher control of the monthly winner. Do not choose winners
+automatically or introduce student voting without a new request.

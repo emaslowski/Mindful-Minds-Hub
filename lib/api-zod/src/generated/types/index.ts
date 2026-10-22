@@ -7,6 +7,14 @@
  */
 
 export * from './analyticsSummary';
+export * from './artworkEntry';
+export * from './artworkEntryStatus';
+export * from './artworkGallery';
+export * from './artworkReviewInput';
+export * from './artworkReviewInputStatus';
+export * from './artworkUpload';
+export * from './artworkUploadInput';
+export * from './artworkUploadInputContentType';
 export * from './authorizationSessionHeaderParameter';
 export * from './authUser';
 export * from './authUserAccountType';

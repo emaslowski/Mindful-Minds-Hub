@@ -29,6 +29,96 @@ tags:
     description: Opt-in friendship matches for enrolled students
 
 paths:
+  /artwork:
+    get:
+      operationId: listArtwork
+      responses:
+        "200":
+          description: Approved gallery and current featured artist
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ArtworkGallery" }
+  /artwork/mine:
+    get:
+      operationId: listMyArtwork
+      responses:
+        "200":
+          description: Own submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ArtworkEntry" }
+  /artwork/upload-url:
+    post:
+      operationId: requestArtworkUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ArtworkUploadInput" }
+      responses:
+        "201":
+          description: Private upload reserved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ArtworkUpload" }
+  /artwork/{id}/complete:
+    post:
+      operationId: completeArtwork
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      responses:
+        "200":
+          description: Submitted for review
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ArtworkEntry" }
+  /artwork/{id}:
+    delete:
+      operationId: deleteArtwork
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      responses:
+        "204": { description: Submission withdrawn }
+  /artwork/{id}/image:
+    get:
+      operationId: getArtworkImage
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      responses:
+        "200":
+          description: Approved image or authorized private preview
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+  /teacher/artwork:
+    get:
+      operationId: listTeacherArtwork
+      responses:
+        "200":
+          description: Teacher review queue
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ArtworkEntry" }
+  /teacher/artwork/{id}:
+    patch:
+      operationId: updateArtwork
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ArtworkReviewInput" }
+      responses:
+        "200":
+          description: Review or monthly winner updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ArtworkEntry" }
   /studio/video-productions:
     get:
       operationId: listVideoProductions
@@ -828,6 +918,50 @@ components:
         type: string
 
   schemas:
+    ArtworkEntry:
+      type: object
+      required: [id, artistName, title, status, featuredMonth, createdAt, imageUrl]
+      properties:
+        id: { type: number }
+        artistName: { type: string }
+        title: { type: string }
+        status: { type: string, enum: [uploading, pending, approved, rejected] }
+        featuredMonth: { type: [string, "null"] }
+        createdAt: { type: string }
+        imageUrl: { type: string }
+    ArtworkGallery:
+      type: object
+      required: [artworks, featured, month]
+      properties:
+        artworks:
+          type: array
+          items: { $ref: "#/components/schemas/ArtworkEntry" }
+        featured:
+          oneOf:
+            - { $ref: "#/components/schemas/ArtworkEntry" }
+            - { type: "null" }
+        month: { type: string }
+    ArtworkUploadInput:
+      type: object
+      required: [artistName, title, filename, contentType, size, consent]
+      properties:
+        artistName: { type: string, minLength: 1, maxLength: 40 }
+        title: { type: string, minLength: 1, maxLength: 100 }
+        filename: { type: string, minLength: 1, maxLength: 255 }
+        contentType: { type: string, enum: [image/jpeg, image/png, image/webp] }
+        size: { type: number, minimum: 1, maximum: 10485760 }
+        consent: { type: boolean }
+    ArtworkUpload:
+      type: object
+      required: [id, uploadUrl]
+      properties:
+        id: { type: number }
+        uploadUrl: { type: string }
+    ArtworkReviewInput:
+      type: object
+      properties:
+        status: { type: string, enum: [approved, rejected] }
+        featuredMonth: { type: [string, "null"] }
     VideoProduction:
       type: object
       required: [projectId, projectTitle, contentType, content, projectStatus, status, instructions, filename, uploadedAt, videoUrl, createdAt]

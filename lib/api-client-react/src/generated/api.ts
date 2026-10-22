@@ -21,6 +21,11 @@ import type {
 
 import type {
   AnalyticsSummary,
+  ArtworkEntry,
+  ArtworkGallery,
+  ArtworkReviewInput,
+  ArtworkUpload,
+  ArtworkUploadInput,
   AuthUserEnvelope,
   BeginBrowserLoginParams,
   BlogPost,
@@ -93,6 +98,551 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getListArtworkUrl = () => {
+
+
+
+
+  return `/api/artwork`
+}
+
+export const listArtwork = async ( options?: Parameters<typeof customFetch>[1]): Promise<ArtworkGallery> => {
+
+  return customFetch<ArtworkGallery>(getListArtworkUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListArtworkQueryKey = () => {
+    return [
+    `/api/artwork`
+    ] as const;
+    }
+
+
+export const getListArtworkQueryOptions = <TData = Awaited<ReturnType<typeof listArtwork>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArtwork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListArtworkQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listArtwork>>> = ({ signal }) => listArtwork({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listArtwork>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListArtworkQueryResult = NonNullable<Awaited<ReturnType<typeof listArtwork>>>
+export type ListArtworkQueryError = ErrorType<unknown>
+
+
+
+export function useListArtwork<TData = Awaited<ReturnType<typeof listArtwork>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArtwork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListArtworkQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListMyArtworkUrl = () => {
+
+
+
+
+  return `/api/artwork/mine`
+}
+
+export const listMyArtwork = async ( options?: Parameters<typeof customFetch>[1]): Promise<ArtworkEntry[]> => {
+
+  return customFetch<ArtworkEntry[]>(getListMyArtworkUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyArtworkQueryKey = () => {
+    return [
+    `/api/artwork/mine`
+    ] as const;
+    }
+
+
+export const getListMyArtworkQueryOptions = <TData = Awaited<ReturnType<typeof listMyArtwork>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyArtwork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyArtworkQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyArtwork>>> = ({ signal }) => listMyArtwork({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyArtwork>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyArtworkQueryResult = NonNullable<Awaited<ReturnType<typeof listMyArtwork>>>
+export type ListMyArtworkQueryError = ErrorType<unknown>
+
+
+
+export function useListMyArtwork<TData = Awaited<ReturnType<typeof listMyArtwork>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyArtwork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyArtworkQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRequestArtworkUploadUrl = () => {
+
+
+
+
+  return `/api/artwork/upload-url`
+}
+
+export const requestArtworkUpload = async (artworkUploadInput: ArtworkUploadInput, options?: Parameters<typeof customFetch>[1]): Promise<ArtworkUpload> => {
+
+  return customFetch<ArtworkUpload>(getRequestArtworkUploadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(artworkUploadInput)
+  }
+);}
+
+
+
+
+
+export const getRequestArtworkUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestArtworkUpload>>, TError,{data: BodyType<ArtworkUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestArtworkUpload>>, TError,{data: BodyType<ArtworkUploadInput>}, TContext> => {
+
+const mutationKey = ['requestArtworkUpload'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestArtworkUpload>>, {data: BodyType<ArtworkUploadInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestArtworkUpload(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestArtworkUploadMutationResult = NonNullable<Awaited<ReturnType<typeof requestArtworkUpload>>>
+    export type RequestArtworkUploadMutationBody = BodyType<ArtworkUploadInput>
+    export type RequestArtworkUploadMutationError = ErrorType<unknown>
+
+    export const useRequestArtworkUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestArtworkUpload>>, TError,{data: BodyType<ArtworkUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestArtworkUpload>>,
+        TError,
+        {data: BodyType<ArtworkUploadInput>},
+        TContext
+      > => {
+      return useMutation(getRequestArtworkUploadMutationOptions(options));
+    }
+
+export const getCompleteArtworkUrl = (id: number,) => {
+
+
+
+
+  return `/api/artwork/${id}/complete`
+}
+
+export const completeArtwork = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<ArtworkEntry> => {
+
+  return customFetch<ArtworkEntry>(getCompleteArtworkUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCompleteArtworkMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeArtwork>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeArtwork>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['completeArtwork'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeArtwork>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  completeArtwork(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteArtworkMutationResult = NonNullable<Awaited<ReturnType<typeof completeArtwork>>>
+
+    export type CompleteArtworkMutationError = ErrorType<unknown>
+
+    export const useCompleteArtwork = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeArtwork>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof completeArtwork>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getCompleteArtworkMutationOptions(options));
+    }
+
+export const getDeleteArtworkUrl = (id: number,) => {
+
+
+
+
+  return `/api/artwork/${id}`
+}
+
+export const deleteArtwork = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteArtworkUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteArtworkMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteArtwork>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteArtwork>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteArtwork'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteArtwork>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteArtwork(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteArtworkMutationResult = NonNullable<Awaited<ReturnType<typeof deleteArtwork>>>
+
+    export type DeleteArtworkMutationError = ErrorType<unknown>
+
+    export const useDeleteArtwork = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteArtwork>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteArtwork>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteArtworkMutationOptions(options));
+    }
+
+export const getGetArtworkImageUrl = (id: number,) => {
+
+
+
+
+  return `/api/artwork/${id}/image`
+}
+
+export const getArtworkImage = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetArtworkImageUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetArtworkImageQueryKey = (id: number,) => {
+    return [
+    `/api/artwork/${id}/image`
+    ] as const;
+    }
+
+
+export const getGetArtworkImageQueryOptions = <TData = Awaited<ReturnType<typeof getArtworkImage>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArtworkImage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetArtworkImageQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getArtworkImage>>> = ({ signal }) => getArtworkImage(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getArtworkImage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetArtworkImageQueryResult = NonNullable<Awaited<ReturnType<typeof getArtworkImage>>>
+export type GetArtworkImageQueryError = ErrorType<unknown>
+
+
+
+export function useGetArtworkImage<TData = Awaited<ReturnType<typeof getArtworkImage>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArtworkImage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetArtworkImageQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListTeacherArtworkUrl = () => {
+
+
+
+
+  return `/api/teacher/artwork`
+}
+
+export const listTeacherArtwork = async ( options?: Parameters<typeof customFetch>[1]): Promise<ArtworkEntry[]> => {
+
+  return customFetch<ArtworkEntry[]>(getListTeacherArtworkUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListTeacherArtworkQueryKey = () => {
+    return [
+    `/api/teacher/artwork`
+    ] as const;
+    }
+
+
+export const getListTeacherArtworkQueryOptions = <TData = Awaited<ReturnType<typeof listTeacherArtwork>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTeacherArtwork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTeacherArtworkQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTeacherArtwork>>> = ({ signal }) => listTeacherArtwork({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTeacherArtwork>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListTeacherArtworkQueryResult = NonNullable<Awaited<ReturnType<typeof listTeacherArtwork>>>
+export type ListTeacherArtworkQueryError = ErrorType<unknown>
+
+
+
+export function useListTeacherArtwork<TData = Awaited<ReturnType<typeof listTeacherArtwork>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTeacherArtwork>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListTeacherArtworkQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateArtworkUrl = (id: number,) => {
+
+
+
+
+  return `/api/teacher/artwork/${id}`
+}
+
+export const updateArtwork = async (id: number,
+    artworkReviewInput: ArtworkReviewInput, options?: Parameters<typeof customFetch>[1]): Promise<ArtworkEntry> => {
+
+  return customFetch<ArtworkEntry>(getUpdateArtworkUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(artworkReviewInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateArtworkMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtwork>>, TError,{id: number;data: BodyType<ArtworkReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateArtwork>>, TError,{id: number;data: BodyType<ArtworkReviewInput>}, TContext> => {
+
+const mutationKey = ['updateArtwork'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateArtwork>>, {id: number;data: BodyType<ArtworkReviewInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateArtwork(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateArtworkMutationResult = NonNullable<Awaited<ReturnType<typeof updateArtwork>>>
+    export type UpdateArtworkMutationBody = BodyType<ArtworkReviewInput>
+    export type UpdateArtworkMutationError = ErrorType<unknown>
+
+    export const useUpdateArtwork = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtwork>>, TError,{id: number;data: BodyType<ArtworkReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateArtwork>>,
+        TError,
+        {id: number;data: BodyType<ArtworkReviewInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateArtworkMutationOptions(options));
+    }
 
 export const getListVideoProductionsUrl = () => {
 

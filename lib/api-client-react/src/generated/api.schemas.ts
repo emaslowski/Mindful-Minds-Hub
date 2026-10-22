@@ -5,6 +5,86 @@
  * Mind Matters API
  * OpenAPI spec version: 0.1.0
  */
+export type ArtworkEntryStatus = typeof ArtworkEntryStatus[keyof typeof ArtworkEntryStatus];
+
+
+export const ArtworkEntryStatus = {
+  uploading: 'uploading',
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface ArtworkEntry {
+  id: number;
+  artistName: string;
+  title: string;
+  status: ArtworkEntryStatus;
+  /** @nullable */
+  featuredMonth: string | null;
+  createdAt: string;
+  imageUrl: string;
+}
+
+export interface ArtworkGallery {
+  artworks: ArtworkEntry[];
+  featured: ArtworkEntry | null;
+  month: string;
+}
+
+export type ArtworkUploadInputContentType = typeof ArtworkUploadInputContentType[keyof typeof ArtworkUploadInputContentType];
+
+
+export const ArtworkUploadInputContentType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/webp': 'image/webp',
+} as const;
+
+export interface ArtworkUploadInput {
+  /**
+     * @minLength 1
+     * @maxLength 40
+     */
+  artistName: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  filename: string;
+  contentType: ArtworkUploadInputContentType;
+  /**
+     * @minimum 1
+     * @maximum 10485760
+     */
+  size: number;
+  consent: boolean;
+}
+
+export interface ArtworkUpload {
+  id: number;
+  uploadUrl: string;
+}
+
+export type ArtworkReviewInputStatus = typeof ArtworkReviewInputStatus[keyof typeof ArtworkReviewInputStatus];
+
+
+export const ArtworkReviewInputStatus = {
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface ArtworkReviewInput {
+  status?: ArtworkReviewInputStatus;
+  /** @nullable */
+  featuredMonth?: string | null;
+}
+
 export type VideoProductionStatus = typeof VideoProductionStatus[keyof typeof VideoProductionStatus];
 
 
