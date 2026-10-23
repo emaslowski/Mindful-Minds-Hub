@@ -31,7 +31,7 @@ export function GardeningSection() {
     <article className={`${panelClass} border-secondary/50 bg-secondary/10`} aria-labelledby="gardening-title">
       <div className="mb-4 flex items-center gap-3 text-secondary">
         <Sprout aria-hidden="true" className="h-8 w-8" />
-         <h1 id="gardening-title" className="font-display text-3xl font-bold">Gardening</h1>
+         <h2 id="gardening-title" className="font-display text-3xl font-bold">Start your own seed</h2>
       </div>
       <p className="mb-5 text-foreground/85">Start small: grow a seed and watch what happens. Ask an adult before using tools or planting outside.</p>
       <p className="mb-3 font-bold text-foreground">Your seed-starting checklist</p>

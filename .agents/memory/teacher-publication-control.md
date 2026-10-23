@@ -61,3 +61,15 @@ instructions for posting, and a featured artist each month.
 **How to apply:** Preserve teacher approval before student photos appear
 publicly, and teacher control of the monthly winner. Do not choose winners
 automatically or introduce student voting without a new request.
+
+## Gardening video priority
+
+On the Gardening page, keep student videos large and before the supplied
+activities.
+
+**Why:** The user explicitly asked for the student gardening video to be
+"bigger and first," followed by more things for students to do.
+
+**How to apply:** Preserve this student-first emphasis when adding or
+rearranging Gardening activities. Do not change the original published media
+or teacher-approved edition just to enlarge its page presentation.

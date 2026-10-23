@@ -10,6 +10,7 @@ import { SnakeGame } from "@/components/SnakeGame";
 import { HangmanGame } from "@/components/games/HangmanGame";
 import { ScrabbleGame } from "@/components/games/ScrabbleGame";
 import { PublishedSection } from "@/components/PublishedSection";
+import GardeningActivities from "@/components/gardening/GardeningActivities";
 
 function ActivityPage({ children }: { children: ReactNode }) {
   return (
@@ -23,10 +24,20 @@ function ActivityPage({ children }: { children: ReactNode }) {
 }
 
 export function GardeningPage() {
-  return <ActivityPage>
-    <GardeningSection />
-    <PublishedSection section="gardening" heading="Gardening from Our Students" className="mt-10" />
-  </ActivityPage>;
+  return <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:py-14">
+    <Link href="/" className="mb-6 inline-flex rounded-full border border-primary/40 px-5 py-2 font-semibold text-primary hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring">
+      Back to home
+    </Link>
+    <header className="mb-8">
+      <h1 className="font-serif text-4xl font-bold text-foreground md:text-5xl">Plants &amp; Gardening</h1>
+      <p className="mt-3 max-w-3xl text-foreground/80">Watch our student gardeners, try a growing experiment, and discover what plants need to thrive.</p>
+    </header>
+    <PublishedSection section="gardening" heading="Watch Our Student Gardeners" featureVideos className="mb-10" />
+    <GardeningActivities />
+    <section className="mt-10" aria-label="Start growing a seed">
+      <GardeningSection />
+    </section>
+  </main>;
 }
 
 export function LanguageCornerPage() {
