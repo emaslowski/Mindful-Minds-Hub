@@ -8,6 +8,21 @@ description: How to apply schema changes to the dev DB when drizzle-kit push fai
 "Interactive prompts require a TTY terminal" — triggered by `promptNamedWithSchemasConflict`
 when drizzle detects tables that might be renames of existing ones.
 
+## Post-merge database policy
+
+Use reviewed, additive, idempotent development migrations after task merges,
+not an unattended whole-schema push against this legacy database.
+Never move those migrations into server startup or production build hooks;
+Publish owns production schema changes.
+
+**Why:** Legacy table-name conflicts can require interactive rename decisions
+even with force flags, while automatic merge setup has no input terminal.
+A short install timeout can also hide the later database-sync failure.
+
+**How to apply:** Include the required additive development migration with new
+schema work, preserve existing records, and allow a buffered dependency-install
+timeout. Keep migration failures fatal rather than silently skipping them.
+
 ## Working approach
 1. `cd lib/db && npx drizzle-kit generate --name <label>` — generates SQL in `lib/db/drizzle/<N>_<label>.sql` (no TTY needed)
 2. Apply directly: `psql "$DATABASE_URL" -f lib/db/drizzle/<file>.sql`
