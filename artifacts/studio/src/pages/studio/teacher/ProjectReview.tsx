@@ -87,6 +87,7 @@ const DESTINATION_OPTIONS = [
   { value: 'learn', label: 'Learn / Strategies' },
   { value: 'create', label: 'Creative Activities' },
   { value: 'calm-corner', label: 'Calm Corner (Meditation)' },
+  { value: 'focus-study', label: 'Focus & Study' },
   { value: 'move', label: 'Move Your Mind' },
   { value: 'move-morning-stretch', label: 'Move · Morning Stretch' },
   { value: 'move-soccer-skills', label: 'Move · Soccer Skills' },

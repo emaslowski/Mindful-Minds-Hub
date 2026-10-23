@@ -115,7 +115,7 @@ function PublicRouter() {
           {() => <BlankTemplate title="Calm Music" subtitle="Relaxing playlists coming soon. Students can add music links here!" />}
         </Route>
         <Route path="/listen/focus-sounds">
-          {() => <BlankTemplate title="Focus Sounds" subtitle="Focus playlists coming soon. Students can add content here!" />}
+          {() => <ListenMeditations focus />}
         </Route>
         <Route path="/listen/meditations" component={ListenMeditations} />
         <Route path="/listen/nature-sounds">
