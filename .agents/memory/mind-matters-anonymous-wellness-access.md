@@ -16,3 +16,11 @@ New wellness-access requests collect a student email alongside the approval deta
 **Why:** The credential handoff needs to work remotely while keeping Student Studio authentication separate.
 
 **How to apply:** Require and validate an email for new requests, retain nullable email fields for legacy requests, and show teachers clear delivery status with a manual fallback if sending fails. Do not reuse this email to create, authorize, or sign into a Studio account.
+
+## Private plant-growth observations
+
+Plant observations use the same private-identity precedence as Journal: private Journal credentials first, otherwise the individual app login. A shared Studio group login alone must never grant plant-journal access, and observations must never enter teacher publishing or public student-video workflows.
+
+**Why:** The user requested an optional private record across days, explicitly excluding sharing between students or shared groups while leaving publication and videos unchanged.
+
+**How to apply:** Keep personal observation ownership separate from Studio identities. Explain which private login is active so students return to the same account rather than expecting journals to merge.

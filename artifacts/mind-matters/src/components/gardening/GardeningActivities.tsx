@@ -1,6 +1,7 @@
 import { Badge } from "@workspace/mind-matters-ds/components/ui/badge";
 import { GardenObservation } from "./GardenObservation";
 import { GrowingExperiments } from "./GrowingExperiments";
+import { PlantGrowthJournal } from "./PlantGrowthJournal";
 import { PlantCareQuiz } from "./PlantCareQuiz";
 import { SeedGrowthPuzzle } from "./SeedGrowthPuzzle";
 
@@ -18,7 +19,7 @@ export default function GardeningActivities() {
           Take a quiz, solve a plant puzzle, or look closely at the world around you. Try activities at your own pace.
         </p>
         <p className="rounded-xl border border-border/60 bg-card/70 p-3 text-sm text-muted-foreground">
-          Your activity progress stays only for this visit and resets when you refresh the page. Nothing is saved.
+          Visit-only: the quiz, puzzle, and garden checklist are not saved. Their progress resets when you refresh the page. Only the optional plant growth journal below is saved, privately, to your own account.
         </p>
         <p className="rounded-xl border border-accent/30 bg-accent/10 p-3 text-sm">
           Ask an adult before using gardening tools or chemicals, or before going outside. Never taste an unknown plant or mushroom.
@@ -32,6 +33,7 @@ export default function GardeningActivities() {
 
       <GardenObservation />
       <GrowingExperiments />
+      <PlantGrowthJournal />
     </section>
   );
 }

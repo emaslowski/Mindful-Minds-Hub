@@ -5,6 +5,62 @@
  * Mind Matters API
  * OpenAPI spec version: 0.1.0
  */
+/**
+ * @nullable
+ */
+export type PlantJournalAccessKind = typeof PlantJournalAccessKind[keyof typeof PlantJournalAccessKind] | null;
+
+
+export const PlantJournalAccessKind = {
+  journal: 'journal',
+  individual: 'individual',
+} as const;
+
+export interface PlantObservation {
+  id: number;
+  date: string;
+  nickname: string;
+  /** @nullable */
+  heightCm: number | null;
+  /** @nullable */
+  leafCount: number | null;
+  observations: string;
+}
+
+export interface PlantJournal {
+  /** @nullable */
+  ownerId: string | null;
+  /** @nullable */
+  accessKind: PlantJournalAccessKind;
+  entries: PlantObservation[];
+}
+
+export interface PlantObservationInput {
+  /** @minLength 1 */
+  ownerId: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  date: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  nickname: string;
+  /**
+     * @minimum 0
+     * @maximum 100000
+     * @nullable
+     */
+  heightCm: number | null;
+  /**
+     * @minimum 0
+     * @maximum 100000
+     * @nullable
+     */
+  leafCount: number | null;
+  /** @maxLength 1000 */
+  observations: string;
+}
+
 export type ArtworkEntryStatus = typeof ArtworkEntryStatus[keyof typeof ArtworkEntryStatus];
 
 

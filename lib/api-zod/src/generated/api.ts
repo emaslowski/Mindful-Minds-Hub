@@ -8,6 +8,90 @@
 import * as zod from 'zod';
 
 
+export const GetPlantJournalResponse = zod.object({
+  "ownerId": zod.string().nullable(),
+  "accessKind": zod.union([zod.literal('journal'),zod.literal('individual'),zod.literal(null)]).nullable(),
+  "entries": zod.array(zod.object({
+  "id": zod.number(),
+  "date": zod.string(),
+  "nickname": zod.string(),
+  "heightCm": zod.number().nullable(),
+  "leafCount": zod.number().nullable(),
+  "observations": zod.string()
+}))
+})
+
+
+
+export const createPlantObservationBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const createPlantObservationBodyNicknameMax = 80;
+
+export const createPlantObservationBodyHeightCmMin = 0;
+export const createPlantObservationBodyHeightCmMax = 100000;
+
+export const createPlantObservationBodyLeafCountMin = 0;
+export const createPlantObservationBodyLeafCountMax = 100000;
+
+export const createPlantObservationBodyObservationsMax = 1000;
+
+
+
+export const CreatePlantObservationBody = zod.object({
+  "ownerId": zod.string().min(1),
+  "date": zod.string().regex(createPlantObservationBodyDateRegExp),
+  "nickname": zod.string().min(1).max(createPlantObservationBodyNicknameMax),
+  "heightCm": zod.number().min(createPlantObservationBodyHeightCmMin).max(createPlantObservationBodyHeightCmMax).nullable(),
+  "leafCount": zod.number().min(createPlantObservationBodyLeafCountMin).max(createPlantObservationBodyLeafCountMax).nullable(),
+  "observations": zod.string().max(createPlantObservationBodyObservationsMax)
+})
+
+export const CreatePlantObservationResponse = zod.object({
+  "id": zod.number(),
+  "date": zod.string(),
+  "nickname": zod.string(),
+  "heightCm": zod.number().nullable(),
+  "leafCount": zod.number().nullable(),
+  "observations": zod.string()
+})
+
+
+export const UpdatePlantObservationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+export const updatePlantObservationBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const updatePlantObservationBodyNicknameMax = 80;
+
+export const updatePlantObservationBodyHeightCmMin = 0;
+export const updatePlantObservationBodyHeightCmMax = 100000;
+
+export const updatePlantObservationBodyLeafCountMin = 0;
+export const updatePlantObservationBodyLeafCountMax = 100000;
+
+export const updatePlantObservationBodyObservationsMax = 1000;
+
+
+
+export const UpdatePlantObservationBody = zod.object({
+  "ownerId": zod.string().min(1),
+  "date": zod.string().regex(updatePlantObservationBodyDateRegExp),
+  "nickname": zod.string().min(1).max(updatePlantObservationBodyNicknameMax),
+  "heightCm": zod.number().min(updatePlantObservationBodyHeightCmMin).max(updatePlantObservationBodyHeightCmMax).nullable(),
+  "leafCount": zod.number().min(updatePlantObservationBodyLeafCountMin).max(updatePlantObservationBodyLeafCountMax).nullable(),
+  "observations": zod.string().max(updatePlantObservationBodyObservationsMax)
+})
+
+export const UpdatePlantObservationResponse = zod.object({
+  "id": zod.number(),
+  "date": zod.string(),
+  "nickname": zod.string(),
+  "heightCm": zod.number().nullable(),
+  "leafCount": zod.number().nullable(),
+  "observations": zod.string()
+})
+
+
 export const ListArtworkResponse = zod.object({
   "artworks": zod.array(zod.object({
   "id": zod.number(),

@@ -53,6 +53,9 @@ import type {
   JournalEntryInput,
   LogoutBrowserSessionParams,
   PageViewInput,
+  PlantJournal,
+  PlantObservation,
+  PlantObservationInput,
   PublicationDraftEnvelope,
   PublicationDraftInput,
   PublicationMediaEnvelope,
@@ -98,6 +101,208 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetPlantJournalUrl = () => {
+
+
+
+
+  return `/api/plant-journal`
+}
+
+export const getPlantJournal = async ( options?: Parameters<typeof customFetch>[1]): Promise<PlantJournal> => {
+
+  return customFetch<PlantJournal>(getGetPlantJournalUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlantJournalQueryKey = () => {
+    return [
+    `/api/plant-journal`
+    ] as const;
+    }
+
+
+export const getGetPlantJournalQueryOptions = <TData = Awaited<ReturnType<typeof getPlantJournal>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlantJournal>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlantJournalQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlantJournal>>> = ({ signal }) => getPlantJournal({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlantJournal>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPlantJournalQueryResult = NonNullable<Awaited<ReturnType<typeof getPlantJournal>>>
+export type GetPlantJournalQueryError = ErrorType<unknown>
+
+
+
+export function useGetPlantJournal<TData = Awaited<ReturnType<typeof getPlantJournal>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlantJournal>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPlantJournalQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreatePlantObservationUrl = () => {
+
+
+
+
+  return `/api/plant-journal`
+}
+
+export const createPlantObservation = async (plantObservationInput: PlantObservationInput, options?: Parameters<typeof customFetch>[1]): Promise<PlantObservation> => {
+
+  return customFetch<PlantObservation>(getCreatePlantObservationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(plantObservationInput)
+  }
+);}
+
+
+
+
+
+export const getCreatePlantObservationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlantObservation>>, TError,{data: BodyType<PlantObservationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPlantObservation>>, TError,{data: BodyType<PlantObservationInput>}, TContext> => {
+
+const mutationKey = ['createPlantObservation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPlantObservation>>, {data: BodyType<PlantObservationInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createPlantObservation(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreatePlantObservationMutationResult = NonNullable<Awaited<ReturnType<typeof createPlantObservation>>>
+    export type CreatePlantObservationMutationBody = BodyType<PlantObservationInput>
+    export type CreatePlantObservationMutationError = ErrorType<unknown>
+
+    export const useCreatePlantObservation = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlantObservation>>, TError,{data: BodyType<PlantObservationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createPlantObservation>>,
+        TError,
+        {data: BodyType<PlantObservationInput>},
+        TContext
+      > => {
+      return useMutation(getCreatePlantObservationMutationOptions(options));
+    }
+
+export const getUpdatePlantObservationUrl = (id: number,) => {
+
+
+
+
+  return `/api/plant-journal/${id}`
+}
+
+export const updatePlantObservation = async (id: number,
+    plantObservationInput: PlantObservationInput, options?: Parameters<typeof customFetch>[1]): Promise<PlantObservation> => {
+
+  return customFetch<PlantObservation>(getUpdatePlantObservationUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(plantObservationInput)
+  }
+);}
+
+
+
+
+
+export const getUpdatePlantObservationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlantObservation>>, TError,{id: number;data: BodyType<PlantObservationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlantObservation>>, TError,{id: number;data: BodyType<PlantObservationInput>}, TContext> => {
+
+const mutationKey = ['updatePlantObservation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlantObservation>>, {id: number;data: BodyType<PlantObservationInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updatePlantObservation(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePlantObservationMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlantObservation>>>
+    export type UpdatePlantObservationMutationBody = BodyType<PlantObservationInput>
+    export type UpdatePlantObservationMutationError = ErrorType<unknown>
+
+    export const useUpdatePlantObservation = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlantObservation>>, TError,{id: number;data: BodyType<PlantObservationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updatePlantObservation>>,
+        TError,
+        {id: number;data: BodyType<PlantObservationInput>},
+        TContext
+      > => {
+      return useMutation(getUpdatePlantObservationMutationOptions(options));
+    }
 
 export const getListArtworkUrl = () => {
 
