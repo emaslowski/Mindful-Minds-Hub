@@ -9,6 +9,7 @@ import LanguageCenter from "@/components/language/LanguageCenter";
 import { SnakeGame } from "@/components/SnakeGame";
 import { HangmanGame } from "@/components/games/HangmanGame";
 import { ScrabbleGame } from "@/components/games/ScrabbleGame";
+import { PublishedSection } from "@/components/PublishedSection";
 
 function ActivityPage({ children }: { children: ReactNode }) {
   return (
@@ -22,7 +23,10 @@ function ActivityPage({ children }: { children: ReactNode }) {
 }
 
 export function GardeningPage() {
-  return <ActivityPage><GardeningSection /></ActivityPage>;
+  return <ActivityPage>
+    <GardeningSection />
+    <PublishedSection section="gardening" heading="Gardening from Our Students" className="mt-10" />
+  </ActivityPage>;
 }
 
 export function LanguageCornerPage() {

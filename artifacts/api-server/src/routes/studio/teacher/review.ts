@@ -250,7 +250,7 @@ router.post(
       res.status(400).json({ error: 'Website draft settings are invalid. Check the title and formatting before publishing.' }); return;
     }
     const destinations = [
-      'blog', 'podcast', 'learn', 'create', 'calm-corner', 'move', 'cooking', 'grow', 'events', 'resources',
+      'blog', 'podcast', 'learn', 'create', 'calm-corner', 'move', 'cooking', 'gardening', 'grow', 'events', 'resources',
       'move-morning-stretch', 'move-soccer-skills', 'move-basketball-drills',
       'move-yoga-for-calm', 'move-stretch-break', 'move-active-challenge',
       'directed-draws',
