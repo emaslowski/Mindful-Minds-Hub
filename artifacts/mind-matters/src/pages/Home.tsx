@@ -9,6 +9,7 @@ const centers = [
   { title: "Podcasts & Videos", description: "Listen, watch, and learn from peers.", href: "/listen/podcast", image: "tile-2.jpg", color: "bg-secondary/20" },
   { title: "Art & Drawing Studio", description: "Create art and follow drawing tutorials.", href: "/create", image: "tile-3.jpg", color: "bg-accent/25" },
   { title: "Games & Challenges", description: "Try quizzes, activities, and fun challenges.", href: "/games", image: "tile-4.jpg", color: "bg-accent/25" },
+  { title: "Plants & Gardening", description: "Grow plants, learn gardening tips, and explore student projects.", href: "/gardening", image: "tile-5.jpg", color: "bg-secondary/20" },
   { title: "Journaling Center", description: "Reflect with private writing prompts.", href: "/grow/journal", image: "tile-6.jpg", color: "bg-muted/30" },
   { title: "Movement & Sports", description: "Stretch, move, and learn new skills.", href: "/move", image: "tile-7.jpg", color: "bg-secondary/20" },
   { title: "Music & Mindful Moments", description: "Find sounds and guided pauses.", href: "/listen", image: "tile-8.jpg", color: "bg-muted/30" },
