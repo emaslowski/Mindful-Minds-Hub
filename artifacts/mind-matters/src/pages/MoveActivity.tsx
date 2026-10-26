@@ -1,5 +1,6 @@
 import { Link, useParams } from "wouter";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
+import { AthleteGallery } from "@/components/AthleteGallery";
 import { PublishedSection } from "@/components/PublishedSection";
 import { WaveFooter } from "@/components/WaveFooter";
 
@@ -35,6 +36,7 @@ export default function MoveActivity() {
         <h1 className="font-display text-5xl italic text-foreground md:text-6xl">{activity.title}</h1>
         <p className="mx-auto mt-3 max-w-2xl text-lg text-foreground/75">{activity.description}</p>
       </header>
+      {category === "active-challenge" && <AthleteGallery />}
       <PublishedSection section={`move-${category}`} heading={`${activity.title} activities`} className="mb-12" />
       <WaveFooter quote="Move your body. Boost your mind." />
     </div>

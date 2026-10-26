@@ -84,3 +84,16 @@ standalone section did not provide the placement they wanted.
 
 **How to apply:** Preserve this separate category when revising Cooking Corner
 navigation and keep the normal teacher-controlled publication workflow.
+
+## Active Challenge photos and recognition
+
+Students can share photos of themselves doing the Active Challenge. The
+Exercise Center should look clean and less busy, and include Athlete of the Month.
+Keep teacher approval before photos become public and teacher selection of the
+monthly athlete, consistent with student artwork recognition.
+
+**Why:** The user asked for a cleaner exercise section because “there's a lot
+going on,” a place to upload Active Challenge photos, and an Athlete of the Month.
+
+**How to apply:** Keep uploads associated with Active Challenge, retain existing
+exercise destinations, and preserve privacy and teacher publication controls.

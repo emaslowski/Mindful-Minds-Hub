@@ -6,4 +6,5 @@ export * from "./friendship";
 export * from "./studio";
 export * from "./studioVideoProductions";
 export * from "./artwork";
+export * from "./athlete";
 export * from "./plantObservations";

@@ -92,6 +92,127 @@ export const UpdatePlantObservationResponse = zod.object({
 })
 
 
+export const ListAthleteResponse = zod.object({
+  "athletes": zod.array(zod.object({
+  "id": zod.number(),
+  "athleteName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})),
+  "featured": zod.union([zod.object({
+  "id": zod.number(),
+  "athleteName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+}),zod.null()]),
+  "month": zod.string()
+})
+
+
+export const ListMyAthleteResponseItem = zod.object({
+  "id": zod.number(),
+  "athleteName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+export const ListMyAthleteResponse = zod.array(ListMyAthleteResponseItem)
+
+
+export const requestAthleteUploadBodyAthleteNameMax = 40;
+
+export const requestAthleteUploadBodyTitleMax = 100;
+
+export const requestAthleteUploadBodyFilenameMax = 255;
+
+export const requestAthleteUploadBodySizeMax = 10485760;
+
+
+
+export const RequestAthleteUploadBody = zod.object({
+  "athleteName": zod.string().min(1).max(requestAthleteUploadBodyAthleteNameMax),
+  "title": zod.string().min(1).max(requestAthleteUploadBodyTitleMax),
+  "filename": zod.string().min(1).max(requestAthleteUploadBodyFilenameMax),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp']),
+  "size": zod.number().min(1).max(requestAthleteUploadBodySizeMax),
+  "consent": zod.boolean()
+})
+
+export const RequestAthleteUploadResponse = zod.object({
+  "id": zod.number(),
+  "uploadUrl": zod.string()
+})
+
+
+export const CompleteAthleteParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CompleteAthleteResponse = zod.object({
+  "id": zod.number(),
+  "athleteName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+
+
+export const DeleteAthleteParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAthleteResponse = zod.void()
+
+
+export const GetAthleteImageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAthleteImageResponse = zod.unknown()
+
+
+export const ListTeacherAthleteResponseItem = zod.object({
+  "id": zod.number(),
+  "athleteName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+export const ListTeacherAthleteResponse = zod.array(ListTeacherAthleteResponseItem)
+
+
+export const UpdateAthleteParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAthleteBody = zod.object({
+  "status": zod.enum(['approved', 'rejected']).optional(),
+  "featuredMonth": zod.string().nullish()
+})
+
+export const UpdateAthleteResponse = zod.object({
+  "id": zod.number(),
+  "athleteName": zod.string(),
+  "title": zod.string(),
+  "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
+  "featuredMonth": zod.string().nullable(),
+  "createdAt": zod.string(),
+  "imageUrl": zod.string()
+})
+
+
 export const ListArtworkResponse = zod.object({
   "artworks": zod.array(zod.object({
   "id": zod.number(),

@@ -75,6 +75,96 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PlantObservation"
+  /athlete:
+    get:
+      operationId: listAthlete
+      responses:
+        "200":
+          description: Approved Active Challenge gallery and Athlete of the Month
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AthleteGallery" }
+  /athlete/mine:
+    get:
+      operationId: listMyAthlete
+      responses:
+        "200":
+          description: Own Active Challenge submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AthleteEntry" }
+  /athlete/upload-url:
+    post:
+      operationId: requestAthleteUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AthleteUploadInput" }
+      responses:
+        "201":
+          description: Private photo upload reserved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AthleteUpload" }
+  /athlete/{id}/complete:
+    post:
+      operationId: completeAthlete
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      responses:
+        "200":
+          description: Photo submitted for teacher review
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AthleteEntry" }
+  /athlete/{id}:
+    delete:
+      operationId: deleteAthlete
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      responses:
+        "204": { description: Own photo withdrawn }
+  /athlete/{id}/image:
+    get:
+      operationId: getAthleteImage
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      responses:
+        "200":
+          description: Approved photo or authorized private preview
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+  /teacher/athlete:
+    get:
+      operationId: listTeacherAthlete
+      responses:
+        "200":
+          description: Teacher Active Challenge photo review queue
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AthleteEntry" }
+  /teacher/athlete/{id}:
+    patch:
+      operationId: updateAthlete
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: number } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AthleteReviewInput" }
+      responses:
+        "200":
+          description: Teacher review or monthly athlete updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AthleteEntry" }
   /artwork:
     get:
       operationId: listArtwork
@@ -995,6 +1085,52 @@ components:
         heightCm: { type: [number, "null"] }
         leafCount: { type: [number, "null"] }
         observations: { type: string }
+    AthleteEntry:
+      type: object
+      required: [id, athleteName, title, status, featuredMonth, createdAt, imageUrl]
+      properties:
+        id: { type: number }
+        athleteName: { type: string }
+        title: { type: string }
+        status: { type: string, enum: [uploading, pending, approved, rejected] }
+        featuredMonth: { type: [string, "null"] }
+        createdAt: { type: string }
+        imageUrl: { type: string }
+    AthleteGallery:
+      type: object
+      required: [athletes, featured, month]
+      properties:
+        athletes:
+          type: array
+          items: { $ref: "#/components/schemas/AthleteEntry" }
+        featured:
+          oneOf:
+            - { $ref: "#/components/schemas/AthleteEntry" }
+            - { type: "null" }
+        month: { type: string }
+    AthleteUploadInput:
+      type: object
+      additionalProperties: false
+      required: [athleteName, title, filename, contentType, size, consent]
+      properties:
+        athleteName: { type: string, minLength: 1, maxLength: 40 }
+        title: { type: string, minLength: 1, maxLength: 100 }
+        filename: { type: string, minLength: 1, maxLength: 255 }
+        contentType: { type: string, enum: [image/jpeg, image/png, image/webp] }
+        size: { type: number, minimum: 1, maximum: 10485760 }
+        consent: { type: boolean }
+    AthleteUpload:
+      type: object
+      required: [id, uploadUrl]
+      properties:
+        id: { type: number }
+        uploadUrl: { type: string }
+    AthleteReviewInput:
+      type: object
+      additionalProperties: false
+      properties:
+        status: { type: string, enum: [approved, rejected] }
+        featuredMonth: { type: [string, "null"] }
     ArtworkEntry:
       type: object
       required: [id, artistName, title, status, featuredMonth, createdAt, imageUrl]

@@ -61,6 +61,86 @@ export interface PlantObservationInput {
   observations: string;
 }
 
+export type AthleteEntryStatus = typeof AthleteEntryStatus[keyof typeof AthleteEntryStatus];
+
+
+export const AthleteEntryStatus = {
+  uploading: 'uploading',
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface AthleteEntry {
+  id: number;
+  athleteName: string;
+  title: string;
+  status: AthleteEntryStatus;
+  /** @nullable */
+  featuredMonth: string | null;
+  createdAt: string;
+  imageUrl: string;
+}
+
+export interface AthleteGallery {
+  athletes: AthleteEntry[];
+  featured: AthleteEntry | null;
+  month: string;
+}
+
+export type AthleteUploadInputContentType = typeof AthleteUploadInputContentType[keyof typeof AthleteUploadInputContentType];
+
+
+export const AthleteUploadInputContentType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/webp': 'image/webp',
+} as const;
+
+export interface AthleteUploadInput {
+  /**
+     * @minLength 1
+     * @maxLength 40
+     */
+  athleteName: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  filename: string;
+  contentType: AthleteUploadInputContentType;
+  /**
+     * @minimum 1
+     * @maximum 10485760
+     */
+  size: number;
+  consent: boolean;
+}
+
+export interface AthleteUpload {
+  id: number;
+  uploadUrl: string;
+}
+
+export type AthleteReviewInputStatus = typeof AthleteReviewInputStatus[keyof typeof AthleteReviewInputStatus];
+
+
+export const AthleteReviewInputStatus = {
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface AthleteReviewInput {
+  status?: AthleteReviewInputStatus;
+  /** @nullable */
+  featuredMonth?: string | null;
+}
+
 export type ArtworkEntryStatus = typeof ArtworkEntryStatus[keyof typeof ArtworkEntryStatus];
 
 

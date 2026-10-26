@@ -26,6 +26,11 @@ import type {
   ArtworkReviewInput,
   ArtworkUpload,
   ArtworkUploadInput,
+  AthleteEntry,
+  AthleteGallery,
+  AthleteReviewInput,
+  AthleteUpload,
+  AthleteUploadInput,
   AuthUserEnvelope,
   BeginBrowserLoginParams,
   BlogPost,
@@ -302,6 +307,551 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getUpdatePlantObservationMutationOptions(options));
+    }
+
+export const getListAthleteUrl = () => {
+
+
+
+
+  return `/api/athlete`
+}
+
+export const listAthlete = async ( options?: Parameters<typeof customFetch>[1]): Promise<AthleteGallery> => {
+
+  return customFetch<AthleteGallery>(getListAthleteUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAthleteQueryKey = () => {
+    return [
+    `/api/athlete`
+    ] as const;
+    }
+
+
+export const getListAthleteQueryOptions = <TData = Awaited<ReturnType<typeof listAthlete>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAthlete>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAthleteQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAthlete>>> = ({ signal }) => listAthlete({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAthlete>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAthleteQueryResult = NonNullable<Awaited<ReturnType<typeof listAthlete>>>
+export type ListAthleteQueryError = ErrorType<unknown>
+
+
+
+export function useListAthlete<TData = Awaited<ReturnType<typeof listAthlete>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAthlete>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAthleteQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListMyAthleteUrl = () => {
+
+
+
+
+  return `/api/athlete/mine`
+}
+
+export const listMyAthlete = async ( options?: Parameters<typeof customFetch>[1]): Promise<AthleteEntry[]> => {
+
+  return customFetch<AthleteEntry[]>(getListMyAthleteUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyAthleteQueryKey = () => {
+    return [
+    `/api/athlete/mine`
+    ] as const;
+    }
+
+
+export const getListMyAthleteQueryOptions = <TData = Awaited<ReturnType<typeof listMyAthlete>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyAthlete>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyAthleteQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyAthlete>>> = ({ signal }) => listMyAthlete({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyAthlete>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyAthleteQueryResult = NonNullable<Awaited<ReturnType<typeof listMyAthlete>>>
+export type ListMyAthleteQueryError = ErrorType<unknown>
+
+
+
+export function useListMyAthlete<TData = Awaited<ReturnType<typeof listMyAthlete>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyAthlete>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyAthleteQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRequestAthleteUploadUrl = () => {
+
+
+
+
+  return `/api/athlete/upload-url`
+}
+
+export const requestAthleteUpload = async (athleteUploadInput: AthleteUploadInput, options?: Parameters<typeof customFetch>[1]): Promise<AthleteUpload> => {
+
+  return customFetch<AthleteUpload>(getRequestAthleteUploadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(athleteUploadInput)
+  }
+);}
+
+
+
+
+
+export const getRequestAthleteUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAthleteUpload>>, TError,{data: BodyType<AthleteUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestAthleteUpload>>, TError,{data: BodyType<AthleteUploadInput>}, TContext> => {
+
+const mutationKey = ['requestAthleteUpload'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestAthleteUpload>>, {data: BodyType<AthleteUploadInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestAthleteUpload(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestAthleteUploadMutationResult = NonNullable<Awaited<ReturnType<typeof requestAthleteUpload>>>
+    export type RequestAthleteUploadMutationBody = BodyType<AthleteUploadInput>
+    export type RequestAthleteUploadMutationError = ErrorType<unknown>
+
+    export const useRequestAthleteUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAthleteUpload>>, TError,{data: BodyType<AthleteUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestAthleteUpload>>,
+        TError,
+        {data: BodyType<AthleteUploadInput>},
+        TContext
+      > => {
+      return useMutation(getRequestAthleteUploadMutationOptions(options));
+    }
+
+export const getCompleteAthleteUrl = (id: number,) => {
+
+
+
+
+  return `/api/athlete/${id}/complete`
+}
+
+export const completeAthlete = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<AthleteEntry> => {
+
+  return customFetch<AthleteEntry>(getCompleteAthleteUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCompleteAthleteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeAthlete>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeAthlete>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['completeAthlete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeAthlete>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  completeAthlete(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteAthleteMutationResult = NonNullable<Awaited<ReturnType<typeof completeAthlete>>>
+
+    export type CompleteAthleteMutationError = ErrorType<unknown>
+
+    export const useCompleteAthlete = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeAthlete>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof completeAthlete>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getCompleteAthleteMutationOptions(options));
+    }
+
+export const getDeleteAthleteUrl = (id: number,) => {
+
+
+
+
+  return `/api/athlete/${id}`
+}
+
+export const deleteAthlete = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteAthleteUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteAthleteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAthlete>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAthlete>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAthlete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAthlete>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAthlete(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAthleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAthlete>>>
+
+    export type DeleteAthleteMutationError = ErrorType<unknown>
+
+    export const useDeleteAthlete = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAthlete>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAthlete>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAthleteMutationOptions(options));
+    }
+
+export const getGetAthleteImageUrl = (id: number,) => {
+
+
+
+
+  return `/api/athlete/${id}/image`
+}
+
+export const getAthleteImage = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetAthleteImageUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAthleteImageQueryKey = (id: number,) => {
+    return [
+    `/api/athlete/${id}/image`
+    ] as const;
+    }
+
+
+export const getGetAthleteImageQueryOptions = <TData = Awaited<ReturnType<typeof getAthleteImage>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAthleteImage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAthleteImageQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAthleteImage>>> = ({ signal }) => getAthleteImage(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAthleteImage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAthleteImageQueryResult = NonNullable<Awaited<ReturnType<typeof getAthleteImage>>>
+export type GetAthleteImageQueryError = ErrorType<unknown>
+
+
+
+export function useGetAthleteImage<TData = Awaited<ReturnType<typeof getAthleteImage>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAthleteImage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAthleteImageQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListTeacherAthleteUrl = () => {
+
+
+
+
+  return `/api/teacher/athlete`
+}
+
+export const listTeacherAthlete = async ( options?: Parameters<typeof customFetch>[1]): Promise<AthleteEntry[]> => {
+
+  return customFetch<AthleteEntry[]>(getListTeacherAthleteUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListTeacherAthleteQueryKey = () => {
+    return [
+    `/api/teacher/athlete`
+    ] as const;
+    }
+
+
+export const getListTeacherAthleteQueryOptions = <TData = Awaited<ReturnType<typeof listTeacherAthlete>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTeacherAthlete>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTeacherAthleteQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTeacherAthlete>>> = ({ signal }) => listTeacherAthlete({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTeacherAthlete>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListTeacherAthleteQueryResult = NonNullable<Awaited<ReturnType<typeof listTeacherAthlete>>>
+export type ListTeacherAthleteQueryError = ErrorType<unknown>
+
+
+
+export function useListTeacherAthlete<TData = Awaited<ReturnType<typeof listTeacherAthlete>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTeacherAthlete>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListTeacherAthleteQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateAthleteUrl = (id: number,) => {
+
+
+
+
+  return `/api/teacher/athlete/${id}`
+}
+
+export const updateAthlete = async (id: number,
+    athleteReviewInput: AthleteReviewInput, options?: Parameters<typeof customFetch>[1]): Promise<AthleteEntry> => {
+
+  return customFetch<AthleteEntry>(getUpdateAthleteUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(athleteReviewInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateAthleteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAthlete>>, TError,{id: number;data: BodyType<AthleteReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAthlete>>, TError,{id: number;data: BodyType<AthleteReviewInput>}, TContext> => {
+
+const mutationKey = ['updateAthlete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAthlete>>, {id: number;data: BodyType<AthleteReviewInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAthlete(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAthleteMutationResult = NonNullable<Awaited<ReturnType<typeof updateAthlete>>>
+    export type UpdateAthleteMutationBody = BodyType<AthleteReviewInput>
+    export type UpdateAthleteMutationError = ErrorType<unknown>
+
+    export const useUpdateAthlete = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAthlete>>, TError,{id: number;data: BodyType<AthleteReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAthlete>>,
+        TError,
+        {id: number;data: BodyType<AthleteReviewInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAthleteMutationOptions(options));
     }
 
 export const getListArtworkUrl = () => {
