@@ -97,3 +97,5 @@ going on,” a place to upload Active Challenge photos, and an Athlete of the Mo
 
 **How to apply:** Keep uploads associated with Active Challenge, retain existing
 exercise destinations, and preserve privacy and teacher publication controls.
+Put the Active Challenge video first, before photo uploads and the gallery,
+as the user explicitly requested.
