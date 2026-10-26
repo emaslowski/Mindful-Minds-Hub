@@ -63,6 +63,14 @@ export default function Cooking() {
           Good food fuels your body and your mind!
         </p>
 
+        <PublishedSection
+          section="cooking-food-reviews"
+          heading="Food Reviews"
+          featureVideos
+          emptyMessage="Student food review videos will appear here once a teacher publishes them."
+          className="mb-12 text-left"
+        />
+
         {/* Pill Tabs */}
         <div className="flex justify-center gap-6 mb-16">
           <button 

@@ -97,6 +97,7 @@ const DESTINATION_OPTIONS = [
   { value: 'move-active-challenge', label: 'Move · Active Challenge' },
   { value: 'directed-draws', label: 'Directed Draws · Easel' },
   { value: 'cooking', label: 'Healthy Habits / Recipes' },
+  { value: 'cooking-food-reviews', label: 'Cooking Corner · Food Reviews' },
   { value: 'gardening', label: 'Gardening' },
   { value: 'grow', label: 'Grow / Journaling' },
   { value: 'events', label: 'Community Events' },

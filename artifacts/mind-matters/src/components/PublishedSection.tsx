@@ -9,6 +9,7 @@ type PublishedSectionProps = {
   className?: string;
   excludeProjectIds?: number[];
   featureVideos?: boolean;
+  emptyMessage?: string;
 };
 
 type PublicEditionItem = {
@@ -22,7 +23,7 @@ type PublicEditionItem = {
   projectId?: number;
 };
 
-export function PublishedSection({ section, heading = "From Our Students", className = "", excludeProjectIds = [], featureVideos = false }: PublishedSectionProps) {
+export function PublishedSection({ section, heading = "From Our Students", className = "", excludeProjectIds = [], featureVideos = false, emptyMessage }: PublishedSectionProps) {
   const { data, isLoading, isError, refetch } = useGetPublishedContent(
     { section },
     { query: { staleTime: 45_000, refetchOnWindowFocus: true } },
@@ -51,7 +52,7 @@ export function PublishedSection({ section, heading = "From Our Students", class
       <Button variant="outline" size="sm" onClick={() => refetch()}>Retry</Button>
     </div>;
   }
-  if (!items.length) return null;
+  if (!items.length && !emptyMessage) return null;
 
   return (
     <section className={`mx-auto w-full max-w-6xl px-4 ${className}`} aria-label={heading}>
@@ -60,6 +61,7 @@ export function PublishedSection({ section, heading = "From Our Students", class
         <h2 className="font-display text-2xl italic text-foreground">{heading}</h2>
         <div className="h-px max-w-[120px] flex-1 bg-sage/20" />
       </div>
+      {!items.length && <p className="rounded-2xl border border-card-border/50 bg-card p-6 text-center text-foreground/70">{emptyMessage}</p>}
       <div className={`grid grid-cols-1 gap-6 ${section === "blog" || featureVideos ? "" : "md:grid-cols-2"}`}>
         {items.map((item) => section === "blog" ? (
           <BlogStoryPreview key={item.id} {...item} projectId={item.projectId ?? item.id} />

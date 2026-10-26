@@ -253,7 +253,7 @@ router.post(
       'blog', 'podcast', 'learn', 'create', 'calm-corner', 'focus-study', 'move', 'cooking', 'gardening', 'grow', 'events', 'resources',
       'move-morning-stretch', 'move-soccer-skills', 'move-basketball-drills',
       'move-yoga-for-calm', 'move-stretch-break', 'move-active-challenge',
-      'directed-draws',
+      'directed-draws', 'cooking-food-reviews',
     ];
     if (decision === 'approve_and_publish' && !destinations.includes(destinationSection!)) {
       res.status(400).json({ error: 'Choose a supported destination page.' }); return;
