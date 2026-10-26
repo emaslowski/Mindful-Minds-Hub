@@ -7,7 +7,7 @@ import { PublishedArticle, type PublicationEdition } from "@workspace/mind-matte
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 
 export default function Cooking() {
-  const [activeTab, setActiveTab] = useState<"videos" | "recipes">("recipes");
+  const [activeTab, setActiveTab] = useState<"food-reviews" | "videos" | "recipes">("food-reviews");
   const { data, isLoading, isError, refetch } = useGetPublishedContent(
     { section: "cooking" },
     { query: { staleTime: 45_000, refetchOnWindowFocus: true } },
@@ -63,39 +63,38 @@ export default function Cooking() {
           Good food fuels your body and your mind!
         </p>
 
-        <PublishedSection
-          section="cooking-food-reviews"
-          heading="Food Reviews"
-          featureVideos
-          emptyMessage="Student food review videos will appear here once a teacher publishes them."
-          className="mb-12 text-left"
-        />
-
         {/* Pill Tabs */}
-        <div className="flex justify-center gap-6 mb-16">
-          <button 
-            onClick={() => setActiveTab("videos")}
-            className={`px-8 py-3 rounded-full font-sans font-semibold text-lg transition-all duration-300 shadow-sm outline-none ${
-              activeTab === "videos" 
-                ? "bg-terracotta text-white shadow-md scale-105" 
-                : "bg-card text-foreground border border-card-border hover:bg-card/80"
-            }`}
-          >
-            Cooking Videos
-          </button>
-          <button 
-            onClick={() => setActiveTab("recipes")}
-            className={`px-8 py-3 rounded-full font-sans font-semibold text-lg transition-all duration-300 shadow-sm outline-none ${
-              activeTab === "recipes" 
-                ? "bg-terracotta text-white shadow-md scale-105" 
-                : "bg-card text-foreground border border-card-border hover:bg-card/80"
-            }`}
-          >
-            Recipes
-          </button>
+        <div className="flex flex-wrap justify-center gap-4 mb-12" role="group" aria-label="Cooking Corner sections">
+          {([
+            ["food-reviews", "Food Reviews"],
+            ["videos", "Cooking Videos"],
+            ["recipes", "Recipes"],
+          ] as const).map(([tab, label]) => (
+            <Button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              aria-pressed={activeTab === tab}
+              aria-controls="cooking-section"
+              variant={activeTab === tab ? "default" : "outline"}
+              className={`h-auto rounded-full px-8 py-3 font-sans text-lg font-semibold shadow-sm ${
+                activeTab === tab ? "bg-terracotta text-primary-foreground" : "bg-card text-foreground border-card-border"
+              }`}
+            >
+              {label}
+            </Button>
+          ))}
         </div>
 
-        {activeTab === "recipes" ? (
+        <div id="cooking-section">
+        {activeTab === "food-reviews" ? (
+          <PublishedSection
+            section="cooking-food-reviews"
+            heading="Food Reviews"
+            featureVideos
+            emptyMessage="Student food review videos will appear here once a teacher publishes them."
+            className="mb-12 text-left"
+          />
+        ) : activeTab === "recipes" ? (
           <div className="flex flex-col md:flex-row gap-12 text-left">
             {/* Left side: Featured Chef Placeholder */}
             <div className="w-full md:w-1/3 flex flex-col relative">
@@ -184,9 +183,10 @@ export default function Cooking() {
             ))}
           </div>
         )}
+        </div>
       </div>
 
-      <PublishedSection section="cooking" heading="Student Recipes" className="mb-12" excludeProjectIds={featuredRecipe ? [featuredRecipe.projectId] : []} />
+      {activeTab === "recipes" && <PublishedSection section="cooking" heading="Student Recipes" className="mb-12" excludeProjectIds={featuredRecipe ? [featuredRecipe.projectId] : []} />}
       <WaveFooter quote="Nourish to flourish." />
     </div>
   );

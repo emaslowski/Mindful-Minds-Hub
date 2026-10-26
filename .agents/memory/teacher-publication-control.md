@@ -73,3 +73,14 @@ activities.
 **How to apply:** Preserve this student-first emphasis when adding or
 rearranging Gardening activities. Do not change the original published media
 or teacher-approved edition just to enlarge its page presentation.
+
+## Food Reviews placement
+
+Give Food Reviews its own button in the Cooking Corner, separate from Cooking
+Videos and Recipes, with food review videos inside that view.
+
+**Why:** The user explicitly requested a new Food Reviews button after the
+standalone section did not provide the placement they wanted.
+
+**How to apply:** Preserve this separate category when revising Cooking Corner
+navigation and keep the normal teacher-controlled publication workflow.
