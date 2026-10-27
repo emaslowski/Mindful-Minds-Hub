@@ -26,3 +26,11 @@ click to read the full story.
 
 **How to apply:** Keep the existing full-story presentation and all writing intact;
 change only the listing and how readers open the complete article.
+
+Give blog posts different calming cover pictures at the top rather than repeating
+the same default picture. Preserve any teacher-selected cover.
+
+**Why:** The user asked to “make each blog post a different picture on the top.”
+
+**How to apply:** Keep each preview's cover consistent with its opened story,
+and do not change student writing or the teacher's published media.

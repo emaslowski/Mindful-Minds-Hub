@@ -1,6 +1,7 @@
 import type { CSSProperties, ElementType, ReactNode } from "react";
 import defaultBlogCover from "../assets/blog-calm-lake.jpg";
 import { PublicationVideo } from "./PublicationVideo";
+import { getBlogCover } from "./BlogCovers";
 
 export type PublicationAppearance = {
   fontFamily: "serif" | "sans";
@@ -48,6 +49,7 @@ type PublishedArticleProps = {
   projectId?: number;
   mediaUrl?: (id: number) => string;
   presentation?: "default" | "blog";
+  blogCoverIndex?: number;
 };
 
 export const DEFAULT_BLOG_COVER = defaultBlogCover;
@@ -194,7 +196,7 @@ function renderBlock(block: PublicationBlock, resolveMedia: (id: number) => stri
   return <figure className="published-media"><audio controls preload="metadata" src={media}>Your browser cannot play this audio. {mediaFallback}</audio>{block.caption && <figcaption>{block.caption}</figcaption>}{mediaFallback}</figure>;
 }
 
-export function PublishedArticle({ title, content, appearance, authorDisplay, blocks = [], projectId, mediaUrl, presentation = "default" }: PublishedArticleProps) {
+export function PublishedArticle({ title, content, appearance, authorDisplay, blocks = [], projectId, mediaUrl, presentation = "default", blogCoverIndex }: PublishedArticleProps) {
   const isBlog = presentation === "blog";
   const style = { "--article-accent": colors[appearance?.accent ?? DEFAULT_APPEARANCE.accent] } as CSSProperties;
   const fontSize = { small: "0.9rem", medium: "1rem", large: "1.125rem" }[appearance?.fontSize ?? DEFAULT_APPEARANCE.fontSize];
@@ -210,10 +212,11 @@ export function PublishedArticle({ title, content, appearance, authorDisplay, bl
   const visibleBlocks = isBlog
     ? blocks.filter((block) => block !== coverBlock && block.type !== "text")
     : blocks;
-  const coverUrl = (coverBlock?.mediaId ? resolveMedia(coverBlock.mediaId) : "") || defaultBlogCover;
+  const fallbackCover = getBlogCover(title, blogCoverIndex);
+  const coverUrl = (coverBlock?.mediaId ? resolveMedia(coverBlock.mediaId) : "") || fallbackCover.src;
   return (
     <article className={isBlog ? "published-blog-article" : undefined} style={{ ...style, overflowWrap: "anywhere", fontFamily: (appearance?.fontFamily ?? DEFAULT_APPEARANCE.fontFamily) === "serif" ? '"Cormorant Garamond", Georgia, serif' : 'Nunito, Arial, sans-serif', fontSize, lineHeight, textAlign: appearance?.alignment ?? DEFAULT_APPEARANCE.alignment, color: "#453329" }}>
-      {isBlog && <figure className="published-blog-cover"><img src={coverUrl} alt={coverBlock?.alt ?? "A calm lake surrounded by a green landscape"} style={{ objectFit: coverBlock?.fit ?? "cover" }} />{coverBlock?.caption && <figcaption>{coverBlock.caption}</figcaption>}</figure>}
+      {isBlog && <figure className="published-blog-cover"><img src={coverUrl} alt={coverBlock?.alt ?? (coverBlock?.mediaId ? "" : fallbackCover.alt)} style={{ objectFit: coverBlock?.fit ?? "cover" }} />{coverBlock?.caption && <figcaption>{coverBlock.caption}</figcaption>}</figure>}
       <h1 style={{ color: "var(--article-accent)", fontSize: "2em", lineHeight: 1.15, margin: "0 0 0.35em", fontWeight: 700 }}>{title}</h1>
       {authorDisplay && <p style={{ fontSize: "0.82em", opacity: 0.72, margin: "0 0 1.5em" }}>{authorDisplay}</p>}
       <div className={`published-article-content${isBlog ? " published-blog-content" : ""}`} style={{ display: "grid", gap: "0.8em" }}>

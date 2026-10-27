@@ -1,11 +1,11 @@
 import { Link } from "wouter";
 import {
-  DEFAULT_BLOG_COVER,
   PublishedArticle,
   stripBlogPlanningSections,
   type PublicationAppearance,
   type PublicationBlock,
 } from "@workspace/mind-matters-ds/components/PublishedArticle";
+import { getBlogCover } from "@workspace/mind-matters-ds/components/BlogCovers";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card } from "@workspace/mind-matters-ds/components/ui/card";
 import {
@@ -22,13 +22,15 @@ type BlogStoryPreviewProps = {
   projectId?: number;
   excerpt?: string;
   href?: string;
+  blogCoverIndex?: number;
 };
 
 export function BlogStoryPreview({ excerpt, href, ...story }: BlogStoryPreviewProps) {
   const cover = story.blocks?.find(block => block.type === "image");
+  const fallbackCover = getBlogCover(story.title, story.blogCoverIndex);
   const coverUrl = cover?.mediaId && story.projectId
     ? `/api/public/publications/${story.projectId}/media/${cover.mediaId}`
-    : DEFAULT_BLOG_COVER;
+    : fallbackCover.src;
   const text = excerpt ?? [
     story.content,
     ...(story.blocks ?? []).filter(block => block.type === "text").map(block => block.text ?? ""),
@@ -44,11 +46,11 @@ export function BlogStoryPreview({ excerpt, href, ...story }: BlogStoryPreviewPr
   return (
     <Dialog>
       <Card className="mx-auto w-full max-w-3xl overflow-hidden">
-        <div className="flex flex-col sm:flex-row">
+        <div className="flex flex-col">
           <img
             src={coverUrl}
-            alt={cover?.alt ?? "A calm lake surrounded by a green landscape"}
-            className="h-36 w-full object-cover sm:h-auto sm:w-44 sm:shrink-0"
+            alt={cover?.alt ?? (cover?.mediaId ? "" : fallbackCover.alt)}
+            className="h-36 w-full object-cover sm:h-48"
             loading="lazy"
           />
           <div className="min-w-0 flex-1 p-5 text-left">

@@ -63,8 +63,8 @@ export function PublishedSection({ section, heading = "From Our Students", class
       </div>
       {!items.length && <p className="rounded-2xl border border-card-border/50 bg-card p-6 text-center text-foreground/70">{emptyMessage}</p>}
       <div className={`grid grid-cols-1 gap-6 ${section === "blog" || featureVideos ? "" : "md:grid-cols-2"}`}>
-        {items.map((item) => section === "blog" ? (
-          <BlogStoryPreview key={item.id} {...item} projectId={item.projectId ?? item.id} />
+        {items.map((item, index) => section === "blog" ? (
+          <BlogStoryPreview key={item.id} {...item} blogCoverIndex={index} projectId={item.projectId ?? item.id} />
         ) : (
           <div key={item.id} className={`w-full rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm ${!featureVideos && section !== "blog" && item.appearance?.pageWidth === "full" ? "md:col-span-2" : ""}`}>
             <PublishedArticle
