@@ -6,7 +6,7 @@ import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { CookingRecipes } from "@/components/CookingRecipes";
 
 export default function Cooking() {
-  const [activeTab, setActiveTab] = useState<"food-reviews" | "videos" | "recipes">("food-reviews");
+  const [activeTab, setActiveTab] = useState<"food-reviews" | "videos" | "recipes">("recipes");
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
@@ -35,9 +35,9 @@ export default function Cooking() {
         {/* Pill Tabs */}
         <div className="flex flex-wrap justify-center gap-4 mb-12" role="group" aria-label="Cooking Corner sections">
           {([
+            ["recipes", "Recipes"],
             ["food-reviews", "Food Reviews"],
             ["videos", "Cooking Videos"],
-            ["recipes", "Recipes"],
           ] as const).map(([tab, label]) => (
             <Button
               key={tab}

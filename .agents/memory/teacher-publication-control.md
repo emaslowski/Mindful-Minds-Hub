@@ -146,3 +146,10 @@ it, and smaller other recipes.
 **How to apply:** Keep full recipe instructions accessible from compact
 previews. Stack the video and sourdough on smaller screens rather than making
 either too narrow to use.
+
+Open the Cooking section on Recipes by default and list Recipes first.
+
+**Why:** The user asked to make recipes the first thing people see when opening
+the cooking section.
+
+**How to apply:** Keep Food Reviews and Cooking Videos accessible as other tabs.
