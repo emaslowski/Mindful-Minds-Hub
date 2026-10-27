@@ -3,5 +3,6 @@
 
 # No need to store the pnpm store twice.
 .local
+/.pythonlibs/
 /generated-artifacts/
 /attached_assets/IMG_3001_1793103148450.MOV

@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 
 /** Shared by teacher previews and published editions. Never autoplays. */
-export function PublicationVideo({ src, fallbackSrc }: { src: string; fallbackSrc?: string }) {
+export function PublicationVideo({ src, fallbackSrc, captions }: {
+  src: string;
+  fallbackSrc?: string;
+  captions?: { src: string; srcLang: string; label: string };
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ready, setReady] = useState(false);
   const [slow, setSlow] = useState(false);
@@ -57,8 +61,10 @@ export function PublicationVideo({ src, fallbackSrc }: { src: string; fallbackSr
               : "The video could not be loaded. Retry, or download it to check the recording.");
         }}
       >
+        {captions && <track kind="captions" src={captions.src} srcLang={captions.srcLang} label={captions.label} default />}
         Your browser does not support embedded video.
       </video>
+      {captions && <p className="text-sm text-muted-foreground">English captions are available. Use the CC control to turn them on or off.</p>}
       {!ready && !error && (
         <p role="status" className="text-sm text-muted-foreground">
           {slow ? "The video is taking longer to load. Press Play, retry, or download the recording below." : "Loading video preview…"}

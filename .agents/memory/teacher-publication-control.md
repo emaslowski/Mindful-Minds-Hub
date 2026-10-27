@@ -121,3 +121,6 @@ Keep the user-supplied homepage video directly above â€œFind your bright spot.â€
 **How to apply:** Preserve the full recording and its audio, provide playback
 controls without autoplay, and keep large video files in App Storage rather
 than bundling them into the website.
+
+The user also requested a slightly smaller player and closed captions.
+Keep captions available when resizing or replacing this homepage video.

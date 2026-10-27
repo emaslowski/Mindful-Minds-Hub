@@ -18,6 +18,20 @@ not decode it; codec compatibility requires an alternate encoding, not a storage
 **How to apply:** Switch to the alternate format when the primary format fails;
 keep the formats synchronized to the same complete recording and audio.
 
+## Local caption transcription
+
+Local Whisper caption generation may need FFmpeg-decoded mono PCM arrays instead
+of passing filenames into the transcription library.
+
+**Why:** Faster Whisper's file decoder passed a removed `metadata_errors`
+argument to the installed PyAV version. Decoding with FFmpeg avoided that
+incompatibility and retained word-level timestamps.
+
+**How to apply:** Keep transcription models and intermediates outside Git.
+Check proper names against the site's established spelling before shipping
+captions, and retain synchronized WebVTT tracks rather than burning text into
+the video.
+
 Keep browser byte-range responses bounded, and use chunked transfer for full
 large-media downloads rather than advertising a huge fixed Content-Length.
 
