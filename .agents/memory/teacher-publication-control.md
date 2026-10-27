@@ -124,3 +124,15 @@ than bundling them into the website.
 
 The user also requested a slightly smaller player and closed captions.
 Keep captions available when resizing or replacing this homepage video.
+
+## Featured Chef video
+
+Keep the user-supplied cooking recording in the Featured Chef area under
+Healthy Cooking Corner's Recipes tab, not as a food review or a replacement
+for the teacher-published recipe collection.
+
+**Why:** The user explicitly asked to upload this recording to Featured Chef.
+
+**How to apply:** Preserve the full recording and audio with controls and no
+autoplay. Store large video assets outside the website bundle and leave
+student-submitted publication workflows unchanged.

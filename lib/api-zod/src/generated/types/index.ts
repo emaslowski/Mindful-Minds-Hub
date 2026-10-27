@@ -51,6 +51,8 @@ export * from './friendshipProfileApprovalStatus';
 export * from './friendshipProfileInput';
 export * from './friendshipProfileInputInterestsItem';
 export * from './friendshipProfileInputQualitiesItem';
+export * from './getFeaturedChefVideoFormat';
+export * from './getFeaturedChefVideoParams';
 export * from './getHomepageVideoFormat';
 export * from './getHomepageVideoParams';
 export * from './getPublishedContentParams';

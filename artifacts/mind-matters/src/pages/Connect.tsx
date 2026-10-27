@@ -4,9 +4,10 @@ import { useGetBlogPosts } from "@workspace/api-client-react";
 import { FriendshipMatchmaker } from "@/components/FriendshipMatchmaker";
 import { PublishedSection } from "@/components/PublishedSection";
 import { BlogStoryPreview } from "@/components/BlogStoryPreview";
+import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 
 export default function Connect() {
-  const { data: apiPosts, isLoading } = useGetBlogPosts();
+  const { data: apiPosts, isLoading, isError, refetch } = useGetBlogPosts();
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
@@ -76,19 +77,6 @@ export default function Connect() {
           </svg>
         </div>
 
-        {/* Submit Post Button Top Right */}
-        <div className="absolute top-4 right-4 md:right-12 z-20">
-          <Link href="/connect/submit">
-            <span className="bg-terracotta hover:bg-terracotta/90 text-white px-8 py-3 rounded-full font-sans font-bold text-lg tracking-wide shadow-md transition-all hover:scale-105 flex items-center gap-3">
-              Submit Post
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-                <path d="M12 20h9" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </span>
-          </Link>
-        </div>
-
         <h1 className="text-6xl md:text-8xl font-display italic text-foreground mb-4 drop-shadow-sm mt-8">
           Blog
         </h1>
@@ -96,24 +84,41 @@ export default function Connect() {
           Real Stories. Real Talk. Real Collaboration...
         </p>
 
-        {isLoading ? (
-          <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 text-left" aria-label="Loading blog posts">
-            {[0, 1].map((i) => <div key={i} className="animate-pulse rounded-2xl border border-card-border/50 bg-card p-6">
-              <div className="mb-6 h-36 w-full rounded-2xl bg-card-border/30" />
-              <div className="mb-3 h-6 w-3/4 rounded-md bg-card-border/30" />
-              <div className="h-4 w-full rounded-md bg-card-border/30" />
-            </div>)}
-          </div>
-        ) : apiPosts?.length ? (
-          <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 text-left">
-            {apiPosts.map((post) => (
-              <BlogStoryPreview key={post.id} title={post.title} content="" authorDisplay={`By ${post.author}`} excerpt={post.excerpt ?? undefined} href={`/connect/blog/${post.id}`} />
-            ))}
-          </div>
-        ) : null}
       </div>
 
-      <PublishedSection section="blog" heading="From Our Students" className="mb-12" />
+      <PublishedSection section="blog" heading="From Our Student Creators" className="mb-12" />
+
+      <section className="mx-auto mb-16 w-full max-w-6xl px-4" aria-labelledby="community-posts-title">
+        <div className="mb-5 flex items-center justify-center gap-3">
+          <div className="h-px max-w-[120px] flex-1 bg-sage/20" />
+          <h2 id="community-posts-title" className="font-display text-2xl italic text-foreground">From Our Community</h2>
+          <div className="h-px max-w-[120px] flex-1 bg-sage/20" />
+        </div>
+        <p className="mx-auto mb-5 max-w-2xl text-center text-sm text-foreground/80">
+          Stories from people adding to the website outside the Student Creator team. Posts appear after review.
+        </p>
+        <div className="mb-7 flex justify-center">
+          <Button asChild><Link href="/connect/submit">Submit a Post</Link></Button>
+        </div>
+        {isLoading ? (
+          <div className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-2" aria-label="Loading community posts">
+            {[0, 1].map((i) => <div key={i} className="h-32 animate-pulse rounded-2xl border border-border bg-card" />)}
+          </div>
+        ) : isError ? (
+          <div className="text-center" role="alert">
+            <p className="mb-3 text-sm text-foreground/70">Community posts could not be loaded.</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
+          </div>
+        ) : apiPosts?.length ? (
+          <div className="mx-auto grid max-w-5xl items-start gap-4 sm:grid-cols-2">
+            {apiPosts.map((post) => (
+              <BlogStoryPreview key={post.id} compact title={post.title} content="" authorDisplay={`By ${post.author}`} excerpt={post.excerpt ?? undefined} href={`/connect/blog/${post.id}`} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-sm text-foreground/70">Approved community stories will appear here.</p>
+        )}
+      </section>
 
       <FriendshipMatchmaker />
       <WaveFooter quote="Your voice matters." />

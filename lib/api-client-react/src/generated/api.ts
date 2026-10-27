@@ -48,6 +48,7 @@ import type {
   FriendshipMatch,
   FriendshipProfile,
   FriendshipProfileInput,
+  GetFeaturedChefVideoParams,
   GetHomepageVideoParams,
   GetPublishedContentParams,
   GratitudeEntry,
@@ -4443,6 +4444,90 @@ export function useGetHomepageVideo<TData = Awaited<ReturnType<typeof getHomepag
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetHomepageVideoQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetFeaturedChefVideoUrl = (params?: GetFeaturedChefVideoParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/public/featured-chef-video?${stringifiedParams}` : `/api/public/featured-chef-video`
+}
+
+/**
+ * @summary Stream the teacher-selected Featured Chef video
+ */
+export const getFeaturedChefVideo = async (params?: GetFeaturedChefVideoParams, options?: Parameters<typeof customFetch>[1]): Promise<Blob | void> => {
+
+  return customFetch<Blob | void>(getGetFeaturedChefVideoUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFeaturedChefVideoQueryKey = (params?: GetFeaturedChefVideoParams,) => {
+    return [
+    `/api/public/featured-chef-video`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetFeaturedChefVideoQueryOptions = <TData = Awaited<ReturnType<typeof getFeaturedChefVideo>>, TError = ErrorType<void>>(params?: GetFeaturedChefVideoParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFeaturedChefVideo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFeaturedChefVideoQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFeaturedChefVideo>>> = ({ signal }) => getFeaturedChefVideo(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFeaturedChefVideo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFeaturedChefVideoQueryResult = NonNullable<Awaited<ReturnType<typeof getFeaturedChefVideo>>>
+export type GetFeaturedChefVideoQueryError = ErrorType<void>
+
+
+/**
+ * @summary Stream the teacher-selected Featured Chef video
+ */
+
+export function useGetFeaturedChefVideo<TData = Awaited<ReturnType<typeof getFeaturedChefVideo>>, TError = ErrorType<void>>(
+ params?: GetFeaturedChefVideoParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFeaturedChefVideo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFeaturedChefVideoQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

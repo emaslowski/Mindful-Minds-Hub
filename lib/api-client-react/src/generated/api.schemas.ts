@@ -906,6 +906,18 @@ export const GetHomepageVideoFormat = {
   webm: 'webm',
 } as const;
 
+export type GetFeaturedChefVideoParams = {
+format?: GetFeaturedChefVideoFormat;
+};
+
+export type GetFeaturedChefVideoFormat = typeof GetFeaturedChefVideoFormat[keyof typeof GetFeaturedChefVideoFormat];
+
+
+export const GetFeaturedChefVideoFormat = {
+  mp4: 'mp4',
+  webm: 'webm',
+} as const;
+
 export type GetPublishedContentParams = {
 /**
  * Filter by destination_section (e.g. podcast, move, blog, meditation, wellness, recipe, events)

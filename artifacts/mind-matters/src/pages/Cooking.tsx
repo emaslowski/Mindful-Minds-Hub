@@ -5,6 +5,8 @@ import { PublishedSection } from "@/components/PublishedSection";
 import { useGetPublishedContent } from "@workspace/api-client-react";
 import { PublishedArticle, type PublicationEdition } from "@workspace/mind-matters-ds/components/PublishedArticle";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
+import { PublicationVideo } from "@workspace/mind-matters-ds/components/PublicationVideo";
+import { Card } from "@workspace/mind-matters-ds/components/ui/card";
 
 export default function Cooking() {
   const [activeTab, setActiveTab] = useState<"food-reviews" | "videos" | "recipes">("food-reviews");
@@ -96,21 +98,16 @@ export default function Cooking() {
           />
         ) : activeTab === "recipes" ? (
           <div className="flex flex-col md:flex-row gap-12 text-left">
-            {/* Left side: Featured Chef Placeholder */}
+            {/* Left side: Featured Chef */}
             <div className="w-full md:w-1/3 flex flex-col relative">
               <h2 className="font-handwritten text-3xl text-terracotta mb-4 px-2">Featured Chef:</h2>
               
-              <div className="w-full aspect-[4/5] bg-deep-brown/90 rounded-[2rem] shadow-lg flex items-center justify-center group cursor-pointer relative overflow-hidden border-4 border-card">
-                {/* Decorative background circle */}
-                <div className="absolute top-[-20%] right-[-20%] w-64 h-64 bg-amber/20 rounded-full blur-2xl"></div>
-                
-                {/* Play Button */}
-                <div className="w-20 h-20 rounded-full border border-white/40 bg-white/10 backdrop-blur-sm flex items-center justify-center pl-2 transition-transform duration-500 group-hover:scale-110 group-hover:bg-white/20 z-10">
-                  <svg viewBox="0 0 24 24" fill="white" className="w-8 h-8 opacity-90">
-                    <path d="M5 3l14 9-14 9V3z" />
-                  </svg>
-                </div>
-              </div>
+              <Card className="overflow-hidden border-border bg-card p-3 [&_video]:aspect-video [&_video]:w-full [&_video]:rounded-xl">
+                <PublicationVideo
+                  src="/api/public/featured-chef-video"
+                  fallbackSrc="/api/public/featured-chef-video?format=webm"
+                />
+              </Card>
             </div>
 
             {/* Right side: Recipes Grid */}

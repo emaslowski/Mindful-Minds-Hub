@@ -34,3 +34,14 @@ the same default picture. Preserve any teacher-selected cover.
 
 **How to apply:** Keep each preview's cover consistent with its opened story,
 and do not change student writing or the teacher's published media.
+
+Keep approved posts submitted by people outside the Student Creator team in
+their own Community section, separate from teacher-published creator stories.
+Show compact previews while preserving the full story behind “Read the full story.”
+
+**Why:** The user specifically identified “The Reasons To NOT Lie” as too large
+and asked for a separate place for contributions from non-creators.
+
+**How to apply:** Classify by the submission/publication path, not a title
+keyword. Keep moderation approval intact and never move a creator project
+solely because its author display name sounds informal.

@@ -23,9 +23,10 @@ type BlogStoryPreviewProps = {
   excerpt?: string;
   href?: string;
   blogCoverIndex?: number;
+  compact?: boolean;
 };
 
-export function BlogStoryPreview({ excerpt, href, ...story }: BlogStoryPreviewProps) {
+export function BlogStoryPreview({ excerpt, href, compact = false, ...story }: BlogStoryPreviewProps) {
   const cover = story.blocks?.find(block => block.type === "image");
   const fallbackCover = getBlogCover(story.title, story.blogCoverIndex);
   const coverUrl = cover?.mediaId && story.projectId
@@ -45,19 +46,19 @@ export function BlogStoryPreview({ excerpt, href, ...story }: BlogStoryPreviewPr
 
   return (
     <Dialog>
-      <Card className="mx-auto w-full max-w-3xl overflow-hidden">
-        <div className="flex flex-col">
+      <Card className={`mx-auto w-full overflow-hidden ${compact ? "" : "max-w-3xl"}`}>
+        <div className={compact ? "flex items-start gap-3 p-3 sm:gap-4" : "flex flex-col"}>
           <img
             src={coverUrl}
             alt={cover?.alt ?? (cover?.mediaId ? "" : fallbackCover.alt)}
-            className="h-36 w-full object-cover sm:h-48"
+            className={compact ? "size-20 shrink-0 rounded-lg object-cover sm:size-24" : "h-36 w-full object-cover sm:h-48"}
             loading="lazy"
           />
-          <div className="min-w-0 flex-1 p-5 text-left">
-            <h3 className="font-display text-2xl font-bold leading-tight text-foreground">{story.title}</h3>
+          <div className={`min-w-0 flex-1 text-left ${compact ? "" : "p-5"}`}>
+            <h3 className={`font-display font-bold leading-tight text-foreground ${compact ? "text-lg" : "text-2xl"}`}>{story.title}</h3>
             {story.authorDisplay && <p className="mt-1 text-xs text-foreground/70">{story.authorDisplay}</p>}
-            {preview && <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-foreground/80">{preview}</p>}
-            <div className="mt-4">
+            {preview && <p className={`text-sm leading-relaxed text-foreground/80 ${compact ? "mt-1 line-clamp-2" : "mt-3 line-clamp-3"}`}>{preview}</p>}
+            <div className={compact ? "mt-2" : "mt-4"}>
               {href ? (
                 <Button asChild variant="outline" size="sm">
                   <Link href={href}>Read the full story</Link>

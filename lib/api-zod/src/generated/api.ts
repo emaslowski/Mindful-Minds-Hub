@@ -1139,6 +1139,18 @@ export const GetHomepageVideoResponse = zod.unknown()
 
 
 /**
+ * @summary Stream the teacher-selected Featured Chef video
+ */
+export const getFeaturedChefVideoQueryFormatDefault = `mp4`;
+
+export const GetFeaturedChefVideoQueryParams = zod.object({
+  "format": zod.enum(['mp4', 'webm']).default(getFeaturedChefVideoQueryFormatDefault)
+})
+
+export const GetFeaturedChefVideoResponse = zod.unknown()
+
+
+/**
  * Returns publications joined to projects where publication_status = active. Never includes student PII.
  * @summary Get all active published student content
  */
