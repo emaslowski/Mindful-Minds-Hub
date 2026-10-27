@@ -99,3 +99,15 @@ going on,” a place to upload Active Challenge photos, and an Athlete of the Mo
 exercise destinations, and preserve privacy and teacher publication controls.
 Put the Active Challenge video first, before photo uploads and the gallery,
 as the user explicitly requested.
+
+## Podcast collection
+
+The Brightside Podcast entry opens a collection of all published podcast episodes,
+including video podcasts about sports. Keep sports podcasts in the Podcast
+destination rather than among exercise drills.
+
+**Why:** The user asked to see all podcasts when clicking the Brightside Podcast
+and to put the sports video podcast there.
+
+**How to apply:** Preserve teacher-controlled publishing, support both audio and
+video episodes, and check existing publication placement before moving media.

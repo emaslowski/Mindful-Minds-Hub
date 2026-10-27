@@ -92,7 +92,7 @@ export default function Listen() {
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Podcast Card (Large) */}
-          <div className="md:col-span-2 bg-gradient-to-br from-terracotta/20 to-amber/20 rounded-[3rem] p-10 flex flex-col md:flex-row items-center justify-between border border-white/40 shadow-sm hover:shadow-md transition-shadow">
+          <Link href="/listen/podcast" aria-label="The Brightside Project Podcast — view all episodes" className="md:col-span-2 bg-gradient-to-br from-terracotta/20 to-amber/20 rounded-[3rem] p-10 flex flex-col md:flex-row items-center justify-between border border-white/40 shadow-sm hover:shadow-md transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
             <div className="text-left mb-6 md:mb-0 md:mr-8 flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-terracotta/20 rounded-full text-terracotta">
@@ -105,11 +105,9 @@ export default function Listen() {
               <p className="text-lg font-sans text-foreground/80 mt-4 max-w-lg leading-relaxed">
                 Join our student podcasters as they talk about life, stress, and everything in between. Real conversations for middle schoolers, by middle schoolers.
               </p>
-              <Link href="/listen/podcast">
-                <button className="mt-8 bg-terracotta hover:bg-terracotta/90 text-white px-8 py-3 rounded-full font-sans font-bold text-lg tracking-wide transition-colors inline-block">
-                  Listen to Episodes
-                </button>
-              </Link>
+              <span className="mt-8 bg-terracotta text-primary-foreground px-8 py-3 rounded-full font-sans font-bold text-lg tracking-wide inline-block">
+                View All Episodes
+              </span>
             </div>
             <div className="w-48 h-48 md:w-64 md:h-64 rounded-[2rem] bg-terracotta/10 flex flex-col items-center justify-center border-2 border-terracotta/20 shrink-0 relative overflow-hidden transform rotate-2">
                <svg viewBox="0 0 100 100" fill="none" className="absolute inset-0 opacity-10">
@@ -118,7 +116,7 @@ export default function Listen() {
                </svg>
                <Mic size={64} className="text-terracotta opacity-80" />
             </div>
-          </div>
+          </Link>
 
           {/* Guided Meditations Card */}
           <div className="bg-gradient-to-br from-sage/20 to-dusty-rose/20 rounded-[3rem] p-8 flex flex-col items-center text-center border border-white/40 shadow-sm hover:shadow-md transition-shadow group">
