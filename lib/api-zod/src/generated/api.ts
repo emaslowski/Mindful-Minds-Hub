@@ -1127,6 +1127,18 @@ export const UpdateTeacherPublicationDraftResponse = zod.object({
 
 
 /**
+ * @summary Stream the teacher-selected homepage video
+ */
+export const getHomepageVideoQueryFormatDefault = `mp4`;
+
+export const GetHomepageVideoQueryParams = zod.object({
+  "format": zod.enum(['mp4', 'webm']).default(getHomepageVideoQueryFormatDefault)
+})
+
+export const GetHomepageVideoResponse = zod.unknown()
+
+
+/**
  * Returns publications joined to projects where publication_status = active. Never includes student PII.
  * @summary Get all active published student content
  */

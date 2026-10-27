@@ -111,3 +111,13 @@ and to put the sports video podcast there.
 
 **How to apply:** Preserve teacher-controlled publishing, support both audio and
 video episodes, and check existing publication placement before moving media.
+
+## Homepage video placement
+
+Keep the user-supplied homepage video directly above “Find your bright spot.”
+
+**Why:** The user explicitly requested that placement for their uploaded video.
+
+**How to apply:** Preserve the full recording and its audio, provide playback
+controls without autoplay, and keep large video files in App Storage rather
+than bundling them into the website.

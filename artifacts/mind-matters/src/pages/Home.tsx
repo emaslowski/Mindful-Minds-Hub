@@ -2,6 +2,7 @@ import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card } from "@workspace/mind-matters-ds/components/ui/card";
+import { PublicationVideo } from "@workspace/mind-matters-ds/components/PublicationVideo";
 import { WaveFooter } from "@/components/WaveFooter";
 
 const centers = [
@@ -83,6 +84,14 @@ export default function Home() {
           Students practice research, digital citizenship, collaboration, and creative communication while making useful content for our school community.
         </p>
       </div>
+
+      <section className="mx-auto mb-8 w-full max-w-4xl px-1 md:mb-10" aria-label="The Brightside Project homepage video">
+        <Card className="overflow-hidden border-border bg-card p-3 sm:p-4">
+          <div className="[&_video]:mx-auto [&_video]:aspect-video [&_video]:max-h-[70dvh] [&_video]:w-full [&_video]:rounded-xl">
+            <PublicationVideo src="/api/public/homepage-video" fallbackSrc="/api/public/homepage-video?format=webm" />
+          </div>
+        </Card>
+      </section>
 
       <section id="bright-spots" className="mx-auto w-full max-w-6xl scroll-mt-6 px-1" aria-labelledby="bright-spots-title">
         <SectionHeading id="bright-spots-title">Find your bright spot</SectionHeading>

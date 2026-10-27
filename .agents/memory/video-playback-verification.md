@@ -9,6 +9,15 @@ When a video player's media error occurs during automated testing, test the same
 
 **How to apply:** Treat upload persistence, access control, byte delivery, and codec playback as separate checks. Use a browser-supported video encoding for future playback verification, and report unverified playback honestly rather than claiming the full media experience passed.
 
+For supplied homepage videos, retain an H.264/AAC MP4 and a VP9/Opus WebM
+fallback so browsers without proprietary codec support can still play the video.
+
+**Why:** The preview browser could download and verify the complete MP4 but could
+not decode it; codec compatibility requires an alternate encoding, not a storage fix.
+
+**How to apply:** Switch to the alternate format when the primary format fails;
+keep the formats synchronized to the same complete recording and audio.
+
 Keep browser byte-range responses bounded, and use chunked transfer for full
 large-media downloads rather than advertising a huge fixed Content-Length.
 

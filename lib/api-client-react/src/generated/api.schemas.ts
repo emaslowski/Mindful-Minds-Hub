@@ -894,6 +894,18 @@ export type LogoutBrowserSessionParams = {
 returnTo?: string;
 };
 
+export type GetHomepageVideoParams = {
+format?: GetHomepageVideoFormat;
+};
+
+export type GetHomepageVideoFormat = typeof GetHomepageVideoFormat[keyof typeof GetHomepageVideoFormat];
+
+
+export const GetHomepageVideoFormat = {
+  mp4: 'mp4',
+  webm: 'webm',
+} as const;
+
 export type GetPublishedContentParams = {
 /**
  * Filter by destination_section (e.g. podcast, move, blog, meditation, wellness, recipe, events)

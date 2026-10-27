@@ -14,6 +14,7 @@ import contactRouter from "./contact";
 import friendshipRouter from "./friendship";
 import artworkRouter from "./artwork";
 import athleteRouter from "./athlete";
+import homepageVideoRouter from "./homepageVideo";
 // Studio routes
 import studioAuthRouter from "./studio/auth";
 import studioProjectsRouter from "./studio/projects";
@@ -50,6 +51,7 @@ router.use(contactRouter);
 router.use(friendshipRouter);
 router.use(artworkRouter);
 router.use(athleteRouter);
+router.use(homepageVideoRouter);
 // Studio — student
 router.use(studioAuthRouter);
 router.use(studioProjectsRouter);

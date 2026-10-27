@@ -1,6 +1,8 @@
 # See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # compiled output
+/generated-artifacts/
+/attached_assets/IMG_3001_1793103148450.MOV
 dist
 tmp
 out-tsc

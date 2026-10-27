@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 
 /** Shared by teacher previews and published editions. Never autoplays. */
-export function PublicationVideo({ src }: { src: string }) {
+export function PublicationVideo({ src, fallbackSrc }: { src: string; fallbackSrc?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ready, setReady] = useState(false);
   const [slow, setSlow] = useState(false);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [usingFallback, setUsingFallback] = useState(false);
+  const activeSrc = usingFallback && fallbackSrc ? fallbackSrc : src;
 
   useEffect(() => {
     if (ready || error) return;
@@ -28,7 +30,7 @@ export function PublicationVideo({ src }: { src: string }) {
         controls
         preload="metadata"
         playsInline
-        src={`${src.split("#")[0]}#t=0.05`}
+        src={`${activeSrc.split("#")[0]}#t=0.05`}
         onLoadedMetadata={(event) => {
           // Request an actual frame: Safari can otherwise leave a black preview
           // after metadata loads, particularly with phone-exported MP4 files.
@@ -40,6 +42,13 @@ export function PublicationVideo({ src }: { src: string }) {
         onLoadedData={markReady}
         onPlaying={markReady}
         onError={(event) => {
+          if (fallbackSrc && !usingFallback) {
+            setUsingFallback(true);
+            setReady(false);
+            setSlow(false);
+            setError("");
+            return;
+          }
           const code = event.currentTarget.error?.code;
           setError(code === 2
             ? "The video connection was interrupted. Retry loading it."

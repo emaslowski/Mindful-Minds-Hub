@@ -48,6 +48,7 @@ import type {
   FriendshipMatch,
   FriendshipProfile,
   FriendshipProfileInput,
+  GetHomepageVideoParams,
   GetPublishedContentParams,
   GratitudeEntry,
   GratitudeEntryInput,
@@ -4369,6 +4370,90 @@ export const useUpdateTeacherPublicationDraft = <TError = ErrorType<void>,
       > => {
       return useMutation(getUpdateTeacherPublicationDraftMutationOptions(options));
     }
+
+export const getGetHomepageVideoUrl = (params?: GetHomepageVideoParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/public/homepage-video?${stringifiedParams}` : `/api/public/homepage-video`
+}
+
+/**
+ * @summary Stream the teacher-selected homepage video
+ */
+export const getHomepageVideo = async (params?: GetHomepageVideoParams, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetHomepageVideoUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHomepageVideoQueryKey = (params?: GetHomepageVideoParams,) => {
+    return [
+    `/api/public/homepage-video`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetHomepageVideoQueryOptions = <TData = Awaited<ReturnType<typeof getHomepageVideo>>, TError = ErrorType<void>>(params?: GetHomepageVideoParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHomepageVideo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHomepageVideoQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHomepageVideo>>> = ({ signal }) => getHomepageVideo(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHomepageVideo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHomepageVideoQueryResult = NonNullable<Awaited<ReturnType<typeof getHomepageVideo>>>
+export type GetHomepageVideoQueryError = ErrorType<void>
+
+
+/**
+ * @summary Stream the teacher-selected homepage video
+ */
+
+export function useGetHomepageVideo<TData = Awaited<ReturnType<typeof getHomepageVideo>>, TError = ErrorType<void>>(
+ params?: GetHomepageVideoParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHomepageVideo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHomepageVideoQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetPublishedContentUrl = (params?: GetPublishedContentParams,) => {
   const normalizedParams = new URLSearchParams();

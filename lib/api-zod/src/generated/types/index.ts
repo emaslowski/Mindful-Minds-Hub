@@ -51,6 +51,8 @@ export * from './friendshipProfileApprovalStatus';
 export * from './friendshipProfileInput';
 export * from './friendshipProfileInputInterestsItem';
 export * from './friendshipProfileInputQualitiesItem';
+export * from './getHomepageVideoFormat';
+export * from './getHomepageVideoParams';
 export * from './getPublishedContentParams';
 export * from './gratitudeEntry';
 export * from './gratitudeEntryInput';
