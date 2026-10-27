@@ -2,44 +2,11 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
 import { PublishedSection } from "@/components/PublishedSection";
-import { useGetPublishedContent } from "@workspace/api-client-react";
-import { PublishedArticle, type PublicationEdition } from "@workspace/mind-matters-ds/components/PublishedArticle";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
-import { PublicationVideo } from "@workspace/mind-matters-ds/components/PublicationVideo";
-import { Card } from "@workspace/mind-matters-ds/components/ui/card";
+import { CookingRecipes } from "@/components/CookingRecipes";
 
 export default function Cooking() {
   const [activeTab, setActiveTab] = useState<"food-reviews" | "videos" | "recipes">("food-reviews");
-  const { data, isLoading, isError, refetch } = useGetPublishedContent(
-    { section: "cooking" },
-    { query: { staleTime: 45_000, refetchOnWindowFocus: true } },
-  );
-  const publications = (data?.publications ?? []) as Array<PublicationEdition & {
-    projectId: number;
-    authorDisplay?: string;
-  }>;
-  const featuredRecipe = publications.find((item) =>
-    /\byogurt\s+pops(?:icles)?\b/i.test(item.title),
-  );
-
-  const recipes = [
-    {
-      id: 2,
-      title: "Apples & Peanut Butter",
-      category: "Snack",
-      desc: "Sweet, crunch, and full of energy!",
-      time: "5 min",
-      colors: "from-amber/30 to-terracotta/20"
-    },
-    {
-      id: 3,
-      title: "Berry Blast Smoothie",
-      category: "Snack",
-      desc: "Packed with fruit and vitamins!",
-      time: "10 min",
-      colors: "from-sage/30 to-dusty-rose/20"
-    }
-  ];
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
@@ -97,73 +64,7 @@ export default function Cooking() {
             className="mb-12 text-left"
           />
         ) : activeTab === "recipes" ? (
-          <div className="flex flex-col md:flex-row gap-12 text-left">
-            {/* Left side: Featured Chef */}
-            <div className="w-full md:w-1/3 flex flex-col relative">
-              <h2 className="font-handwritten text-3xl text-terracotta mb-4 px-2">Featured Chef:</h2>
-              
-              <Card className="overflow-hidden border-border bg-card p-3 [&_video]:aspect-video [&_video]:w-full [&_video]:rounded-xl">
-                <PublicationVideo
-                  src="/api/public/featured-chef-video"
-                  fallbackSrc="/api/public/featured-chef-video?format=webm"
-                />
-              </Card>
-            </div>
-
-            {/* Right side: Recipes Grid */}
-            <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-8">
-              <section aria-labelledby="recipe-of-the-month" className="sm:col-span-2 overflow-hidden rounded-2xl border border-card-border/50 bg-card shadow-sm">
-                <h2 id="recipe-of-the-month" className="border-b border-card-border/40 px-5 py-3 text-center font-handwritten text-xl text-terracotta">
-                  Recipe of the Month
-                </h2>
-                <div className="p-6">
-                  {isLoading ? <p role="status" className="font-sans text-foreground/70">Loading this month's recipe…</p>
-                    : isError ? <div role="alert"><p className="mb-3 font-sans text-foreground/70">This month's recipe could not be loaded.</p><Button variant="outline" onClick={() => refetch()}>Try again</Button></div>
-                    : featuredRecipe ? <PublishedArticle
-                      title={featuredRecipe.title}
-                      content={featuredRecipe.content}
-                      appearance={featuredRecipe.appearance}
-                      authorDisplay={featuredRecipe.authorDisplay}
-                      blocks={featuredRecipe.blocks}
-                      projectId={featuredRecipe.projectId}
-                    />
-                    : <p className="font-sans text-foreground/70">This month's recipe will appear here when it is published.</p>}
-                </div>
-              </section>
-              {recipes.map(recipe => (
-                <Link key={recipe.id} href={`/create/cooking/recipes/${recipe.id}`}>
-                  <div className="flex flex-col bg-card rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full cursor-pointer group border border-card-border/50 relative">
-                    
-                    {/* Herb Corner Decoration */}
-                    <div className="absolute top-2 right-2 opacity-30 w-8 h-8 text-sage">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
-                      </svg>
-                    </div>
-
-                    {/* Earthy Image Gradient Area */}
-                    <div className={`w-full h-40 bg-gradient-to-br ${recipe.colors} opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center`}>
-                      <span className="text-4xl opacity-50 font-display italic mix-blend-overlay">Fresh</span>
-                    </div>
-                    
-                    <div className="p-6 flex flex-col flex-1 bg-card">
-                      <h3 className="font-display italic text-2xl mb-2 text-foreground font-semibold">{recipe.title}</h3>
-                      <span className="inline-block bg-amber/20 text-amber-foreground font-sans text-xs font-bold px-3 py-1 rounded-full w-fit mb-3 uppercase tracking-wider">{recipe.category}</span>
-                      <p className="text-sm text-foreground/70 font-sans flex-1 leading-relaxed mb-4">{recipe.desc}</p>
-                      
-                      <div className="flex items-center text-sm font-sans font-medium text-sage mt-auto">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 mr-2">
-                          <circle cx="12" cy="12" r="10"/>
-                          <path d="M12 6v6l4 2"/>
-                        </svg>
-                        {recipe.time}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <CookingRecipes />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map(id => (
@@ -183,7 +84,6 @@ export default function Cooking() {
         </div>
       </div>
 
-      {activeTab === "recipes" && <PublishedSection section="cooking" heading="Student Recipes" className="mb-12" excludeProjectIds={featuredRecipe ? [featuredRecipe.projectId] : []} />}
       <WaveFooter quote="Nourish to flourish." />
     </div>
   );

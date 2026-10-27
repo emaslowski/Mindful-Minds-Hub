@@ -136,3 +136,13 @@ for the teacher-published recipe collection.
 **How to apply:** Preserve the full recording and audio with controls and no
 autoplay. Store large video assets outside the website bundle and leave
 student-submitted publication workflows unchanged.
+
+Give Featured Chef a large player with the sourdough recipe beside it on
+wide screens. Keep the other recipes smaller, below this featured pair.
+
+**Why:** The user explicitly requested a bigger chef video, sourdough next to
+it, and smaller other recipes.
+
+**How to apply:** Keep full recipe instructions accessible from compact
+previews. Stack the video and sourdough on smaller screens rather than making
+either too narrow to use.
