@@ -17,6 +17,12 @@ New wellness-access requests collect a student email alongside the approval deta
 
 **How to apply:** Require and validate an email for new requests, retain nullable email fields for legacy requests, and show teachers clear delivery status with a manual fallback if sending fails. Do not reuse this email to create, authorize, or sign into a Studio account.
 
+Students receiving private-access credentials use school-issued email addresses.
+
+**Why:** The user confirmed this while reporting missing approval emails. School mail restrictions are a possibility, not a confirmed cause.
+
+**How to apply:** Distinguish application send failures, mail-provider acceptance, and school delivery filtering. Do not claim receipt from a successful approval or absence of logged errors.
+
 ## Private plant-growth observations
 
 Plant observations use the same private-identity precedence as Journal: private Journal credentials first, otherwise the individual app login. A shared Studio group login alone must never grant plant-journal access, and observations must never enter teacher publishing or public student-video workflows.
