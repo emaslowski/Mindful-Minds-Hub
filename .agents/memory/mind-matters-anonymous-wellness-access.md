@@ -23,6 +23,12 @@ Students receiving private-access credentials use school-issued email addresses.
 
 **How to apply:** Distinguish application send failures, mail-provider acceptance, and school delivery filtering. Do not claim receipt from a successful approval or absence of logged errors.
 
+Private-access approval emails must use the authorized school Gmail connection, not the general website SMTP sender. Keep other website email workflows unchanged.
+
+**Why:** The user requested the school Gmail account as the sender after students did not receive credential emails.
+
+**How to apply:** Verify the connected mailbox matches the configured sender before transmitting credentials. Do not silently fall back to another account. Gmail acceptance is not proof of delivery; preserve the teacher's manual credential fallback and never log passwords.
+
 ## Private plant-growth observations
 
 Plant observations use the same private-identity precedence as Journal: private Journal credentials first, otherwise the individual app login. A shared Studio group login alone must never grant plant-journal access, and observations must never enter teacher publishing or public student-video workflows.

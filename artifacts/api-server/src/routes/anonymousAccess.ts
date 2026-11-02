@@ -17,6 +17,7 @@ import {
 } from '../lib/auth';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { requireStudioRole } from '../middlewares/studioAuthMiddleware';
+import { sendCredentialEmail } from '../lib/credentialEmail';
 
 const router = Router();
 
@@ -181,27 +182,7 @@ async function sendCredentialsEmail(
     password: string;
   },
 ): Promise<void> {
-  const smtpHost = process.env.SMTP_HOST;
-  if (!smtpHost) {
-    req.log.warn(
-      { studentEmail: details.studentEmail, smtpConfigured: false },
-      'Anonymous access approved without student credential email',
-    );
-    return;
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: Number(process.env.SMTP_PORT ?? 587),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
+  const messageId = await sendCredentialEmail({
     to: details.studentEmail,
     subject: 'Your Brightside Project private access details',
     text: [
@@ -223,6 +204,10 @@ async function sendCredentialsEmail(
       <p><em>Keep these details private. Use them on The Brightside Project private access page to open your journal.</em></p>
     `,
   });
+  req.log.info(
+    { provider: 'gmail', messageId },
+    'School Gmail accepted the anonymous access credential email',
+  );
 }
 
 async function createRequestCode(): Promise<string> {
@@ -458,7 +443,10 @@ router.post(
         emailSent = true;
       } catch (error) {
         req.log.error(
-          { err: error, requestCode: request.requestCode, studentEmail: request.studentEmail },
+          {
+            requestCode: request.requestCode,
+            reason: error instanceof Error ? error.message : 'Unknown Gmail send failure',
+          },
           'Unable to send anonymous access credentials email',
         );
       }
