@@ -20,6 +20,7 @@ const centers = [
   { title: "Friendship & Belonging", description: "Practice kindness, teamwork, and inclusion.", href: "/connect", image: "tile-11.jpg", color: "bg-muted/30" },
   { title: "School & Community Events", description: "Discover events, clubs, and activities.", href: "/events", image: "tile-12.jpg", color: "bg-accent/25" },
   { title: "Groups & Connections", description: "Find teacher-approved ways to join in.", href: "/connect", image: "tile-13.jpg", color: "bg-secondary/20" },
+  { title: "ASMR", description: "Listen to gentle, teacher-approved sounds created by students.", href: "/listen/asmr", image: "tile-8.jpg", color: "bg-muted/30" },
 ];
 
 const creatorRoles = [

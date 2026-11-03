@@ -669,7 +669,7 @@ export const DESTINATION_SECTIONS: Record<string, string> = {
   'Game section': 'create',
   'Sports drills': 'move',
   'Sports Rules': 'move',
-  'ASMR video': 'calm-corner',
+  'ASMR video': 'asmr',
   'Cooking video': 'cooking',
   'Artwork': 'create',
   'Directed drawing activity': 'create',

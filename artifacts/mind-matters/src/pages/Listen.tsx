@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
 import { Mic, Headphones, Leaf, Activity } from "lucide-react";
+import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 
 export default function Listen() {
   const tabs = [
@@ -8,6 +9,7 @@ export default function Listen() {
     { label: "Focus Sounds", path: "/listen/focus-sounds", icon: <Activity size={18} /> },
     { label: "Meditations", path: "/listen/meditations", icon: <Leaf size={18} /> },
     { label: "Nature Sounds", path: "/listen/nature-sounds", icon: <Leaf size={18} /> }, // Replace Leaf with better if needed
+    { label: "ASMR", path: "/listen/asmr", icon: <Headphones size={18} /> },
   ];
 
   return (
@@ -80,12 +82,12 @@ export default function Listen() {
         {/* Filters */}
         <div className="flex flex-wrap justify-center gap-4 mb-16 px-4">
           {tabs.map((tab) => (
-            <Link key={tab.path} href={tab.path}>
-              <button className="flex items-center gap-2 px-6 py-2 rounded-full font-sans font-bold text-sm md:text-base transition-all duration-300 outline-none bg-card text-foreground hover:bg-sage/10 border border-card-border shadow-sm">
+            <Button key={tab.path} asChild variant="outline" size="sm" data-testid={`link-listen-${tab.label.toLowerCase().replaceAll(" ", "-")}`}>
+              <Link href={tab.path}>
                 {tab.icon}
                 {tab.label}
-              </button>
-            </Link>
+              </Link>
+            </Button>
           ))}
         </div>
 
@@ -149,6 +151,23 @@ export default function Listen() {
                </button>
              </Link>
           </div>
+
+          <Link
+            href="/listen/asmr"
+            data-testid="card-listen-asmr"
+            className="group rounded-[3rem] border border-white/40 bg-gradient-to-br from-sage/15 to-amber/15 p-8 text-center shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+          >
+            <div className="mb-6 inline-flex rounded-full bg-white/40 p-6 text-sage transition-transform group-hover:scale-110">
+              <Headphones aria-hidden="true" size={48} />
+            </div>
+            <h3 className="mb-3 font-display text-3xl italic text-foreground">ASMR</h3>
+            <p className="mb-8 px-4 font-sans text-foreground/70">
+              Explore gentle sounds from student work reviewed and published by teachers.
+            </p>
+            <span className="inline-flex w-full items-center justify-center rounded-full border-2 border-sage px-8 py-2.5 font-sans text-sm font-bold uppercase tracking-wider text-sage transition-colors group-hover:bg-sage group-hover:text-white">
+              Explore clips
+            </span>
+          </Link>
         </div>
       </div>
 

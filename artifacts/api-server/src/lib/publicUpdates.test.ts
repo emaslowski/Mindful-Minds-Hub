@@ -19,7 +19,7 @@ test('invalid dates are never presented as recent posts', () => {
 
 test('every teacher publishing destination has a public route', () => {
   for (const section of [
-    'blog', 'podcast', 'learn', 'create', 'calm-corner', 'focus-study',
+    'blog', 'podcast', 'learn', 'create', 'calm-corner', 'focus-study', 'asmr',
     'move', 'move-morning-stretch', 'move-soccer-skills', 'move-basketball-drills',
     'move-yoga-for-calm', 'move-stretch-break', 'move-active-challenge',
     'directed-draws', 'cooking', 'cooking-food-reviews', 'gardening', 'grow',

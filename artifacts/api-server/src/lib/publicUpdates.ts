@@ -7,6 +7,7 @@ export const UPDATE_DESTINATIONS: Record<string, { href: string; label: string }
   create: { href: '/create', label: 'Creative Activities' },
   'calm-corner': { href: '/listen/meditations', label: 'Mindful Moments' },
   'focus-study': { href: '/listen/focus-sounds', label: 'Focus & Study' },
+  asmr: { href: '/listen/asmr', label: 'ASMR' },
   move: { href: '/move', label: 'Movement & Sports' },
   'directed-draws': { href: '/create/directed-draws', label: 'Art & Drawing Studio' },
   cooking: { href: '/create/cooking', label: 'Cooking & Recipes' },

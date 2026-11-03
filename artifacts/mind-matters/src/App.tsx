@@ -25,6 +25,7 @@ import Move from '@/pages/Move';
 import MoveActivity from '@/pages/MoveActivity';
 import DirectedDraws from '@/pages/DirectedDraws';
 import Listen from '@/pages/Listen';
+import ListenAsmr from '@/pages/ListenAsmr';
 import Grow from '@/pages/Grow';
 import GrowJournal from '@/pages/GrowJournal';
 import GrowGratitude from '@/pages/GrowGratitude';
@@ -110,6 +111,7 @@ function PublicRouter() {
 
         {/* Listen Section */}
         <Route path="/listen" component={Listen} />
+        <Route path="/listen/asmr" component={ListenAsmr} />
         <Route path="/listen/podcast" component={ListenPodcast} />
         <Route path="/listen/calm-music">
           {() => <BlankTemplate title="Calm Music" subtitle="Relaxing playlists coming soon. Students can add music links here!" />}
