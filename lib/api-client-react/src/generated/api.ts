@@ -41,6 +41,8 @@ import type {
   CollabCommentInput,
   CollabPost,
   CollabPostInput,
+  ContentComment,
+  ContentCommentInput,
   Event,
   FriendshipDecisionInput,
   FriendshipDecisionResult,
@@ -48,6 +50,7 @@ import type {
   FriendshipMatch,
   FriendshipProfile,
   FriendshipProfileInput,
+  GetContentCommentsParams,
   GetFeaturedChefVideoParams,
   GetHomepageVideoParams,
   GetPublishedContentParams,
@@ -63,6 +66,7 @@ import type {
   PlantJournal,
   PlantObservation,
   PlantObservationInput,
+  PublicUpdate,
   PublicationDraftEnvelope,
   PublicationDraftInput,
   PublicationMediaEnvelope,
@@ -72,7 +76,9 @@ import type {
   PublishedContentEnvelope,
   Review,
   ReviewInput,
+  SubmissionReceipt,
   SubmissionResult,
+  TeacherReviewReplyInput,
   TeacherWebsiteProjectInput,
   TodayPrompt,
   VideoCompletionInput,
@@ -3709,6 +3715,310 @@ export const useSubmitCheckin = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getSubmitCheckinMutationOptions(options));
+    }
+
+export const getGetPublicUpdatesUrl = () => {
+
+
+
+
+  return `/api/public/updates`
+}
+
+/**
+ * @summary Latest teacher-published content and approved community posts
+ */
+export const getPublicUpdates = async ( options?: Parameters<typeof customFetch>[1]): Promise<PublicUpdate[]> => {
+
+  return customFetch<PublicUpdate[]>(getGetPublicUpdatesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicUpdatesQueryKey = () => {
+    return [
+    `/api/public/updates`
+    ] as const;
+    }
+
+
+export const getGetPublicUpdatesQueryOptions = <TData = Awaited<ReturnType<typeof getPublicUpdates>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicUpdates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicUpdatesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicUpdates>>> = ({ signal }) => getPublicUpdates({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicUpdates>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicUpdatesQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicUpdates>>>
+export type GetPublicUpdatesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Latest teacher-published content and approved community posts
+ */
+
+export function useGetPublicUpdates<TData = Awaited<ReturnType<typeof getPublicUpdates>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicUpdates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicUpdatesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetContentCommentsUrl = (params: GetContentCommentsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/content-comments?${stringifiedParams}` : `/api/content-comments`
+}
+
+/**
+ * @summary Get approved comments for a public content page
+ */
+export const getContentComments = async (params: GetContentCommentsParams, options?: Parameters<typeof customFetch>[1]): Promise<ContentComment[]> => {
+
+  return customFetch<ContentComment[]>(getGetContentCommentsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetContentCommentsQueryKey = (params?: GetContentCommentsParams,) => {
+    return [
+    `/api/content-comments`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetContentCommentsQueryOptions = <TData = Awaited<ReturnType<typeof getContentComments>>, TError = ErrorType<unknown>>(params: GetContentCommentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getContentComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetContentCommentsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getContentComments>>> = ({ signal }) => getContentComments(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContentComments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetContentCommentsQueryResult = NonNullable<Awaited<ReturnType<typeof getContentComments>>>
+export type GetContentCommentsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get approved comments for a public content page
+ */
+
+export function useGetContentComments<TData = Awaited<ReturnType<typeof getContentComments>>, TError = ErrorType<unknown>>(
+ params: GetContentCommentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getContentComments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetContentCommentsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSubmitContentCommentUrl = () => {
+
+
+
+
+  return `/api/content-comments`
+}
+
+/**
+ * @summary Submit a comment for teacher approval
+ */
+export const submitContentComment = async (contentCommentInput: ContentCommentInput, options?: Parameters<typeof customFetch>[1]): Promise<SubmissionReceipt> => {
+
+  return customFetch<SubmissionReceipt>(getSubmitContentCommentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(contentCommentInput)
+  }
+);}
+
+
+
+
+
+export const getSubmitContentCommentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitContentComment>>, TError,{data: BodyType<ContentCommentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitContentComment>>, TError,{data: BodyType<ContentCommentInput>}, TContext> => {
+
+const mutationKey = ['submitContentComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitContentComment>>, {data: BodyType<ContentCommentInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitContentComment(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitContentCommentMutationResult = NonNullable<Awaited<ReturnType<typeof submitContentComment>>>
+    export type SubmitContentCommentMutationBody = BodyType<ContentCommentInput>
+    export type SubmitContentCommentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Submit a comment for teacher approval
+ */
+export const useSubmitContentComment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitContentComment>>, TError,{data: BodyType<ContentCommentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitContentComment>>,
+        TError,
+        {data: BodyType<ContentCommentInput>},
+        TContext
+      > => {
+      return useMutation(getSubmitContentCommentMutationOptions(options));
+    }
+
+export const getSaveTeacherReviewReplyUrl = (id: number,) => {
+
+
+
+
+  return `/api/teacher/reviews/${id}/reply`
+}
+
+/**
+ * @summary Teacher only reply to a pending or approved review
+ */
+export const saveTeacherReviewReply = async (id: number,
+    teacherReviewReplyInput: TeacherReviewReplyInput, options?: Parameters<typeof customFetch>[1]): Promise<Review> => {
+
+  return customFetch<Review>(getSaveTeacherReviewReplyUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(teacherReviewReplyInput)
+  }
+);}
+
+
+
+
+
+export const getSaveTeacherReviewReplyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveTeacherReviewReply>>, TError,{id: number;data: BodyType<TeacherReviewReplyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveTeacherReviewReply>>, TError,{id: number;data: BodyType<TeacherReviewReplyInput>}, TContext> => {
+
+const mutationKey = ['saveTeacherReviewReply'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveTeacherReviewReply>>, {id: number;data: BodyType<TeacherReviewReplyInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  saveTeacherReviewReply(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveTeacherReviewReplyMutationResult = NonNullable<Awaited<ReturnType<typeof saveTeacherReviewReply>>>
+    export type SaveTeacherReviewReplyMutationBody = BodyType<TeacherReviewReplyInput>
+    export type SaveTeacherReviewReplyMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Teacher only reply to a pending or approved review
+ */
+export const useSaveTeacherReviewReply = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveTeacherReviewReply>>, TError,{id: number;data: BodyType<TeacherReviewReplyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveTeacherReviewReply>>,
+        TError,
+        {id: number;data: BodyType<TeacherReviewReplyInput>},
+        TContext
+      > => {
+      return useMutation(getSaveTeacherReviewReplyMutationOptions(options));
     }
 
 export const getGetReviewsUrl = () => {

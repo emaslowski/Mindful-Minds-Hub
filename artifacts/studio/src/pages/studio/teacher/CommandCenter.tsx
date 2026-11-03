@@ -2,9 +2,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherReview, teacherAnalytics, teacherModeration, teacherAnonymousAccess, teacherFriendship, type FriendshipJoinRequest, type ModerationItem } from '@/lib/studioApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { teacherReview, teacherAnalytics, teacherModeration, teacherAnonymousAccess, teacherFriendship, type FriendshipJoinRequest, type ModerationItem, type TeacherModerationData } from '@/lib/studioApi';
+import { Card, CardContent } from '@workspace/mind-matters-ds/components/ui/card';
+import { Button } from '@workspace/mind-matters-ds/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,14 +14,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@workspace/mind-matters-ds/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { PublicFeedbackModeration } from '@/pages/studio/teacher/PublicFeedbackModeration';
 import {
   Users, FolderOpen, ClipboardCheck, Star, KeyRound, HeartHandshake,
   RefreshCw, AlertCircle, ChevronRight, Trash2, CheckCircle2, FileText, MessageSquare,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
 
 export default function CommandCenter() {
   const { user, isLoading } = useRequireStudioRole('teacher');
@@ -45,11 +46,12 @@ export default function CommandCenter() {
     refetchInterval: 30_000,
   });
 
-  const { data: moderationData } = useQuery({
+  const { data: moderationData, isLoading: moderationLoading, isError: moderationError, refetch: refetchModeration } = useQuery({
     queryKey: ['teacher-moderation'],
     queryFn: () => teacherModeration.list(),
     enabled: !!user,
     refetchOnWindowFocus: true,
+    refetchInterval: 30_000,
   });
 
   const { data: anonymousAccess, isLoading: accessLoading, isError: accessError, refetch: refetchAccess } = useQuery({
@@ -133,6 +135,10 @@ export default function CommandCenter() {
     ...(moderationData?.collabPosts ?? []),
     ...(moderationData?.comments ?? []),
   ];
+  const pendingFeedbackCount =
+    (moderationData?.contentComments?.length ?? 0) +
+    (moderationData?.reviews ?? []).filter((review) => !review.approved).length;
+  const awaitingAuthorizationCount = authorizationQueue.length + pendingFeedbackCount;
   const approvedBoardPosts = moderationData?.approvedCollabPosts ?? [];
   const moderationLabels = {
     blog: { label: 'Blog post', icon: <FileText className="h-4 w-4 text-[#c4622d]" /> },
@@ -312,16 +318,23 @@ export default function CommandCenter() {
           )}
         </section>
 
+        <PublicFeedbackModeration
+          data={moderationData as TeacherModerationData | undefined}
+          isLoading={moderationLoading}
+          isError={moderationError}
+          refetch={() => { void refetchModeration(); }}
+        />
+
         {/* Public content moderation */}
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="font-serif text-lg font-semibold text-[#453329]">Awaiting Authorization</h2>
             <p className="text-xs text-[#688a52] mt-0.5">
-              Blog posts, collaboration board posts, and comments stay private until you approve them.
+              Blog posts, collaboration posts, and comments stay private until approved. Page comments and site reviews are listed above.
             </p>
           </div>
           <span className="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-full bg-[#c4622d] text-white text-xs font-bold">
-            {authorizationQueue.length}
+            {moderationLoading ? '…' : awaitingAuthorizationCount}
           </span>
         </div>
 

@@ -823,6 +823,83 @@ export const SubmitCheckinResponse = zod.object({
 
 
 /**
+ * @summary Latest teacher-published content and approved community posts
+ */
+export const GetPublicUpdatesResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "section": zod.string(),
+  "href": zod.string(),
+  "publishedAt": zod.string()
+})
+export const GetPublicUpdatesResponse = zod.array(GetPublicUpdatesResponseItem)
+
+
+/**
+ * @summary Get approved comments for a public content page
+ */
+export const GetContentCommentsQueryParams = zod.object({
+  "section": zod.coerce.string()
+})
+
+export const GetContentCommentsResponseItem = zod.object({
+  "id": zod.number(),
+  "section": zod.string(),
+  "authorName": zod.string(),
+  "content": zod.string(),
+  "createdAt": zod.string()
+})
+export const GetContentCommentsResponse = zod.array(GetContentCommentsResponseItem)
+
+
+/**
+ * @summary Submit a comment for teacher approval
+ */
+export const submitContentCommentBodyAuthorNameMax = 60;
+
+export const submitContentCommentBodyContentMax = 2000;
+
+
+
+export const SubmitContentCommentBody = zod.object({
+  "section": zod.string(),
+  "authorName": zod.string().max(submitContentCommentBodyAuthorNameMax).optional(),
+  "content": zod.string().min(1).max(submitContentCommentBodyContentMax)
+})
+
+export const SubmitContentCommentResponse = zod.object({
+  "id": zod.number(),
+  "pending": zod.boolean()
+})
+
+
+/**
+ * @summary Teacher only reply to a pending or approved review
+ */
+export const SaveTeacherReviewReplyParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const saveTeacherReviewReplyBodyReplyMax = 2000;
+
+
+
+export const SaveTeacherReviewReplyBody = zod.object({
+  "reply": zod.string().max(saveTeacherReviewReplyBodyReplyMax)
+})
+
+export const SaveTeacherReviewReplyResponse = zod.object({
+  "id": zod.number(),
+  "rating": zod.number(),
+  "helpful": zod.boolean(),
+  "comment": zod.string().nullish(),
+  "approved": zod.boolean().optional(),
+  "teacherReply": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
  * @summary Get site reviews
  */
 export const GetReviewsResponseItem = zod.object({
@@ -830,6 +907,8 @@ export const GetReviewsResponseItem = zod.object({
   "rating": zod.number(),
   "helpful": zod.boolean(),
   "comment": zod.string().nullish(),
+  "approved": zod.boolean().optional(),
+  "teacherReply": zod.string().nullish(),
   "createdAt": zod.string()
 })
 export const GetReviewsResponse = zod.array(GetReviewsResponseItem)
@@ -849,6 +928,8 @@ export const SubmitReviewResponse = zod.object({
   "rating": zod.number(),
   "helpful": zod.boolean(),
   "comment": zod.string().nullish(),
+  "approved": zod.boolean().optional(),
+  "teacherReply": zod.string().nullish(),
   "createdAt": zod.string()
 })
 

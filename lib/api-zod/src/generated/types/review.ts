@@ -12,5 +12,8 @@ export interface Review {
   helpful: boolean;
   /** @nullable */
   comment?: string | null;
+  approved?: boolean;
+  /** @nullable */
+  teacherReply?: string | null;
   createdAt: string;
 }

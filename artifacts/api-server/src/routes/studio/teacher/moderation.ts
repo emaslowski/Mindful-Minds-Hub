@@ -3,6 +3,8 @@ import {
   blogPostsTable,
   collabCommentsTable,
   collabPostsTable,
+  contentCommentsTable,
+  reviewsTable,
 } from '@workspace/db/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
@@ -14,7 +16,8 @@ router.get(
   '/teacher/moderation',
   requireStudioRole('teacher'),
   async (_req: Request, res: Response) => {
-    const [blogPosts, collabPosts, approvedCollabPosts, comments] = await Promise.all([
+    res.setHeader('Cache-Control', 'no-store');
+    const [blogPosts, collabPosts, approvedCollabPosts, comments, contentComments, reviews] = await Promise.all([
       db
         .select({
           id: blogPostsTable.id,
@@ -62,9 +65,20 @@ router.get(
         )
         .where(eq(collabCommentsTable.approved, false))
         .orderBy(desc(collabCommentsTable.createdAt)),
+      db.select().from(contentCommentsTable)
+        .where(eq(contentCommentsTable.approved, false))
+        .orderBy(desc(contentCommentsTable.createdAt)),
+      db.select().from(reviewsTable)
+        .orderBy(reviewsTable.approved, desc(reviewsTable.createdAt)),
     ]);
 
     res.json({
+      contentComments: contentComments.map(row => ({
+        ...row, type: 'content-comment', createdAt: row.createdAt.toISOString(),
+      })),
+      reviews: reviews.map(row => ({
+        ...row, type: 'review', createdAt: row.createdAt.toISOString(),
+      })),
       blogPosts: blogPosts.map((post) => ({
         ...post,
         type: 'blog' as const,
@@ -95,13 +109,21 @@ router.post(
   async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const type = req.params.type;
-    if (!Number.isInteger(id)) {
+    if (!Number.isSafeInteger(id) || id <= 0) {
       res.status(400).json({ error: 'Invalid moderation item' });
       return;
     }
 
     let updated: { id: number }[] = [];
-    if (type === 'blog') {
+    if (type === 'content-comment') {
+      updated = await db.update(contentCommentsTable).set({ approved: true })
+        .where(and(eq(contentCommentsTable.id, id), eq(contentCommentsTable.approved, false)))
+        .returning({ id: contentCommentsTable.id });
+    } else if (type === 'review') {
+      updated = await db.update(reviewsTable).set({ approved: true })
+        .where(and(eq(reviewsTable.id, id), eq(reviewsTable.approved, false)))
+        .returning({ id: reviewsTable.id });
+    } else if (type === 'blog') {
       updated = await db
         .update(blogPostsTable)
         .set({ approved: true, approvedAt: new Date() })
@@ -144,12 +166,19 @@ router.delete(
   async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const type = req.params.type;
-    if (!Number.isInteger(id)) {
+    if (!Number.isSafeInteger(id) || id <= 0) {
       res.status(400).json({ error: 'Invalid moderation item' });
       return;
     }
 
-    if (type === 'blog') {
+    if (type === 'content-comment' || type === 'review') {
+      const table = type === 'review' ? reviewsTable : contentCommentsTable;
+      const deleted = await db.delete(table).where(eq(table.id, id)).returning({ id: table.id });
+      if (!deleted.length) {
+        res.status(404).json({ error: 'Moderation item not found' });
+        return;
+      }
+    } else if (type === 'blog') {
       const deleted = await db
         .delete(blogPostsTable)
         .where(and(eq(blogPostsTable.id, id), eq(blogPostsTable.approved, false)))

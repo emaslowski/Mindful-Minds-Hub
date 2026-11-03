@@ -49,6 +49,18 @@ export const reviewsTable = pgTable("reviews", {
   rating: integer("rating").notNull(),
   helpful: boolean("helpful").notNull().default(true),
   comment: text("comment"),
+  approved: boolean("approved").notNull().default(false),
+  teacherReply: text("teacher_reply"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Public content discussions. Private journals never use these threads.
+export const contentCommentsTable = pgTable("content_comments", {
+  id: serial("id").primaryKey(),
+  section: text("section").notNull(),
+  authorName: text("author_name").notNull(),
+  content: text("content").notNull(),
+  approved: boolean("approved").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

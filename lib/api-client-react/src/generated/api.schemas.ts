@@ -583,12 +583,52 @@ export interface CheckinResult {
   recommendations: SectionRecommendation[];
 }
 
+export interface PublicUpdate {
+  id: string;
+  title: string;
+  section: string;
+  href: string;
+  publishedAt: string;
+}
+
+export interface ContentComment {
+  id: number;
+  section: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface ContentCommentInput {
+  section: string;
+  /** @maxLength 60 */
+  authorName?: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  content: string;
+}
+
+export interface SubmissionReceipt {
+  id: number;
+  pending: boolean;
+}
+
+export interface TeacherReviewReplyInput {
+  /** @maxLength 2000 */
+  reply: string;
+}
+
 export interface Review {
   id: number;
   rating: number;
   helpful: boolean;
   /** @nullable */
   comment?: string | null;
+  approved?: boolean;
+  /** @nullable */
+  teacherReply?: string | null;
   createdAt: string;
 }
 
@@ -892,6 +932,10 @@ iss?: string;
 
 export type LogoutBrowserSessionParams = {
 returnTo?: string;
+};
+
+export type GetContentCommentsParams = {
+section: string;
 };
 
 export type GetHomepageVideoParams = {

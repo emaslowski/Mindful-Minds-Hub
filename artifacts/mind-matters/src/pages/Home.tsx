@@ -4,6 +4,7 @@ import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card } from "@workspace/mind-matters-ds/components/ui/card";
 import { PublicationVideo } from "@workspace/mind-matters-ds/components/PublicationVideo";
 import { WaveFooter } from "@/components/WaveFooter";
+import { HomeUpdates } from "@/components/HomeUpdates";
 
 const centers = [
   { title: "Student Stories & Blogs", description: "Ideas, encouragement, and student voices.", href: "/connect", image: "tile-1.jpg", color: "bg-muted/30" },
@@ -84,6 +85,8 @@ export default function Home() {
           Students practice research, digital citizenship, collaboration, and creative communication while making useful content for our school community.
         </p>
       </div>
+
+      <HomeUpdates />
 
       <section className="mx-auto mb-8 w-full max-w-3xl px-1 md:mb-10" aria-label="The Brightside Project homepage video">
         <Card className="overflow-hidden border-border bg-card p-3 sm:p-4">

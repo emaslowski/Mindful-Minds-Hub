@@ -805,6 +805,76 @@ paths:
               schema:
                 $ref: "#/components/schemas/CheckinResult"
 
+  /public/updates:
+    get:
+      operationId: getPublicUpdates
+      tags: [reviews]
+      summary: Latest teacher-published content and approved community posts
+      responses:
+        "200":
+          description: Newest public posts first, never drafts or pending submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PublicUpdate" }
+
+  /content-comments:
+    get:
+      operationId: getContentComments
+      tags: [reviews]
+      summary: Get approved comments for a public content page
+      parameters:
+        - in: query
+          name: section
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Approved comments only
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ContentComment" }
+    post:
+      operationId: submitContentComment
+      tags: [reviews]
+      summary: Submit a comment for teacher approval
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContentCommentInput" }
+      responses:
+        "201":
+          description: Saved privately pending teacher approval
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubmissionReceipt" }
+
+  /teacher/reviews/{id}/reply:
+    put:
+      operationId: saveTeacherReviewReply
+      tags: [reviews]
+      summary: Teacher only reply to a pending or approved review
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: number }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TeacherReviewReplyInput" }
+      responses:
+        "200":
+          description: Saved without changing approval state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Review" }
+
   # Reviews
   /reviews:
     get:
@@ -1680,6 +1750,42 @@ components:
       required: [section, path, reason]
 
     # Reviews
+    PublicUpdate:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        section: { type: string }
+        href: { type: string }
+        publishedAt: { type: string }
+      required: [id, title, section, href, publishedAt]
+    ContentComment:
+      type: object
+      properties:
+        id: { type: number }
+        section: { type: string }
+        authorName: { type: string }
+        content: { type: string }
+        createdAt: { type: string }
+      required: [id, section, authorName, content, createdAt]
+    ContentCommentInput:
+      type: object
+      properties:
+        section: { type: string }
+        authorName: { type: string, maxLength: 60 }
+        content: { type: string, minLength: 1, maxLength: 2000 }
+      required: [section, content]
+    SubmissionReceipt:
+      type: object
+      properties:
+        id: { type: number }
+        pending: { type: boolean }
+      required: [id, pending]
+    TeacherReviewReplyInput:
+      type: object
+      properties:
+        reply: { type: string, maxLength: 2000 }
+      required: [reply]
     Review:
       type: object
       properties:
@@ -1690,6 +1796,10 @@ components:
         helpful:
           type: boolean
         comment:
+          type: ["string", "null"]
+        approved:
+          type: boolean
+        teacherReply:
           type: ["string", "null"]
         createdAt:
           type: string

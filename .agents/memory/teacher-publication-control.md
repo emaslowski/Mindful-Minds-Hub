@@ -114,6 +114,12 @@ video episodes, and check existing publication placement before moving media.
 
 ## Homepage video placement
 
+The homepage should automatically show what is new each time content is posted.
+
+**Why:** The user requested updates on the homepage each time they post, rather than a manually maintained announcement.
+
+**How to apply:** Derive updates from actual published editions and approved community posts. Never announce student drafts, unpublished teacher edits, or pending discussions.
+
 Keep the user-supplied homepage video directly above “Find your bright spot.”
 
 **Why:** The user explicitly requested that placement for their uploaded video.

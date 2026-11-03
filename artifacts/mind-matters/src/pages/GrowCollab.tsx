@@ -175,10 +175,10 @@ export default function GrowCollab() {
           <BackButton />
           <div className="mb-10">
             <h1 className="text-5xl font-display italic text-foreground mb-4 flex items-center gap-3">
-              <Users className="text-terracotta" size={36} /> Collab Board
+              <Users className="text-terracotta" size={36} /> Brightside Advice Column
             </h1>
             <p className="text-lg font-sans text-foreground/80 leading-relaxed">
-              Share your thoughts, advice, and words of encouragement with classmates and peers.
+              Share kind thoughts, ask for advice, and encourage classmates. Posts and comments appear only after teacher approval, helping keep discussions safe and supportive.
             </p>
           </div>
 

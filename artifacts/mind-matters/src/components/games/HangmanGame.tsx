@@ -1,30 +1,68 @@
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 
 type Puzzle = { word: string; category: string; hint: string };
 type Round = { puzzle: Puzzle; guessed: string[]; usedWords: string[]; number: number };
 
 const PUZZLES: Puzzle[] = [
-  { word: "compass", category: "School tools", hint: "It helps you find direction on a map." },
-  { word: "volcano", category: "Earth science", hint: "A mountain that can release lava." },
-  { word: "library", category: "Places", hint: "A quiet place to borrow books." },
-  { word: "habitat", category: "Life science", hint: "The natural home of a plant or animal." },
-  { word: "rhythm", category: "Music", hint: "A pattern of beats in music." },
-  { word: "planet", category: "Space", hint: "Earth is one of these." },
-  { word: "courage", category: "Character strengths", hint: "Being brave when something feels difficult." },
-  { word: "puzzle", category: "Things to solve", hint: "A game or problem made of pieces or clues." },
-  { word: "rainbow", category: "Weather", hint: "A colorful arc that may appear after rain." },
-  { word: "harvest", category: "Gardening", hint: "Gathering crops when they are ready." },
-  { word: "octopus", category: "Ocean animals", hint: "An intelligent sea animal with eight arms." },
-  { word: "fraction", category: "Math", hint: "A way to show part of a whole." },
+  { word: "compass", category: "Exploration", hint: "Its needle has a preferred direction." },
+  { word: "volcano", category: "Geology", hint: "Pressure can reshape its summit." },
+  { word: "library", category: "Community", hint: "Quiet shelves are only part of what it offers." },
+  { word: "habitat", category: "Ecology", hint: "A living thing depends on this particular place." },
+  { word: "rhythm", category: "Sound", hint: "A steady pattern can be tapped or clapped." },
+  { word: "planet", category: "Astronomy", hint: "It travels around a star." },
+  { word: "courage", category: "Character", hint: "A strength that can show up even when you feel nervous." },
+  { word: "puzzle", category: "Problem solving", hint: "Small clues or pieces come together." },
+  { word: "rainbow", category: "Atmosphere", hint: "Light and water droplets can make an arc." },
+  { word: "harvest", category: "Growing", hint: "A season's work can lead to this gathering." },
+  { word: "octopus", category: "Marine life", hint: "A clever creature with flexible arms." },
+  { word: "fraction", category: "Numbers", hint: "A numerator and denominator work together." },
+  { word: "symmetry", category: "Design", hint: "Two sides can reflect a similar arrangement." },
+  { word: "migration", category: "Animal behavior", hint: "A seasonal journey made by many species." },
+  { word: "telescope", category: "Observation", hint: "A lens or mirror helps distant objects appear nearer." },
+  { word: "ecosystem", category: "Ecology", hint: "Living things and their surroundings interact here." },
+  { word: "blueprint", category: "Making", hint: "A plan can guide what gets built." },
+  { word: "algorithm", category: "Computing", hint: "A set of steps arranged to solve a task." },
+  { word: "molecule", category: "Chemistry", hint: "Atoms join together to form one." },
+  { word: "constellation", category: "Astronomy", hint: "People connect stars into a familiar pattern." },
+  { word: "metamorphosis", category: "Life cycles", hint: "A dramatic change during development." },
+  { word: "biodiversity", category: "Nature", hint: "A rich variety of living forms in one place." },
+  { word: "thermometer", category: "Measurement", hint: "Its scale can show how warm or cool something is." },
+  { word: "architecture", category: "Design", hint: "The shape and planning of spaces people use." },
+  { word: "camouflage", category: "Adaptation", hint: "A way to blend into surroundings." },
+  { word: "photosynthesis", category: "Botany", hint: "Leaves use light in an important process." },
+  { word: "amphibian", category: "Animal groups", hint: "Many members begin life in water." },
+  { word: "peninsula", category: "Landforms", hint: "Water surrounds most, but not all, of this land." },
+  { word: "longitude", category: "Geography", hint: "One coordinate runs between the poles." },
+  { word: "evaporation", category: "Water cycle", hint: "A liquid changes state as it gains energy." },
+  { word: "percussion", category: "Music", hint: "This family makes sound by striking or shaking." },
+  { word: "choreography", category: "Movement", hint: "A sequence of motions arranged for performance." },
+  { word: "onomatopoeia", category: "Language", hint: "A word can imitate a sound." },
+  { word: "metaphor", category: "Writing", hint: "A comparison that does not use 'like' or 'as'." },
+  { word: "democracy", category: "Civics", hint: "People have a voice in decisions." },
+  { word: "renewable", category: "Energy", hint: "A resource can be replenished over time." },
+  { word: "crystallize", category: "Materials", hint: "A substance can form an ordered solid pattern." },
+  { word: "archipelago", category: "Geography", hint: "A cluster of islands belongs to this landform group." },
+  { word: "equilibrium", category: "Science", hint: "Opposing effects can balance in this state." },
+  { word: "observatory", category: "Research", hint: "Researchers gather data from a dedicated place." },
+  { word: "perseverance", category: "Character", hint: "Continuing carefully after a setback." },
+  { word: "invertebrate", category: "Animal groups", hint: "This broad group has no backbone." },
+  { word: "topography", category: "Geography", hint: "A map may show the shape and elevation of land." },
+  { word: "instrument", category: "Music", hint: "A crafted object can make musical sound." },
+  { word: "biography", category: "Reading", hint: "A person's life story written by someone else." },
+  { word: "microclimate", category: "Weather", hint: "A small area can have its own local conditions." },
+  { word: "tributary", category: "Waterways", hint: "A smaller stream joins a larger one." },
+  { word: "cartography", category: "Exploration", hint: "The craft of representing places on a map." },
+  { word: "numerator", category: "Numbers", hint: "The upper part of a fraction." },
+  { word: "resilience", category: "Wellbeing", hint: "The ability to recover and adapt after challenges." },
 ];
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const MAX_MISSES = 6;
 
 function drawRound(usedWords: string[], number: number): Round {
   const available = PUZZLES.filter((puzzle) => !usedWords.includes(puzzle.word));
-  const pool = available.length ? available : PUZZLES;
+  const pool = available.length ? available : PUZZLES.filter((puzzle) => puzzle.word !== usedWords[usedWords.length - 1]);
   const puzzle = pool[Math.floor(Math.random() * pool.length)];
   return {
     puzzle,
@@ -61,6 +99,7 @@ function HangmanDrawing({ misses }: { misses: number }) {
 export function HangmanGame({ isActive }: { isActive: boolean }) {
   const [round, setRound] = useState<Round>(initialRound);
   const [hintVisible, setHintVisible] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
   const rootRef = useRef<HTMLElement>(null);
   const misses = round.guessed.filter((letter) => !round.puzzle.word.includes(letter.toLowerCase())).length;
   const won = [...round.puzzle.word].every((letter) => round.guessed.includes(letter.toUpperCase()));
@@ -79,7 +118,21 @@ export function HangmanGame({ isActive }: { isActive: boolean }) {
 
   function nextRound() {
     setHintVisible(false);
+    setHintUsed(false);
     setRound((current) => drawRound(current.usedWords, current.number + 1));
+  }
+
+  function revealHint() {
+    if (hintUsed || complete || misses >= MAX_MISSES - 1) return;
+    setHintUsed(true);
+    setHintVisible(true);
+    setRound((current) => {
+      const currentMisses = current.guessed.filter((letter) => !current.puzzle.word.includes(letter.toLowerCase())).length;
+      const currentWon = [...current.puzzle.word].every((char) => current.guessed.includes(char.toUpperCase()));
+      const chargeLetter = ALPHABET.find((letter) => !current.guessed.includes(letter) && !current.puzzle.word.includes(letter.toLowerCase()));
+      if (currentWon || currentMisses >= MAX_MISSES - 1 || !chargeLetter) return current;
+      return { ...current, guessed: [...current.guessed, chargeLetter] };
+    });
   }
 
   useEffect(() => {
@@ -106,15 +159,16 @@ export function HangmanGame({ isActive }: { isActive: boolean }) {
           <RotateCcw aria-hidden="true" /> New round
         </Button>
       </div>
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-background/80 p-4">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-background/80 p-4">
         <div>
           <p className="font-bold text-secondary">Category: {round.puzzle.category}</p>
           <p className="mt-1 text-sm text-foreground/75">Incorrect guesses: {misses} of {MAX_MISSES}</p>
+            <p className="mt-1 max-w-xl text-xs text-muted-foreground">A clue costs one incorrect guess. Use it only when you have at least two guesses left; there is one clue per round.</p>
         </div>
-        <Button variant="outline" onClick={() => setHintVisible((visible) => !visible)} aria-expanded={hintVisible} data-testid="hangman-hint">
-          {hintVisible ? "Hide hint" : "Show hint"}
+          <Button variant="outline" onClick={revealHint} disabled={hintUsed || complete || misses >= MAX_MISSES - 1} aria-expanded={hintVisible} data-testid="hangman-hint">
+            {hintUsed ? "Clue used" : "Use charged clue"}
         </Button>
-        {hintVisible && <p className="basis-full text-foreground/85" data-testid="hangman-hint-text">{round.puzzle.hint}</p>}
+          {hintVisible && <p className="basis-full text-foreground/85" data-testid="hangman-hint-text">Clue: {round.puzzle.hint}</p>}
       </div>
       <div className="grid gap-5 md:grid-cols-[minmax(180px,0.7fr)_1.3fr]">
         <div className="flex min-h-44 items-center justify-center rounded-2xl bg-background/75 p-4 text-secondary">

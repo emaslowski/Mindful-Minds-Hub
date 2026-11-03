@@ -226,12 +226,7 @@ export const teacherAnalytics = {
 // ── Teacher: Content moderation ─────────────────────────────────────────────
 export const teacherModeration = {
   list: () =>
-    studioFetch<{
-      blogPosts: ModerationItem[];
-      collabPosts: ModerationItem[];
-      approvedCollabPosts: ModerationItem[];
-      comments: ModerationItem[];
-    }>('/teacher/moderation'),
+    studioFetch<TeacherModerationData>('/teacher/moderation'),
   approve: (type: ModerationItemType, id: number) =>
     studioFetch<{ success: boolean }>(`/teacher/moderation/${type}/${id}/approve`, {
       method: 'POST',
@@ -333,11 +328,41 @@ export interface StudioProject {
   publishedAt?: string | null;
 }
 
-export type ModerationItemType = 'blog' | 'collab-post' | 'comment';
+export type ModerationItemType = 'blog' | 'collab-post' | 'comment' | 'content-comment' | 'review';
+export type LegacyModerationItemType = 'blog' | 'collab-post' | 'comment';
+
+export interface ContentCommentModerationItem {
+  id: number;
+  section: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
+  type: 'content-comment';
+}
+
+export interface ModeratedSiteReview {
+  id: number;
+  rating: number;
+  helpful: boolean;
+  comment: string | null;
+  approved: boolean;
+  teacherReply: string | null;
+  createdAt: string;
+  type: 'review';
+}
+
+export interface TeacherModerationData {
+  blogPosts: ModerationItem[];
+  collabPosts: ModerationItem[];
+  approvedCollabPosts: ModerationItem[];
+  comments: ModerationItem[];
+  contentComments: ContentCommentModerationItem[];
+  reviews: ModeratedSiteReview[];
+}
 
 export interface ModerationItem {
   id: number;
-  type: ModerationItemType;
+  type: LegacyModerationItemType;
   title?: string;
   author: string;
   content: string;

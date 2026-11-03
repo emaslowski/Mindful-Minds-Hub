@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { CheckCircle, Home, LogIn, LogOut, PenLine, Star, Sun, User } from "lucide-react";
+import { ContentComments, normalizePublicCommentSection } from "@/components/ContentComments";
 
 const mainLinks = [
   { href: "/", label: "Home" },
@@ -96,6 +97,12 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         )}
         {children}
+        {normalizePublicCommentSection(location) && (
+          <ContentComments
+            key={normalizePublicCommentSection(location) ?? location}
+            section={normalizePublicCommentSection(location)!}
+          />
+        )}
       </main>
     </div>
   );

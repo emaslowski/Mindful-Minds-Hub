@@ -14,8 +14,8 @@ export default function Grow() {
       requiresAuth: true
     },
     { 
-      title: "Collaboration Board", 
-      subtitle: "Share & Connect",
+      title: "Brightside Advice Column",
+      subtitle: "Kind, teacher-approved discussions",
       icon: <Users size={48} />,
       path: "/grow/collab", 
       colors: "from-terracotta/20 to-sage/20",
