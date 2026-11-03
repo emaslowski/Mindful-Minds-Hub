@@ -67,8 +67,8 @@ export default function Home() {
         </div>
         <Card className="order-1 overflow-hidden border-0 bg-transparent shadow-none md:order-2">
           <img
-            src="/assets/bright/hero.jpg"
-            alt="Students work together on a school project at a table covered with books and creative supplies"
+            src="/api/public/homepage-image"
+            alt="Hand-drawn Brightside Project illustration of students creating together, with a poster reading A kinder school, brighter tomorrow"
             className="h-auto w-full object-contain"
             fetchPriority="high"
           />

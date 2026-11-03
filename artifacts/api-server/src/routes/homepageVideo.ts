@@ -5,6 +5,23 @@ import { streamProjectVideo } from "../lib/projectVideoStorage";
 const router: IRouter = Router();
 const storage = new ObjectStorageService();
 
+router.get("/public/homepage-image", async (req, res) => {
+  try {
+    const file = await storage.searchPublicObject("homepage/student-art-2026-11-03.webp");
+    if (!file) {
+      res.status(404).json({ error: "The homepage image is not available." });
+      return;
+    }
+    const [image] = await file.download();
+    res.set("Content-Type", "image/webp");
+    res.set("Cache-Control", "public, max-age=3600");
+    res.send(image);
+  } catch (error) {
+    req.log.error({ err: error }, "Failed to load homepage image");
+    res.status(500).json({ error: "The homepage image could not be loaded." });
+  }
+});
+
 // Only this explicitly selected public homepage asset is exposed. Never accept
 // a client-supplied object path or open access to student uploads.
 router.get("/public/homepage-video", async (req, res) => {
