@@ -41,6 +41,7 @@ import Contact from '@/pages/Contact';
 import ListenPodcast from '@/pages/ListenPodcast';
 import ListenMeditations from '@/pages/ListenMeditations';
 import AnonymousAccess from '@/pages/AnonymousAccess';
+import PublishedContentDetail from '@/pages/PublishedContentDetail';
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,7 @@ function PublicRouter() {
         <Route path="/connect/submit" component={SubmitPost} />
         <Route path="/connect/blog/:id" component={BlogPost} />
         <Route path="/connect/post/:id" component={BlogPost} />
+        <Route path="/content/publication/:id" component={PublishedContentDetail} />
 
         {/* Move Section */}
         <Route path="/move" component={Move} />

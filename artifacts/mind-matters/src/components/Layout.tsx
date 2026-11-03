@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useLayoutEffect, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
@@ -14,6 +14,20 @@ const mainLinks = [
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+
+  useLayoutEffect(() => {
+    const previousRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+    return () => { window.history.scrollRestoration = previousRestoration; };
+  }, []);
+
+  useLayoutEffect(() => {
+    // Section navigation must not keep the previous page's position near its
+    // comments. Leave explicit anchor links to the browser.
+    if (!window.location.hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+  }, [location]);
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col overflow-x-hidden bg-background">

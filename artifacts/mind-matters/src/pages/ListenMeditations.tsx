@@ -4,6 +4,8 @@ import { Link } from "wouter";
 import { useGetPublishedContent } from "@workspace/api-client-react";
 import { PublishedArticle, type PublicationAppearance } from "@workspace/mind-matters-ds/components/PublishedArticle";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
+import { PublicationDiscussion } from "@/components/PublicationDiscussion";
+import { Skeleton } from "@workspace/mind-matters-ds/components/ui/skeleton";
 
 export default function ListenMeditations({ focus = false }: { focus?: boolean }) {
   const { data, isLoading, isError, refetch } = useGetPublishedContent({}, { query: { staleTime: 45_000, refetchOnWindowFocus: true } });
@@ -14,7 +16,9 @@ export default function ListenMeditations({ focus = false }: { focus?: boolean }
     const destination = post.destinationSection === "calm-corner"
       && post.title.trim().toLowerCase() === "music for studying"
       ? "focus-study" : post.destinationSection;
-    return destination === section;
+    const isAsmr = post.destinationSection === "calm-corner"
+      && (post.contentType === "ASMR video" || post.title.trim().toLowerCase() === "squishy asmr");
+    return destination === section && !(section === "calm-corner" && isAsmr);
   });
   const title = focus ? "Focus & Study" : "Guided Meditations";
   const Icon = focus ? Headphones : Leaf;
@@ -23,11 +27,9 @@ export default function ListenMeditations({ focus = false }: { focus?: boolean }
     <div className="w-full flex flex-col flex-1 pt-12 relative">
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 mb-24 relative z-10">
         <div className="mb-8">
-          <Link href="/listen">
-            <button className="px-6 py-2 rounded-full border border-sage text-sage font-sans text-sm tracking-wide transition-all hover:bg-sage hover:text-white">
-              ← Back to Listen
-            </button>
-          </Link>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/listen">Back to Listen</Link>
+          </Button>
         </div>
 
         <div className="text-center mb-12">
@@ -41,12 +43,8 @@ export default function ListenMeditations({ focus = false }: { focus?: boolean }
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-pulse flex gap-4">
-              <div className="w-4 h-4 bg-sage/40 rounded-full"></div>
-              <div className="w-4 h-4 bg-sage/40 rounded-full"></div>
-              <div className="w-4 h-4 bg-sage/40 rounded-full"></div>
-            </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2" aria-label="Loading published posts">
+            {[0, 1].map((item) => <div key={item} className="space-y-3 rounded-2xl border border-border bg-card p-6"><Skeleton className="h-7 w-2/3" /><Skeleton className="h-20 w-full" /></div>)}
           </div>
         ) : isError ? (
           <div role="alert" className="text-center">
@@ -67,6 +65,11 @@ export default function ListenMeditations({ focus = false }: { focus?: boolean }
                   projectId={med.projectId}
                   appearance={(med as typeof med & { appearance?: PublicationAppearance }).appearance}
                   authorDisplay={med.authorDisplay}
+                />
+                <PublicationDiscussion
+                  section={`/content/publication/${med.projectId ?? med.id}`}
+                  title={med.title}
+                  testId={`publication-${med.projectId ?? med.id}`}
                 />
               </div>
             ))}

@@ -2,6 +2,7 @@ import { useGetPublishedContent } from "@workspace/api-client-react";
 import { PublishedArticle, type PublicationAppearance, type PublicationBlock } from "@workspace/mind-matters-ds/components/PublishedArticle";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { BlogStoryPreview } from "./BlogStoryPreview";
+import { PublicationDiscussion } from "./PublicationDiscussion";
 
 type PublishedSectionProps = {
   section: string;
@@ -63,21 +64,34 @@ export function PublishedSection({ section, heading = "From Our Students", class
       </div>
       {!items.length && <p className="rounded-2xl border border-card-border/50 bg-card p-6 text-center text-foreground/70">{emptyMessage}</p>}
       <div className={`grid grid-cols-1 gap-6 ${section === "blog" || featureVideos ? "" : "md:grid-cols-2"}`}>
-        {items.map((item, index) => section === "blog" ? (
-          <BlogStoryPreview key={item.id} {...item} blogCoverIndex={index} projectId={item.projectId ?? item.id} />
-        ) : (
-          <div key={item.id} className={`w-full rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm ${!featureVideos && section !== "blog" && item.appearance?.pageWidth === "full" ? "md:col-span-2" : ""}`}>
-            <PublishedArticle
-              title={item.title}
-              content={item.content}
-              appearance={item.appearance}
-              authorDisplay={item.authorDisplay}
-              blocks={featureVideos ? item.blocks?.map((block) => block.type === "video" ? { ...block, width: "full" as const } : block) : item.blocks}
-              projectId={item.projectId ?? item.id}
-              presentation={section === "blog" ? "blog" : "default"}
+        {items.map((item, index) => {
+          const projectId = item.projectId ?? item.id;
+          return section === "blog" ? (
+            <BlogStoryPreview
+              key={item.id}
+              {...item}
+              blogCoverIndex={index}
+              href={item.projectId ? undefined : `/connect/blog/${item.id}`}
             />
-          </div>
-        ))}
+          ) : (
+            <div key={item.id} className={`w-full rounded-2xl border border-card-border/50 bg-card p-6 shadow-sm ${!featureVideos && section !== "blog" && item.appearance?.pageWidth === "full" ? "md:col-span-2" : ""}`}>
+              <PublishedArticle
+                title={item.title}
+                content={item.content}
+                appearance={item.appearance}
+                authorDisplay={item.authorDisplay}
+                blocks={featureVideos ? item.blocks?.map((block) => block.type === "video" ? { ...block, width: "full" as const } : block) : item.blocks}
+                projectId={projectId}
+                presentation="default"
+              />
+              <PublicationDiscussion
+                section={`/content/publication/${projectId}`}
+                title={item.title}
+                testId={`publication-${projectId}`}
+              />
+            </div>
+          );
+        })}
       </div>
     </section>
   );

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { MessageSquare, Send } from "lucide-react";
@@ -30,12 +30,21 @@ export function normalizePublicCommentSection(path: string): string | null {
   if (/^\/connect\/(?:blog|post)\/[0-9]+$/.test(normalized)) {
     return normalized.replace("/connect/post/", "/connect/blog/");
   }
+  if (/^\/content\/publication\/[0-9]+$/.test(normalized)) return normalized;
+  if (/^\/content\/featured\/(?:chef-video|homepage-video)$/.test(normalized)) return normalized;
   if (/^\/(?:move|listen)\/[a-z0-9-]+$/.test(normalized)) return normalized;
   if (normalized === "/grow/collab") return normalized;
   return null;
 }
 
-export function ContentComments({ section }: { section: string }) {
+export function ContentComments({ section, itemTitle }: { section: string; itemTitle?: string }) {
+  const id = useId();
+  const authorId = `comment-author-${id}`;
+  const contentId = `comment-content-${id}`;
+  const approvalNoteId = `comment-approval-note-${id}`;
+  const countId = `comment-count-${id}`;
+  const titleId = `content-comments-title-${id}`;
+  const testId = (name: string) => itemTitle ? `${name}-${id}` : name;
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, isError, refetch } = useGetContentComments(
     { section },
@@ -80,12 +89,12 @@ export function ContentComments({ section }: { section: string }) {
   const comments = (data ?? []).filter((comment) => comment.section === section);
 
   return (
-    <section className="w-full max-w-4xl py-8" aria-labelledby="content-comments-title">
+    <section className="w-full max-w-4xl py-8" aria-labelledby={titleId}>
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <MessageSquare aria-hidden="true" className="h-5 w-5 text-primary" />
-            <CardTitle id="content-comments-title">Join the conversation</CardTitle>
+            <CardTitle id={titleId}>{itemTitle ? `Join the conversation about ${itemTitle}` : "Join the conversation"}</CardTitle>
           </div>
           <CardDescription>
             Share a kind, on-topic thought about this page. A teacher reviews every comment before it appears publicly.
@@ -94,39 +103,39 @@ export function ContentComments({ section }: { section: string }) {
         <CardContent className="space-y-6">
           <form className="space-y-3" onSubmit={handleSubmit} noValidate>
             <div className="space-y-1.5">
-              <Label htmlFor="comment-author" className="text-sm font-medium">Display name <span className="font-normal text-muted-foreground">(optional)</span></Label>
+              <Label htmlFor={authorId} className="text-sm font-medium">Display name <span className="font-normal text-muted-foreground">(optional)</span></Label>
               <Input
-                id="comment-author"
-                data-testid="input-comment-author"
+                id={authorId}
+                data-testid={testId("input-comment-author")}
                 value={authorName}
                 onChange={(event) => setAuthorName(event.target.value)}
                 maxLength={60}
                 autoComplete="nickname"
                 placeholder="Name or nickname"
-                aria-describedby="comment-approval-note"
+                aria-describedby={approvalNoteId}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="comment-content" className="text-sm font-medium">Your comment</Label>
+              <Label htmlFor={contentId} className="text-sm font-medium">Your comment</Label>
               <Textarea
-                id="comment-content"
-                data-testid="input-comment-content"
+                id={contentId}
+                data-testid={testId("input-comment-content")}
                 value={content}
                 onChange={(event) => setContent(event.target.value)}
                 maxLength={2000}
                 rows={4}
                 required
-                aria-describedby="comment-approval-note comment-count"
+                aria-describedby={`${approvalNoteId} ${countId}`}
                 placeholder="What would you like to share?"
               />
-              <p id="comment-count" className="text-right text-xs text-muted-foreground">{content.length}/2000</p>
+              <p id={countId} className="text-right text-xs text-muted-foreground">{content.length}/2000</p>
             </div>
-            <p id="comment-approval-note" className="text-sm text-muted-foreground">
+            <p id={approvalNoteId} className="text-sm text-muted-foreground">
               Comments stay private until a teacher approves them. Please do not share personal information.
             </p>
-            {error && <p className="text-sm font-medium text-destructive" role="alert" data-testid="status-comment-error">{error}</p>}
-            {success && <p className="text-sm font-medium text-secondary" role="status" data-testid="status-comment-submitted">Your comment was sent for teacher approval. It will appear here only if approved.</p>}
-            <Button type="submit" disabled={isPending || !content.trim()} data-testid="button-submit-comment">
+            {error && <p className="text-sm font-medium text-destructive" role="alert" data-testid={testId("status-comment-error")}>{error}</p>}
+            {success && <p className="text-sm font-medium text-secondary" role="status" data-testid={testId("status-comment-submitted")}>Your comment was sent for teacher approval. It will appear here only if approved.</p>}
+            <Button type="submit" disabled={isPending || !content.trim()} data-testid={testId("button-submit-comment")}>
               <Send aria-hidden="true" />
               {isPending ? "Sending…" : "Send for approval"}
             </Button>
@@ -153,7 +162,7 @@ export function ContentComments({ section }: { section: string }) {
                 <p className="mt-2 text-sm text-muted-foreground">No approved comments yet. You can be the first to share a thoughtful note.</p>
               </div>
             ) : (
-              <ul className="space-y-3" data-testid="list-approved-comments">
+              <ul className="space-y-3" data-testid={testId("list-approved-comments")}>
                 {comments.map((comment) => (
                   <li key={comment.id} className="rounded-lg border border-border bg-card p-4" data-testid={`comment-approved-${comment.id}`}>
                     <div className="mb-2 flex flex-wrap items-center justify-between gap-2">

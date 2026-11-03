@@ -7,6 +7,7 @@ import { Card } from "@workspace/mind-matters-ds/components/ui/card";
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@workspace/mind-matters-ds/components/ui/dialog";
+import { PublicationDiscussion } from "./PublicationDiscussion";
 
 type RecipeEdition = PublicationEdition & { projectId: number; authorDisplay?: string };
 
@@ -33,6 +34,11 @@ function SmallRecipeCard({ recipe }: { recipe: RecipeEdition }) {
           <DialogDescription>The complete recipe, ingredients, and instructions.</DialogDescription>
         </DialogHeader>
         <PublishedArticle {...recipe} />
+        <PublicationDiscussion
+          section={`/content/publication/${recipe.projectId}`}
+          title={recipe.title}
+          testId={`publication-${recipe.projectId}`}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -66,6 +72,11 @@ export function CookingRecipes() {
               fallbackSrc="/api/public/featured-chef-video?format=webm"
             />
           </Card>
+          <PublicationDiscussion
+            section="/content/featured/chef-video"
+            title="Featured Chef video"
+            testId="featured-chef-video"
+          />
         </section>
         <section className="min-w-0 lg:col-span-2" aria-labelledby="sourdough-recipe-title">
           <h2 id="sourdough-recipe-title" className="mb-4 font-handwritten text-3xl text-terracotta">Sourdough Recipe</h2>
@@ -75,7 +86,16 @@ export function CookingRecipes() {
                 <p className="mb-3 text-sm text-muted-foreground">The recipes could not be loaded.</p>
                 <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
               </div>
-              : sourdough ? <PublishedArticle {...sourdough} />
+              : sourdough ? (
+                <>
+                  <PublishedArticle {...sourdough} />
+                  <PublicationDiscussion
+                    section={`/content/publication/${sourdough.projectId}`}
+                    title={sourdough.title}
+                    testId={`publication-${sourdough.projectId}`}
+                  />
+                </>
+              )
               : <p className="text-sm text-muted-foreground">The sourdough recipe will appear here when it is published.</p>}
           </Card>
         </section>
@@ -92,6 +112,11 @@ export function CookingRecipes() {
               <Button asChild variant="outline" size="sm" className="mt-auto self-start">
                 <Link href={`/create/cooking/recipes/${recipe.id}`}>Read recipe</Link>
               </Button>
+              <PublicationDiscussion
+                section={`/create/cooking/recipes/${recipe.id}`}
+                title={recipe.title}
+                testId={`recipe-${recipe.id}`}
+              />
             </Card>
           ))}
         </div>

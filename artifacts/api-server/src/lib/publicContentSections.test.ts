@@ -7,7 +7,9 @@ test('all public content sections support discussions', () => {
     '/', '/learn', '/learn/breathing', '/create', '/create/directed-draws',
     '/create/cooking', '/create/cooking/videos', '/create/cooking/recipes/42',
     '/connect', '/connect/blog/4', '/move', '/move/yoga', '/listen',
-    '/listen/podcast', '/grow', '/grow/collab', '/gardening',
+    '/listen/podcast', '/listen/asmr', '/content/publication/65',
+    '/content/featured/homepage-video', '/content/featured/chef-video',
+    '/grow', '/grow/collab', '/gardening',
     '/language-corner', '/games', '/resources', '/events', '/review',
   ]) assert.equal(publicContentSection(path), path);
 });
@@ -17,6 +19,8 @@ test('private or unknown paths cannot become public threads', () => {
     '/grow/journal', '/grow/gratitude', '/gardening/journal', '/anonymous-access',
     '/checkin', '/contact', '/connect/submit', '/studio', '/teacher',
     '/does-not-exist', '/learn/foo/bar', '/learn/../grow/journal',
+    '/content/publication/0', '/content/publication/-1', '/content/publication/private',
+    '/content/featured/journal', '/content/publication/65/draft',
     'https://example.test/learn', '/games?secret=private', undefined, {},
   ]) assert.equal(publicContentSection(path), null);
 });

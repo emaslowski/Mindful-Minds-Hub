@@ -4,6 +4,7 @@ import { useGetPublishedContent } from "@workspace/api-client-react";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/mind-matters-ds/components/ui/select";
 import type { PublicationBlock } from "@workspace/mind-matters-ds/components/PublishedArticle";
+import { PublicationDiscussion } from "@/components/PublicationDiscussion";
 
 type PublishedEdition = {
   id: number;
@@ -66,6 +67,13 @@ export function DirectedDrawsEasel() {
         <div className="flex min-h-0 w-full flex-1 items-center justify-center p-3 text-center">
           <p className="font-handwritten text-xl text-foreground/65">A new drawing lesson will appear here.</p>
         </div>
+      )}
+      {!isLoading && !isError && selected && (
+        <PublicationDiscussion
+          section={`/content/publication/${selected.edition.projectId}`}
+          title={selected.block.caption || selected.edition.title}
+          testId={`publication-${selected.edition.projectId}`}
+        />
       )}
       {!isLoading && !isError && videos.length > 1 && (
         <Select value={String(activeVideo)} onValueChange={(value) => setActiveVideo(Number(value))}>

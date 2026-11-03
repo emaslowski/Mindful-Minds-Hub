@@ -5,6 +5,7 @@ import { Card } from "@workspace/mind-matters-ds/components/ui/card";
 import { PublicationVideo } from "@workspace/mind-matters-ds/components/PublicationVideo";
 import { WaveFooter } from "@/components/WaveFooter";
 import { HomeUpdates } from "@/components/HomeUpdates";
+import { PublicationDiscussion } from "@/components/PublicationDiscussion";
 
 const centers = [
   { title: "Student Stories & Blogs", description: "Ideas, encouragement, and student voices.", href: "/connect", image: "tile-1.jpg", color: "bg-muted/30" },
@@ -87,8 +88,6 @@ export default function Home() {
         </p>
       </div>
 
-      <HomeUpdates />
-
       <section className="mx-auto mb-8 w-full max-w-3xl px-1 md:mb-10" aria-label="The Brightside Project homepage video">
         <Card className="overflow-hidden border-border bg-card p-3 sm:p-4">
           <div className="[&_video]:mx-auto [&_video]:aspect-video [&_video]:max-h-[60dvh] [&_video]:w-full [&_video]:rounded-xl">
@@ -99,7 +98,14 @@ export default function Home() {
             />
           </div>
         </Card>
+        <PublicationDiscussion
+          section="/content/featured/homepage-video"
+          title="Homepage video"
+          testId="featured-homepage-video"
+        />
       </section>
+
+      <HomeUpdates />
 
       <section id="bright-spots" className="mx-auto w-full max-w-6xl scroll-mt-6 px-1" aria-labelledby="bright-spots-title">
         <SectionHeading id="bright-spots-title">Find your bright spot</SectionHeading>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { Link } from "wouter";
 import { CheckCircle2, MessageSquare, Star, Trash2 } from "lucide-react";
 import { useSaveTeacherReviewReply } from "@workspace/api-client-react";
 import { Badge } from "@workspace/mind-matters-ds/components/ui/badge";
@@ -67,7 +66,7 @@ function TeacherReplyEditor({ id, initialReply }: { id: number; initialReply: st
       {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
       <div className="flex flex-wrap gap-2">
         <Button type="button" size="sm" disabled={isPending || reply.trim().length > 2000 || (!reply.trim() && !hasReply)} onClick={() => save()} data-testid={`button-save-review-reply-${id}`}>
-          {isPending ? "Saving…" : hasReply ? "Save reply" : "Post reply"}
+          {isPending ? "Saving…" : "Save reply"}
         </Button>
         {(hasReply || reply) && (
           <Button type="button" size="sm" variant="outline" disabled={isPending} onClick={() => { setReply(""); save(""); }} data-testid={`button-clear-review-reply-${id}`}>
@@ -118,6 +117,12 @@ export function PublicFeedbackModeration({ data, isLoading, isError, refetch }: 
   const pendingReviewCount = reviews.filter((review) => !review.approved).length;
   const pendingCount = comments.length + pendingReviewCount;
   const busy = isApproving || isRejecting || isDeleting;
+  const getCommentPageHref = (section: string) => {
+    if (/^\/content\/publication\/[0-9]+$/.test(section)) return section;
+    if (section === "/content/featured/chef-video") return "/create/cooking";
+    if (section === "/content/featured/homepage-video") return "/";
+    return section;
+  };
 
   return (
     <section className="mb-8" aria-labelledby="public-feedback-heading">
@@ -171,7 +176,7 @@ export function PublicFeedbackModeration({ data, isLoading, isError, refetch }: 
                         {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                       </time>
                       <Button asChild type="button" size="sm" variant="link" className="ml-auto h-auto px-1">
-                        <Link href={comment.section}>Open {comment.section}</Link>
+                        <a href={getCommentPageHref(comment.section)} target="_blank" rel="noopener noreferrer" data-testid={`link-view-comment-page-${comment.id}`}>View page</a>
                       </Button>
                     </div>
                     <p className="mb-3 whitespace-pre-wrap text-sm leading-relaxed">{comment.content}</p>

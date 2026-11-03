@@ -5,6 +5,7 @@ import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Skeleton } from "@workspace/mind-matters-ds/components/ui/skeleton";
 import { Headphones } from "lucide-react";
 import { WaveFooter } from "@/components/WaveFooter";
+import { PublicationDiscussion } from "@/components/PublicationDiscussion";
 
 export default function ListenAsmr() {
   const { data, isLoading, isError, refetch } = useGetPublishedContent({}, {
@@ -13,7 +14,9 @@ export default function ListenAsmr() {
   const clips = (data?.publications ?? [])
     .filter((publication) =>
       publication.destinationSection === "asmr"
-      || (publication.destinationSection === "calm-corner" && publication.contentType === "ASMR video"),
+      || (publication.destinationSection === "calm-corner" && (
+        publication.contentType === "ASMR video" || publication.title.trim().toLowerCase() === "squishy asmr"
+      )),
     )
     .sort((first, second) => (first.pageOrder ?? 0) - (second.pageOrder ?? 0));
 
@@ -66,6 +69,11 @@ export default function ListenAsmr() {
                   projectId={clip.projectId}
                   appearance={clip.appearance}
                   authorDisplay={clip.authorDisplay}
+                />
+                <PublicationDiscussion
+                  section={`/content/publication/${clip.projectId ?? clip.id}`}
+                  title={clip.title}
+                  testId={`publication-${clip.projectId ?? clip.id}`}
                 />
               </article>
             ))}

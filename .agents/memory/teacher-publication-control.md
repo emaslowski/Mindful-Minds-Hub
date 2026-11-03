@@ -102,6 +102,12 @@ as the user explicitly requested.
 
 ## Podcast collection
 
+ASMR has its own public listening destination and teacher publishing option. “Squishy ASMR” belongs on ASMR, not Guided Meditations.
+
+**Why:** The user explicitly requested ASMR publishing and moving that recording from Guided Meditations.
+
+**How to apply:** Preserve the recording, published appearance, student original, and any separate teacher draft when changing its destination. Do not mix ASMR videos back into meditation listings.
+
 The Brightside Podcast entry opens a collection of all published podcast episodes,
 including video podcasts about sports. Keep sports podcasts in the Podcast
 destination rather than among exercise drills.
@@ -120,9 +126,9 @@ The homepage should automatically show what is new each time content is posted.
 
 **How to apply:** Derive updates from actual published editions and approved community posts. Never announce student drafts, unpublished teacher edits, or pending discussions.
 
-Keep the user-supplied homepage video directly above “Find your bright spot.”
+Keep the user-supplied homepage video above “What’s new” and the Advice Column, with “Find your bright spot” after those sections.
 
-**Why:** The user explicitly requested that placement for their uploaded video.
+**Why:** The user explicitly moved their video above the updates and advice area, superseding the earlier placement directly above “Find your bright spot.”
 
 **How to apply:** Preserve the full recording and its audio, provide playback
 controls without autoplay, and keep large video files in App Storage rather

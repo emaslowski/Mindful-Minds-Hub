@@ -12,6 +12,7 @@ import {
   Dialog, DialogClose, DialogContent, DialogDescription,
   DialogHeader, DialogTitle, DialogTrigger,
 } from "@workspace/mind-matters-ds/components/ui/dialog";
+import { PublicationDiscussion } from "./PublicationDiscussion";
 
 type BlogStoryPreviewProps = {
   title: string;
@@ -79,6 +80,13 @@ export function BlogStoryPreview({ excerpt, href, compact = false, ...story }: B
             <DialogDescription>The complete student blog story.</DialogDescription>
           </DialogHeader>
           <PublishedArticle {...story} presentation="blog" />
+          {story.projectId && (
+            <PublicationDiscussion
+              section={`/content/publication/${story.projectId}`}
+              title={story.title}
+              testId={`publication-${story.projectId}`}
+            />
+          )}
           <DialogClose asChild>
             <Button variant="outline" className="mt-4 justify-self-start">Back to stories</Button>
           </DialogClose>
