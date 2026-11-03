@@ -9,6 +9,12 @@ The user requested comment sections on every public content section, teacher rev
 
 **How to apply:** Treat saving a teacher reply and approving a review as separate decisions. Keep private journal and gratitude pages outside public discussion threads; comments must never create a path for private wellness content to become public. Preserve the existing collaboration-board moderation rules.
 
+Reviews that were public before review moderation should remain visible.
+
+**Why:** The user requested that all previously displayed reviews be restored after the new approval setting hid them.
+
+**How to apply:** Preserve the public status of historical reviews when changing moderation. Restoring those reviews does not authorize publishing new pending submissions without teacher approval.
+
 Teachers must be able to delete pending and already-published site reviews.
 
 **Why:** The user explicitly requested review deletion in addition to approval and replies.
