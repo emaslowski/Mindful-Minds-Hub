@@ -28,22 +28,36 @@ interface PublicFeedbackModerationProps {
 function TeacherReplyEditor({ id, initialReply }: { id: number; initialReply: string | null }) {
   const queryClient = useQueryClient();
   const [reply, setReply] = useState(initialReply ?? "");
-  const [hasReply, setHasReply] = useState(Boolean(initialReply));
+  const [savedReply, setSavedReply] = useState(initialReply ?? "");
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
-  const { mutate: saveReply, isPending } = useSaveTeacherReviewReply();
+  const { mutate: saveReply, isPending } = useSaveTeacherReviewReply({
+    request: { credentials: "include" },
+  });
+  const hasReply = Boolean(savedReply);
+  const hasChanges = reply.trim() !== savedReply;
 
   function save(value = reply) {
     setError("");
+    setSaved(false);
     saveReply(
       { id, data: { reply: value.trim() } },
       {
-        onSuccess: () => {
-          setReply(value.trim());
-          setHasReply(Boolean(value.trim()));
+        onSuccess: (review) => {
+          const persistedReply = review.teacherReply ?? "";
+          setReply(persistedReply);
+          setSavedReply(persistedReply);
+          setSaved(true);
           queryClient.invalidateQueries({ queryKey: ["teacher-moderation"] });
           queryClient.invalidateQueries({ queryKey: ["/api/reviews"] });
         },
-        onError: () => setError("The teacher reply could not be saved. Try again."),
+        onError: (failure) => setError(
+          failure.status === 401
+            ? "Your session has expired. Sign in again, then save your reply. Your text has been kept here."
+            : failure.status === 403
+              ? "You must be signed in as a teacher to save a reply. Your text has been kept here."
+              : "The teacher reply could not be saved. Your text has been kept here. Try again.",
+        ),
       },
     );
   }
@@ -54,7 +68,12 @@ function TeacherReplyEditor({ id, initialReply }: { id: number; initialReply: st
       <Textarea
         id={`teacher-reply-${id}`}
         value={reply}
-        onChange={(event) => setReply(event.target.value)}
+        onChange={(event) => {
+          setReply(event.target.value);
+          setSaved(false);
+          setError("");
+        }}
+        disabled={isPending}
         maxLength={2000}
         rows={3}
         placeholder="Write a helpful response"
@@ -64,12 +83,15 @@ function TeacherReplyEditor({ id, initialReply }: { id: number; initialReply: st
         Saving a reply does not approve the review. A reply becomes public only after the review is approved.
       </p>
       {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+      <p className="text-xs text-muted-foreground" role="status" aria-live="polite" data-testid={`status-teacher-review-reply-${id}`}>
+        {isPending ? "Saving reply…" : saved ? (hasReply ? "Reply saved." : "Reply removed.") : hasChanges ? "You have unsaved changes." : hasReply ? "This reply is saved." : ""}
+      </p>
       <div className="flex flex-wrap gap-2">
-        <Button type="button" size="sm" disabled={isPending || reply.trim().length > 2000 || (!reply.trim() && !hasReply)} onClick={() => save()} data-testid={`button-save-review-reply-${id}`}>
-          {isPending ? "Saving…" : "Save reply"}
+        <Button type="button" size="sm" disabled={isPending || reply.trim().length > 2000 || (!reply.trim() && !hasReply) || (saved && !hasChanges)} onClick={() => save()} data-testid={`button-save-review-reply-${id}`}>
+          {isPending ? "Saving…" : saved && !hasChanges ? "Saved" : "Save reply"}
         </Button>
         {(hasReply || reply) && (
-          <Button type="button" size="sm" variant="outline" disabled={isPending} onClick={() => { setReply(""); save(""); }} data-testid={`button-clear-review-reply-${id}`}>
+          <Button type="button" size="sm" variant="outline" disabled={isPending} onClick={() => save("")} data-testid={`button-clear-review-reply-${id}`}>
             Clear reply
           </Button>
         )}
