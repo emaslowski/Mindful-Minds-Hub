@@ -32,6 +32,18 @@ const FLOWER_GARDEN = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 
 </svg>`;
 
 export const BUILT_IN_COLORING_TEMPLATES: ColoringTemplate[] = [
+  ...[
+    { title: "Flower-crown deer", description: "A cheerful little deer wearing a crown of flowers." },
+    { title: "Underwater friends", description: "Hand-drawn sea creatures, jellyfish, and starfish." },
+    { title: "Be positive", description: "A positive message with friendly characters and clouds." },
+    { title: "Sweet dreams with Astro", description: "A dreamy moon, stars, and a sleeping friend." },
+    { title: "Find fossils with Shelly", description: "A fossil adventure with flowers and a sunny sky." },
+    { title: "Bunny and carrot", description: "A happy bunny enjoying a carrot." },
+  ].map((page, index) => ({
+    ...page,
+    id: `uploaded-2026-11-04-${index + 1}`,
+    imageUrl: `/api/public/coloring-pages/2026-11-04/${index + 1}`,
+  })),
   {
     id: "flower-garden",
     title: "Flower garden",

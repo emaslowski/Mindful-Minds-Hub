@@ -9,6 +9,7 @@ The user explicitly chose this name over “Middle School Matters” when approv
 Keep Student Studio and its existing student work, teacher reviews, and publishing controls.
 Retain the reference-based illustrated design when making local refinements.
 The website is about connection and a sense of belonging with peers. The gaming section is not its main focus.
+Visitors must visit three different sections and submit a comment on another section before they can play games. Show a pop-up explaining these requirements when they go to Games.
 Keep “How we create” as smaller circles arranged left to right, rather than a vertically stacked process.
 Do not include Calm & Coping Corner, Student Resources, or Connect with a Trusted Adult among the homepage’s Bright Spots.
 Use “Events” rather than “Student-Created Events” or “Student-Organized Events.”
@@ -23,6 +24,8 @@ They asked to remove student-created wording from the Events section.
 They explicitly requested those three top navigation buttons and removal of About Us.
 They reiterated that Student Studio should replace “Middle School Matters” anywhere it is used as product branding.
 The user explicitly emphasized connection and belonging with peers as the website's purpose, not gaming.
+They requested the three-section prerequisite and Games pop-up so visitors explore the rest of the website before playing.
+They subsequently added the requirement to comment on a section before Games opens. Count a successful moderated submission, not merely typing a comment; teacher approval remains required before public display.
 
 **How to apply:** Keep the public website and Studio consistent without changing student-authored content, saved work, existing logins, or service URLs.
 

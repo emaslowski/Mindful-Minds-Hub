@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,6 +9,8 @@ import {
 } from '@workspace/mind-matters-ds/components/ui/alert-dialog';
 
 const ACKNOWLEDGMENT_KEY = 'middle-school-matters-website-rules-v1';
+const WebsiteRulesContext = createContext(false);
+export const useWebsiteRulesAcknowledged = () => useContext(WebsiteRulesContext);
 
 const rules = [
   "Please don't share personal information (no last names, phone numbers, or addresses).",
@@ -26,7 +28,7 @@ function alreadyAcknowledged() {
   }
 }
 
-export function WebsiteRulesGate() {
+export function WebsiteRulesGate({ children }: { children?: ReactNode }) {
   const [acknowledged, setAcknowledged] = useState(alreadyAcknowledged);
 
   function acknowledge() {
@@ -39,6 +41,8 @@ export function WebsiteRulesGate() {
   }
 
   return (
+    <WebsiteRulesContext.Provider value={acknowledged}>
+    {children}
     <AlertDialog open={!acknowledged}>
       <AlertDialogContent
         className="max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-3xl border-border bg-background p-6 sm:p-8"
@@ -64,5 +68,6 @@ export function WebsiteRulesGate() {
         </AlertDialogAction>
       </AlertDialogContent>
     </AlertDialog>
+    </WebsiteRulesContext.Provider>
   );
 }

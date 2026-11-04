@@ -4,6 +4,7 @@ import { useGetCollabPosts, useSubmitCollabPost, useGetCollabComments, useAddCol
 import { Users, MessageCircle, Send } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "wouter";
+import { useExploration } from "@/components/ExplorationProvider";
 
 function BackButton() {
   return (
@@ -19,6 +20,7 @@ function BackButton() {
 
 // Component for a single post with its comments section
 function PostCard({ post, onCommentSubmitted }: { post: any; onCommentSubmitted: () => void }) {
+  const { recordCommentSubmission } = useExploration();
   const [expanded, setExpanded] = useState(false);
   const { data: comments, refetch } = useGetCollabComments(post.id, {
     query: {
@@ -41,6 +43,7 @@ function PostCard({ post, onCommentSubmitted }: { post: any; onCommentSubmitted:
       { id: post.id, data: { authorName: commentName, content: commentText } },
       {
         onSuccess: () => {
+          recordCommentSubmission("/grow/collab");
           setCommentName("");
           setCommentText("");
           setCommentSubmitted(true);

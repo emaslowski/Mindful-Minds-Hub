@@ -15,6 +15,7 @@ import { useTrackPageView } from '@workspace/api-client-react';
 
 import { Layout } from '@/components/Layout';
 import { WebsiteRulesGate } from '@/components/WebsiteRulesGate';
+import { ExplorationProvider } from '@/components/ExplorationProvider';
 import Home from '@/pages/Home';
 import { GardeningPage, LanguageCornerPage, GamesPage } from '@/pages/ActivityPages';
 import Learn from '@/pages/Learn';
@@ -156,11 +157,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <RoutedErrorBoundary>
-            <PublicRouter />
-          </RoutedErrorBoundary>
+          <WebsiteRulesGate>
+            <ExplorationProvider>
+              <RoutedErrorBoundary>
+                <PublicRouter />
+              </RoutedErrorBoundary>
+            </ExplorationProvider>
+          </WebsiteRulesGate>
         </WouterRouter>
-        <WebsiteRulesGate />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

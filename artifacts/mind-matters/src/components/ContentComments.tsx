@@ -14,6 +14,9 @@ import { Input } from "@workspace/mind-matters-ds/components/ui/input";
 import { Label } from "@workspace/mind-matters-ds/components/ui/label";
 import { Skeleton } from "@workspace/mind-matters-ds/components/ui/skeleton";
 import { Textarea } from "@workspace/mind-matters-ds/components/ui/textarea";
+import { useExploration } from "@/components/ExplorationProvider";
+import { isQualifyingGameComment } from "@/lib/exploration";
+import { Link } from "wouter";
 
 export function normalizePublicCommentSection(path: string): string | null {
   const rawPath = path.split(/[?#]/, 1)[0];
@@ -38,6 +41,7 @@ export function normalizePublicCommentSection(path: string): string | null {
 }
 
 export function ContentComments({ section, itemTitle }: { section: string; itemTitle?: string }) {
+  const { recordCommentSubmission } = useExploration();
   const id = useId();
   const authorId = `comment-author-${id}`;
   const contentId = `comment-content-${id}`;
@@ -76,6 +80,7 @@ export function ContentComments({ section, itemTitle }: { section: string; itemT
       { data: { section, content: trimmedContent, ...(trimmedName ? { authorName: trimmedName } : {}) } },
       {
         onSuccess: () => {
+          recordCommentSubmission(section);
           setContent("");
           setAuthorName("");
           setSuccess(true);
@@ -134,7 +139,19 @@ export function ContentComments({ section, itemTitle }: { section: string; itemT
               Comments stay private until a teacher approves them. Please do not share personal information.
             </p>
             {error && <p className="text-sm font-medium text-destructive" role="alert" data-testid={testId("status-comment-error")}>{error}</p>}
-            {success && <p className="text-sm font-medium text-secondary" role="status" data-testid={testId("status-comment-submitted")}>Your comment was sent for teacher approval. It will appear here only if approved.</p>}
+            {success && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-secondary" role="status" data-testid={testId("status-comment-submitted")}>
+                  Your comment was sent for teacher approval. It will appear here only if approved.
+                  {isQualifyingGameComment(section) && " Your comment requirement for Games is complete."}
+                </p>
+                {isQualifyingGameComment(section) && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/games" data-testid={testId("link-comment-game-progress")}>Check Games requirements</Link>
+                  </Button>
+                )}
+              </div>
+            )}
             <Button type="submit" disabled={isPending || !content.trim()} data-testid={testId("button-submit-comment")}>
               <Send aria-hidden="true" />
               {isPending ? "Sending…" : "Send for approval"}

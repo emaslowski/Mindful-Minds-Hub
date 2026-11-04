@@ -53,7 +53,7 @@ type PublishedArtwork = {
 
 export default function ColoringStudio() {
   const canvasRef = useRef<ColoringCanvasHandle>(null);
-  const [templateId, setTemplateId] = useState("flower-garden");
+  const [templateId, setTemplateId] = useState(BUILT_IN_COLORING_TEMPLATES[0].id);
   const [tool, setTool] = useState<ColoringTool>("brush");
   const [color, setColor] = useState(swatches[0].value);
   const [brushSize, setBrushSize] = useState([12]);

@@ -12,6 +12,9 @@ import { ScrabbleGame } from "@/components/games/ScrabbleGame";
 import { DailyWordleGame } from "@/components/games/DailyWordleGame";
 import { PublishedSection } from "@/components/PublishedSection";
 import GardeningActivities from "@/components/gardening/GardeningActivities";
+import { useExploration } from "@/components/ExplorationProvider";
+import { gamesAreUnlocked } from "@/lib/exploration";
+import { GamesExplorationGate } from "@/components/games/GamesExplorationGate";
 
 function ActivityPage({ children }: { children: ReactNode }) {
   return (
@@ -46,6 +49,12 @@ export function LanguageCornerPage() {
 }
 
 export function GamesPage() {
+  const { visited, hasSubmittedComment } = useExploration();
+  if (!gamesAreUnlocked(visited, hasSubmittedComment)) return <GamesExplorationGate />;
+  return <UnlockedGamesPage />;
+}
+
+function UnlockedGamesPage() {
   const [activeGame, setActiveGame] = useState<"wordle" | "snake" | "hangman" | "tiles">("wordle");
   const games = [
     { id: "wordle", label: "Daily Wordle" },
