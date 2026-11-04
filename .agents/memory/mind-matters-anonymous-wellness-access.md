@@ -3,6 +3,18 @@ name: Mind Matters anonymous wellness access
 description: Session-boundary rule for anonymous journal/gratitude access alongside existing OAuth and Studio authentication.
 ---
 
+## Student login retries and password visibility
+
+Students must not face a login-attempt timeout, and student login forms must offer
+a keyboard-accessible Show/Hide password control with masking as the default.
+
+**Why:** The user requested removing the student login-attempt timeout and letting
+students see the password they are typing.
+
+**How to apply:** Do not reintroduce the shared-network Journal sign-in lockout.
+Keep credential checks, disabled-account enforcement, and the separate
+access-request submission limit. Keep Journal identity separate from Studio.
+
 Anonymous wellness credentials are an independently validated secondary identity for journal and gratitude routes, and may also be used to request Friendship Matchmaker participation. They must never overwrite the primary Replit/Google identity that powers normal app behavior and Studio authorization. Matchmaker consent and approval remain separate from Journal access.
 
 **Why:** A browser can hold anonymous wellness access and an OAuth/Studio session at the same time. Treating the anonymous identity as global masks the authenticated user and breaks normal Studio role resolution. The user explicitly chose Journal credentials as sufficient to request Matchmaker access, but that does not authorize matching without a separate teacher decision. Disabling a code must also invalidate the anonymous session centrally, not only in a page handler.

@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useLocation, useSearch } from 'wouter';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, Eye, EyeOff, Lock } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@workspace/mind-matters-ds/components/ui/card';
+import { Button } from '@workspace/mind-matters-ds/components/ui/button';
+import { Input } from '@workspace/mind-matters-ds/components/ui/input';
+import { Label } from '@workspace/mind-matters-ds/components/ui/label';
 import { studioAuth } from '@/lib/studioApi';
 
 export default function StudioLogin() {
@@ -98,25 +98,30 @@ export default function StudioLogin() {
 
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-[#453329] text-sm">Password</Label>
-                  <div className="relative">
+                  <div className="flex items-center gap-2">
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete="current-password"
-                      className="bg-white border-[#d5cabe] focus-visible:ring-[#c4622d] pr-10"
+                      className="min-w-0 flex-1 bg-background border-border focus-visible:ring-ring"
                       placeholder="Enter your password"
                       required
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8a6a55] hover:text-[#453329]"
-                      tabIndex={-1}
+                      className="shrink-0"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-pressed={showPassword}
+                      aria-controls="password"
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+                      {showPassword ? <EyeOff aria-hidden="true" className="h-4 w-4" /> : <Eye aria-hidden="true" className="h-4 w-4" />}
+                      {showPassword ? 'Hide' : 'Show'}
+                    </Button>
                   </div>
                 </div>
 

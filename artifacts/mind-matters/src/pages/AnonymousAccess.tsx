@@ -2,12 +2,16 @@ import { useState } from 'react';
 import { Link, useSearch } from 'wouter';
 import { KeyRound, ShieldCheck, UserRoundCheck } from 'lucide-react';
 import { WaveFooter } from '@/components/WaveFooter';
+import { Button } from '@workspace/mind-matters-ds/components/ui/button';
+import { Input } from '@workspace/mind-matters-ds/components/ui/input';
+import { Label } from '@workspace/mind-matters-ds/components/ui/label';
 
 function getSafeReturnTo(value: string | null): string {
   return value && value.startsWith('/') && !value.startsWith('//') ? value : '/grow/journal';
 }
 
 export default function AnonymousAccess() {
+  const [showPassword, setShowPassword] = useState(false);
   const search = useSearch();
   const returnTo = getSafeReturnTo(new URLSearchParams(search).get('returnTo'));
   const [requestCode, setRequestCode] = useState<string | null>(null);
@@ -105,17 +109,32 @@ export default function AnonymousAccess() {
                   className="mt-2 w-full bg-white/70 border border-card-border rounded-2xl px-4 py-3 font-mono tracking-wide focus:outline-none focus:ring-2 focus:ring-sage/50"
                 />
               </label>
-              <label className="block font-sans text-sm font-bold text-foreground/70">
-                Password
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  autoComplete="current-password"
-                  required
-                  className="mt-2 w-full bg-white/70 border border-card-border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sage/50"
-                />
-              </label>
+              <div className="space-y-2">
+                <Label htmlFor="journal-password">Password</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="journal-password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    autoComplete="current-password"
+                    required
+                    className="min-w-0 flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPassword}
+                    aria-controls="journal-password"
+                    className="shrink-0"
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </Button>
+                </div>
+              </div>
               {loginError && <p className="text-sm text-red-700 bg-red-50 rounded-xl p-3">{loginError}</p>}
               <button
                 type="submit"

@@ -25,7 +25,6 @@ const ACCESS_CODE_PATTERN = /^[A-Z0-9-]{4,32}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
 const REQUEST_LIMIT = 5;
-const LOGIN_LIMIT = 10;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const VALID_GRADES = new Set([
   'Kindergarten',
@@ -43,7 +42,6 @@ const VALID_GRADES = new Set([
   '12th grade',
 ]);
 const requestRateLimits = new Map<string, { count: number; resetAt: number }>();
-const loginRateLimits = new Map<string, { count: number; resetAt: number }>();
 
 function normalizeAccessCode(value: string): string {
   return value.trim().toUpperCase();
@@ -263,11 +261,6 @@ router.post('/anonymous-access/requests', async (req: Request, res: Response): P
 
 // POST /api/anonymous-access/login
 router.post('/anonymous-access/login', async (req: Request, res: Response): Promise<void> => {
-  if (isRateLimited(req, loginRateLimits, LOGIN_LIMIT)) {
-    res.status(429).json({ error: 'Too many sign-in attempts. Please wait before trying again.' });
-    return;
-  }
-
   const { accessCode, password } = req.body ?? {};
   if (typeof accessCode !== 'string' || typeof password !== 'string') {
     res.status(400).json({ error: 'Access code and password are required' });
