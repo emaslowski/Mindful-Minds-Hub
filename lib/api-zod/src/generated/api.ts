@@ -1012,7 +1012,7 @@ export const requestPublicationMediaUploadBodySizeMax = 262144000;
 
 export const RequestPublicationMediaUploadBody = zod.object({
   "filename": zod.string().min(1).max(requestPublicationMediaUploadBodyFilenameMax),
-  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm']),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'video/quicktime', 'video/ogg', 'audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm']),
   "size": zod.number().min(1).max(requestPublicationMediaUploadBodySizeMax)
 })
 

@@ -6,10 +6,11 @@ import { StudioLayout, StudioPage } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
 import { useVideoProduction } from '@/hooks/useVideoProductions';
 import { isVideoProducer, videoMimeForName, videoProductions } from '@/lib/videoApi';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { uploadVideoContentType } from '@workspace/api-client-react';
+import { Button } from '@workspace/mind-matters-ds/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/mind-matters-ds/components/ui/card';
+import { Input } from '@workspace/mind-matters-ds/components/ui/input';
+import { Label } from '@workspace/mind-matters-ds/components/ui/label';
 
 const MAX_VIDEO_BYTES = 262144000;
 const ACCEPTED_VIDEO_MIME: Record<string, string> = {
@@ -21,14 +22,15 @@ const ACCEPTED_VIDEO_MIME: Record<string, string> = {
 
 function getVideoType(file: File): string {
   const byName = videoMimeForName(file.name);
+  const contentType = uploadVideoContentType(file);
   if (!byName) throw new Error('Unsupported video format. Choose an MP4, WebM, MOV, or OGV file.');
-  if (file.type && file.type !== byName) {
+  if (contentType && contentType !== byName) {
     throw new Error(`The selected file type (${file.type}) does not match its .${file.name.split('.').pop()?.toLowerCase()} extension.`);
   }
-  if (file.type && !Object.values(ACCEPTED_VIDEO_MIME).includes(file.type)) {
+  if (contentType && !Object.values(ACCEPTED_VIDEO_MIME).includes(contentType)) {
     throw new Error('Unsupported video MIME type. Choose MP4, WebM, MOV, or OGV.');
   }
-  return file.type || byName;
+  return contentType || byName;
 }
 
 function validateVideo(file: File): string | null {

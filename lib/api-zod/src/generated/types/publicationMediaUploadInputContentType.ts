@@ -16,6 +16,8 @@ export const PublicationMediaUploadInputContentType = {
   'image/gif': 'image/gif',
   'video/mp4': 'video/mp4',
   'video/webm': 'video/webm',
+  'video/quicktime': 'video/quicktime',
+  'video/ogg': 'video/ogg',
   'audio/mpeg': 'audio/mpeg',
   'audio/mp4': 'audio/mp4',
   'audio/wav': 'audio/wav',

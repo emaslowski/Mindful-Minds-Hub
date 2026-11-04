@@ -27,9 +27,12 @@ async function call(path: string, cookie = "", method = "GET", body?: unknown) {
   });
 }
 try {
+  const mov = process.argv.includes("--mov");
+  const filename = mov ? "test.MOV" : "test.webm";
+  const contentType = mov ? "video/quicktime" : "video/webm";
   execFileSync("ffmpeg", ["-v", "error", "-f", "lavfi", "-i", "color=c=blue:s=160x120:d=1",
-    "-c:v", "libvpx", "-an", join(folder, "test.webm")]);
-  const bytes = await readFile(join(folder, "test.webm"));
+    "-c:v", mov ? "mpeg4" : "libvpx", "-an", join(folder, filename)]);
+  const bytes = await readFile(join(folder, filename));
   const session = await call("/athlete/session");
   assert.equal(session.status, 200);
   const cookieHeader = session.headers.get("set-cookie")!;
@@ -44,7 +47,7 @@ try {
 
   const input = {
     athleteName: "Test mover", title: "Disposable challenge video",
-    filename: "test.webm", contentType: "video/webm", size: bytes.length, consent: true,
+    filename, contentType, size: bytes.length, consent: true,
   };
   assert.equal((await call("/athlete/upload-url", "", "POST", input)).status, 401);
   for (const invalid of [{ consent: false }, { contentType: "text/html" }, { size: 262144001 },
@@ -59,7 +62,7 @@ try {
   objectPaths.add(initial!.objectPath);
   assert.equal((await call(`/athlete/${ticket.id}/complete`, other, "POST")).status, 404);
   assert.equal((await call(`/athlete/${ticket.id}/image`, cookie)).status, 404);
-  const uploaded = await fetch(ticket.uploadUrl, { method: "PUT", headers: { "Content-Type": "video/webm" }, body: bytes });
+  const uploaded = await fetch(ticket.uploadUrl, { method: "PUT", headers: { "Content-Type": contentType }, body: bytes });
   assert(uploaded.ok);
   const completed = await call(`/athlete/${ticket.id}/complete`, cookie, "POST");
   assert.equal(completed.status, 200);
@@ -88,7 +91,7 @@ try {
   assert.equal((await call(`/teacher/athlete/${ticket.id}`, teacher, "PATCH", { status: "approved" })).status, 200);
   const range = await fetch(`${base}/athlete/${ticket.id}/image`, { headers: { Range: "bytes=0-63" } });
   assert.equal(range.status, 206);
-  assert.equal(range.headers.get("content-type"), "video/webm");
+  assert.equal(range.headers.get("content-type"), contentType);
   assert.equal(Buffer.from(await range.arrayBuffer()).equals(bytes.subarray(0, 64)), true);
   assert.equal((await (await call("/athlete")).json()).athletes.some((r: { id: number }) => r.id === ticket.id), true);
   assert.equal((await call(`/athlete/${ticket.id}`, cookie, "DELETE")).status, 204);

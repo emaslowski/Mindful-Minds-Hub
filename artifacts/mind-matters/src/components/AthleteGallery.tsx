@@ -7,6 +7,7 @@ import {
   useGetAthleteSession,
   useListAthlete,
   useRequestAthleteUpload,
+  uploadVideoContentType,
 } from "@workspace/api-client-react";
 import type { AthleteEntry, AthleteUploadInput } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -58,7 +59,7 @@ function uploadFile(url: string, file: File, onProgress: (progress: number) => v
   return new Promise<void>((resolve, reject) => {
     const request = new XMLHttpRequest();
     request.open("PUT", url);
-    request.setRequestHeader("Content-Type", file.type);
+    request.setRequestHeader("Content-Type", uploadVideoContentType(file));
     request.upload.onprogress = (event) => {
       if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
     };
@@ -112,13 +113,14 @@ function AthleteGalleryContent() {
       setFile(null);
       return;
     }
-    if (!ACCEPTED_TYPES.includes(selected.type as (typeof ACCEPTED_TYPES)[number])) {
+    const contentType = uploadVideoContentType(selected);
+    if (!ACCEPTED_TYPES.includes(contentType as (typeof ACCEPTED_TYPES)[number])) {
       setFile(null);
       event.target.value = "";
-      setFormError("Choose a JPG, PNG, or WebP image, or an MP4, WebM, QuickTime, or Ogg video.");
+      setFormError("Choose a JPG, PNG, or WebP image, or an MP4, WebM, MOV, or OGV video.");
       return;
     }
-    const isVideo = VIDEO_TYPES.includes(selected.type as (typeof VIDEO_TYPES)[number]);
+    const isVideo = VIDEO_TYPES.includes(contentType as (typeof VIDEO_TYPES)[number]);
     const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
     if (selected.size > maxBytes) {
       setFile(null);
@@ -149,7 +151,7 @@ function AthleteGalleryContent() {
         athleteName: athleteName.trim(),
         title: title.trim(),
         filename: file.name,
-        contentType: file.type as AthleteUploadInput["contentType"],
+        contentType: uploadVideoContentType(file) as AthleteUploadInput["contentType"],
         size: file.size,
         consent,
       };
@@ -167,7 +169,7 @@ function AthleteGalleryContent() {
       setUploadProgress(0);
       const fileInput = document.getElementById("athlete-media-file") as HTMLInputElement | null;
       if (fileInput) fileInput.value = "";
-      setSuccess(`Your ${VIDEO_TYPES.includes(file.type as (typeof VIDEO_TYPES)[number]) ? "video" : "photo"} is submitted for teacher approval. It will not appear publicly unless a teacher approves it.`);
+      setSuccess(`Your ${VIDEO_TYPES.includes(uploadVideoContentType(file) as (typeof VIDEO_TYPES)[number]) ? "video" : "photo"} is submitted for teacher approval. It will not appear publicly unless a teacher approves it.`);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "We could not submit your media. Please try again.");
     } finally {
@@ -265,8 +267,8 @@ function AthleteGalleryContent() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="athlete-media-file">Challenge photo or video</Label>
-                  <Input id="athlete-media-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,video/ogg,.jpg,.jpeg,.png,.webp,.mp4,.webm,.mov,.ogg" onChange={handleFile} disabled={pending} data-testid="input-athlete-file" />
-                  <p className="text-xs text-foreground/70">Photos: JPG, PNG, WebP · 10 MB max. Videos: MP4, WebM, QuickTime, Ogg · 250 MB max.</p>
+                  <Input id="athlete-media-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,video/ogg,.jpg,.jpeg,.png,.webp,.mp4,.webm,.mov,.MOV,.ogv,.ogg" onChange={handleFile} disabled={pending} data-testid="input-athlete-file" />
+                  <p className="text-xs text-foreground/70">Photos: JPG, PNG, WebP · 10 MB max. Videos: MP4, WebM, MOV, OGV · 250 MB max.</p>
                   {file && <p className="break-all text-xs text-foreground/70" data-testid="text-athlete-file-name">{file.name}</p>}
                 </div>
                 <div className="flex items-start gap-3">

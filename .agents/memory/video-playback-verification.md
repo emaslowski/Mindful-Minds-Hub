@@ -44,3 +44,16 @@ an open-ended range, which otherwise becomes one response for the entire file.
 tail metadata, and full downloads above 32 MiB—not just tiny range requests.
 Preserve authentication and the active-publication media checks; do not replace
 private serving with public storage URLs to work around playback failures.
+
+## MOV upload support
+
+All website video-upload destinations must accept `.MOV` files, including teacher
+publication media, Video Production, and direct Active Challenge submissions.
+Normalize missing, generic, and alternate QuickTime browser MIME labels
+consistently for validation, upload tickets, and the actual storage PUT.
+
+**Why:** The user asked to “allow the whole website to accept .MOV videos.”
+
+**How to apply:** Preserve existing upload limits and moderation. MOV acceptance
+does not guarantee browser decoding of every codec; do not claim universal
+playback or silently add transcoding as part of a format-validation change.

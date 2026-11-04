@@ -1,7 +1,8 @@
 import { studioFetch, type PublicationMedia } from '@/lib/studioApi';
+import { uploadVideoContentType } from '@workspace/api-client-react';
 
 const uploadContentType = (file: File) =>
-  file.type === 'audio/wave' ? 'audio/wav' : file.type === 'audio/x-m4a' ? 'audio/mp4' : file.type;
+  file.type === 'audio/wave' ? 'audio/wav' : file.type === 'audio/x-m4a' ? 'audio/mp4' : uploadVideoContentType(file);
 
 export const publicationMediaApi = {
   list: (projectId: number) =>

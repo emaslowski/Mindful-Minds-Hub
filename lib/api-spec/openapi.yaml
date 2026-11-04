@@ -1892,7 +1892,7 @@ components:
           maxLength: 255
         contentType:
           type: string
-          enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mpeg, audio/mp4, audio/wav, audio/x-wav, audio/ogg, audio/webm]
+          enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, video/quicktime, video/ogg, audio/mpeg, audio/mp4, audio/wav, audio/x-wav, audio/ogg, audio/webm]
         size:
           type: number
           minimum: 1

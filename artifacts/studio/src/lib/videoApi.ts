@@ -1,4 +1,5 @@
 import { studioFetch } from './studioApi';
+import { uploadVideoContentType } from '@workspace/api-client-react';
 import type { VideoProductionEnvelope, VideoProductionsEnvelope, VideoUploadTicket } from '@workspace/api-client-react';
 
 export const isVideoProducer = (jobTitle?: string | null) =>
@@ -10,7 +11,7 @@ export const videoProductions = {
   requestUpload: (projectId: number, file: File) =>
     studioFetch<VideoUploadTicket>(`/studio/video-productions/${projectId}/upload-url`, {
       method: 'POST',
-      body: JSON.stringify({ filename: file.name, contentType: file.type || videoMimeForName(file.name), size: file.size }),
+      body: JSON.stringify({ filename: file.name, contentType: uploadVideoContentType(file), size: file.size }),
     }),
   complete: (projectId: number, objectPath: string) =>
     studioFetch<{ success: boolean; message: string }>(`/studio/video-productions/${projectId}/complete`, {

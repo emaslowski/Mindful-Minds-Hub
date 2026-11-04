@@ -1,14 +1,15 @@
 import { useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@workspace/mind-matters-ds/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/mind-matters-ds/components/ui/card';
+import { Input } from '@workspace/mind-matters-ds/components/ui/input';
+import { Label } from '@workspace/mind-matters-ds/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/mind-matters-ds/components/ui/select';
+import { Textarea } from '@workspace/mind-matters-ds/components/ui/textarea';
+import { uploadVideoContentType } from '@workspace/api-client-react';
 import { publicationMediaApi, putPublicationFile, teacherPublicationMediaUrl } from '@/lib/publicationMediaApi';
 import type { PublicationBlock, PublicationEdition, PublicationMedia, PublicationRecipe } from '@/lib/studioApi';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@workspace/mind-matters-ds/hooks/use-toast';
 import { ArrowDown, ArrowUp, AudioLines, FileImage, FileText, Film, Plus, Trash2, Utensils } from 'lucide-react';
 
 const EMPTY_RECIPE: PublicationRecipe = {
@@ -16,7 +17,7 @@ const EMPTY_RECIPE: PublicationRecipe = {
 };
 const MEDIA_ACCEPT: Record<PublicationMedia['kind'], string> = {
   image: 'image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif',
-  video: 'video/mp4,video/webm,.mp4,.webm',
+  video: 'video/mp4,video/webm,video/quicktime,video/ogg,.mp4,.webm,.mov,.MOV,.ogv',
   audio: 'audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/ogg,audio/webm,audio/x-wav,audio/wave,.mp3,.m4a,.wav,.ogg,.webm',
 };
 const LIMITS: Record<PublicationMedia['kind'], number> = { image: 15, video: 250, audio: 100 };
@@ -32,8 +33,8 @@ function makeBlock(type: PublicationBlock['type']): PublicationBlock {
 }
 
 function inferredKind(file: File): PublicationMedia['kind'] | null {
+  if (['video/mp4', 'video/webm', 'video/quicktime', 'video/ogg'].includes(uploadVideoContentType(file))) return 'video';
   if (file.type.startsWith('image/')) return ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type) ? 'image' : null;
-  if (file.type.startsWith('video/')) return ['video/mp4', 'video/webm'].includes(file.type) ? 'video' : null;
   if (file.type.startsWith('audio/')) return ['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/x-wav', 'audio/wave'].includes(file.type) ? 'audio' : null;
   return null;
 }
@@ -104,7 +105,7 @@ export function PublicationBlockEditor({ projectId, draft, onChange, canImportVi
     setUploadProgress(0);
     const kind = inferredKind(file);
     if (!kind || kind !== selectedKind) {
-      setUploadError('Choose a supported JPEG, PNG, WebP, GIF, MP4, WebM, MP3, M4A, WAV, or OGG file.');
+      setUploadError('Choose a supported JPEG, PNG, WebP, GIF, MP4, WebM, MOV, OGV, MP3, M4A, WAV, or OGG file.');
       return;
     }
     if (file.size > LIMITS[kind] * 1024 * 1024) {
@@ -259,7 +260,7 @@ export function PublicationBlockEditor({ projectId, draft, onChange, canImportVi
         <div className="space-y-3 rounded-lg border border-[#d5cabe] bg-white p-3">
           <div>
             <p className="text-sm font-medium text-[#453329]">Project media library</p>
-            <p className="text-xs text-[#688a52]">Images: JPEG, PNG, WebP or GIF up to 15 MB. Video: MP4 or WebM up to 250 MB. Audio: MP3, M4A, WAV, OGG or WebM up to 100 MB.</p>
+            <p className="text-xs text-muted-foreground">Images: JPEG, PNG, WebP or GIF up to 15 MB. Video: MP4, WebM, MOV or OGV up to 250 MB. Audio: MP3, M4A, WAV, OGG or WebM up to 100 MB.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <Select disabled={uploadPhase === 'uploading' || uploadPhase === 'verifying'} value={selectedKind} onValueChange={(value: PublicationMedia['kind']) => setSelectedKind(value)}>
