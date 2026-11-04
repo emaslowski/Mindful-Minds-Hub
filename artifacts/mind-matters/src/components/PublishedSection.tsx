@@ -1,4 +1,4 @@
-import { useGetPublishedContent } from "@workspace/api-client-react";
+import { getGetPublishedContentQueryKey, useGetPublishedContent } from "@workspace/api-client-react";
 import { PublishedArticle, type PublicationAppearance, type PublicationBlock } from "@workspace/mind-matters-ds/components/PublishedArticle";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { BlogStoryPreview } from "./BlogStoryPreview";
@@ -27,7 +27,7 @@ type PublicEditionItem = {
 export function PublishedSection({ section, heading = "From Our Students", className = "", excludeProjectIds = [], featureVideos = false, emptyMessage }: PublishedSectionProps) {
   const { data, isLoading, isError, refetch } = useGetPublishedContent(
     { section },
-    { query: { staleTime: 45_000, refetchOnWindowFocus: true } },
+    { query: { queryKey: getGetPublishedContentQueryKey({ section }), staleTime: 45_000, refetchOnWindowFocus: true } },
   );
   const items = ((data?.publications ?? []) as PublicEditionItem[]).filter(
     (item) => !excludeProjectIds.includes(item.projectId ?? item.id),

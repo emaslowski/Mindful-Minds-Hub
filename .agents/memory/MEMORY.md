@@ -21,3 +21,4 @@
 - [Teacher publication control](teacher-publication-control.md) — teachers control website editions; draft saves preserve student originals and do not silently update live pages.
 - [Blog publication style](blog-publication-style.md) — calming cover image, continuous writing without worksheet headings, and no sample articles.
 - [Language learning content](language-learning-content.md) — Spanish and ASL activity-center scope; verified handshapes, movement-aware instruction, and optional audio.
+- [Online coloring](online-coloring.md) — students should paint coloring pages directly on the website, without needing to print them.

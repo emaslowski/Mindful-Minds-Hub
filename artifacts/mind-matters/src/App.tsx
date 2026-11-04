@@ -19,6 +19,7 @@ import Home from '@/pages/Home';
 import { GardeningPage, LanguageCornerPage, GamesPage } from '@/pages/ActivityPages';
 import Learn from '@/pages/Learn';
 import Create from '@/pages/Create';
+import ColoringStudio from '@/pages/ColoringStudio';
 import Cooking from '@/pages/Cooking';
 import Connect from '@/pages/Connect';
 import Move from '@/pages/Move';
@@ -89,6 +90,7 @@ function PublicRouter() {
         {/* Create Section */}
         <Route path="/create" component={Create} />
         <Route path="/create/directed-draws" component={DirectedDraws} />
+        <Route path="/create/coloring-pages" component={ColoringStudio} />
         <Route path="/create/cooking" component={Cooking} />
         <Route path="/create/cooking/videos">
           {() => <BlankTemplate title="Cooking Videos" subtitle="Grab your apron! Videos coming soon." />}

@@ -110,6 +110,11 @@ export default function Create() {
                 <div className="absolute -bottom-24 right-[15%] w-4 h-24 bg-[#8B5A2B] -rotate-[18deg] z-10 origin-top opacity-90 rounded-b-sm shadow-md"></div>
                 <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-4 h-20 bg-[#6A4420] z-0 origin-top opacity-80 rounded-b-sm"></div>
               </div>
+              {section.path === "/create/coloring-pages" && (
+                <p className="mt-24 max-w-xs text-center text-sm text-muted-foreground">
+                  Paint coloring pages online. No printer needed.
+                </p>
+              )}
               {section.title === "Directed Draws" && (
                 <div className="mt-28 flex w-full justify-center">
                   <TeacherDrawingPostLink />
