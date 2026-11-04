@@ -29,6 +29,7 @@ import type {
   AthleteEntry,
   AthleteGallery,
   AthleteReviewInput,
+  AthleteSession,
   AthleteUpload,
   AthleteUploadInput,
   AuthUserEnvelope,
@@ -316,6 +317,77 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdatePlantObservationMutationOptions(options));
     }
+
+export const getGetAthleteSessionUrl = () => {
+
+
+
+
+  return `/api/athlete/session`
+}
+
+export const getAthleteSession = async ( options?: Parameters<typeof customFetch>[1]): Promise<AthleteSession> => {
+
+  return customFetch<AthleteSession>(getGetAthleteSessionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAthleteSessionQueryKey = () => {
+    return [
+    `/api/athlete/session`
+    ] as const;
+    }
+
+
+export const getGetAthleteSessionQueryOptions = <TData = Awaited<ReturnType<typeof getAthleteSession>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAthleteSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAthleteSessionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAthleteSession>>> = ({ signal }) => getAthleteSession({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAthleteSession>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAthleteSessionQueryResult = NonNullable<Awaited<ReturnType<typeof getAthleteSession>>>
+export type GetAthleteSessionQueryError = ErrorType<unknown>
+
+
+
+export function useGetAthleteSession<TData = Awaited<ReturnType<typeof getAthleteSession>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAthleteSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAthleteSessionQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getListAthleteUrl = () => {
 

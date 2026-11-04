@@ -61,6 +61,10 @@ export interface PlantObservationInput {
   observations: string;
 }
 
+export interface AthleteSession {
+  id: string;
+}
+
 export type AthleteEntryStatus = typeof AthleteEntryStatus[keyof typeof AthleteEntryStatus];
 
 
@@ -69,6 +73,14 @@ export const AthleteEntryStatus = {
   pending: 'pending',
   approved: 'approved',
   rejected: 'rejected',
+} as const;
+
+export type AthleteEntryMediaType = typeof AthleteEntryMediaType[keyof typeof AthleteEntryMediaType];
+
+
+export const AthleteEntryMediaType = {
+  image: 'image',
+  video: 'video',
 } as const;
 
 export interface AthleteEntry {
@@ -80,6 +92,7 @@ export interface AthleteEntry {
   featuredMonth: string | null;
   createdAt: string;
   imageUrl: string;
+  mediaType?: AthleteEntryMediaType;
 }
 
 export interface AthleteGallery {
@@ -95,6 +108,10 @@ export const AthleteUploadInputContentType = {
   'image/jpeg': 'image/jpeg',
   'image/png': 'image/png',
   'image/webp': 'image/webp',
+  'video/mp4': 'video/mp4',
+  'video/webm': 'video/webm',
+  'video/quicktime': 'video/quicktime',
+  'video/ogg': 'video/ogg',
 } as const;
 
 export interface AthleteUploadInput {
@@ -116,7 +133,7 @@ export interface AthleteUploadInput {
   contentType: AthleteUploadInputContentType;
   /**
      * @minimum 1
-     * @maximum 10485760
+     * @maximum 262144000
      */
   size: number;
   consent: boolean;

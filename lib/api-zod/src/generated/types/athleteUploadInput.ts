@@ -26,7 +26,7 @@ export interface AthleteUploadInput {
   contentType: AthleteUploadInputContentType;
   /**
      * @minimum 1
-     * @maximum 10485760
+     * @maximum 262144000
      */
   size: number;
   consent: boolean;

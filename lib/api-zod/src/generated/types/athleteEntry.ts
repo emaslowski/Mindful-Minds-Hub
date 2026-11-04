@@ -5,6 +5,7 @@
  * Mind Matters API
  * OpenAPI spec version: 0.1.0
  */
+import type { AthleteEntryMediaType } from './athleteEntryMediaType';
 import type { AthleteEntryStatus } from './athleteEntryStatus';
 
 export interface AthleteEntry {
@@ -16,4 +17,5 @@ export interface AthleteEntry {
   featuredMonth: string | null;
   createdAt: string;
   imageUrl: string;
+  mediaType?: AthleteEntryMediaType;
 }

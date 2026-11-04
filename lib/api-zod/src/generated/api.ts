@@ -92,6 +92,11 @@ export const UpdatePlantObservationResponse = zod.object({
 })
 
 
+export const GetAthleteSessionResponse = zod.object({
+  "id": zod.string()
+})
+
+
 export const ListAthleteResponse = zod.object({
   "athletes": zod.array(zod.object({
   "id": zod.number(),
@@ -100,7 +105,8 @@ export const ListAthleteResponse = zod.object({
   "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
   "featuredMonth": zod.string().nullable(),
   "createdAt": zod.string(),
-  "imageUrl": zod.string()
+  "imageUrl": zod.string(),
+  "mediaType": zod.enum(['image', 'video']).optional()
 })),
   "featured": zod.union([zod.object({
   "id": zod.number(),
@@ -109,7 +115,8 @@ export const ListAthleteResponse = zod.object({
   "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
   "featuredMonth": zod.string().nullable(),
   "createdAt": zod.string(),
-  "imageUrl": zod.string()
+  "imageUrl": zod.string(),
+  "mediaType": zod.enum(['image', 'video']).optional()
 }),zod.null()]),
   "month": zod.string()
 })
@@ -122,7 +129,8 @@ export const ListMyAthleteResponseItem = zod.object({
   "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
   "featuredMonth": zod.string().nullable(),
   "createdAt": zod.string(),
-  "imageUrl": zod.string()
+  "imageUrl": zod.string(),
+  "mediaType": zod.enum(['image', 'video']).optional()
 })
 export const ListMyAthleteResponse = zod.array(ListMyAthleteResponseItem)
 
@@ -133,7 +141,7 @@ export const requestAthleteUploadBodyTitleMax = 100;
 
 export const requestAthleteUploadBodyFilenameMax = 255;
 
-export const requestAthleteUploadBodySizeMax = 10485760;
+export const requestAthleteUploadBodySizeMax = 262144000;
 
 
 
@@ -141,7 +149,7 @@ export const RequestAthleteUploadBody = zod.object({
   "athleteName": zod.string().min(1).max(requestAthleteUploadBodyAthleteNameMax),
   "title": zod.string().min(1).max(requestAthleteUploadBodyTitleMax),
   "filename": zod.string().min(1).max(requestAthleteUploadBodyFilenameMax),
-  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp']),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime', 'video/ogg']),
   "size": zod.number().min(1).max(requestAthleteUploadBodySizeMax),
   "consent": zod.boolean()
 })
@@ -163,7 +171,8 @@ export const CompleteAthleteResponse = zod.object({
   "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
   "featuredMonth": zod.string().nullable(),
   "createdAt": zod.string(),
-  "imageUrl": zod.string()
+  "imageUrl": zod.string(),
+  "mediaType": zod.enum(['image', 'video']).optional()
 })
 
 
@@ -188,7 +197,8 @@ export const ListTeacherAthleteResponseItem = zod.object({
   "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
   "featuredMonth": zod.string().nullable(),
   "createdAt": zod.string(),
-  "imageUrl": zod.string()
+  "imageUrl": zod.string(),
+  "mediaType": zod.enum(['image', 'video']).optional()
 })
 export const ListTeacherAthleteResponse = zod.array(ListTeacherAthleteResponseItem)
 
@@ -209,7 +219,8 @@ export const UpdateAthleteResponse = zod.object({
   "status": zod.enum(['uploading', 'pending', 'approved', 'rejected']),
   "featuredMonth": zod.string().nullable(),
   "createdAt": zod.string(),
-  "imageUrl": zod.string()
+  "imageUrl": zod.string(),
+  "mediaType": zod.enum(['image', 'video']).optional()
 })
 
 

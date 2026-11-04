@@ -64,7 +64,7 @@ export default function TeacherAthletes() {
       await refreshAthletes();
       setFeedback(message);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : "This challenge photo could not be updated. Please try again.");
+      setActionError(error instanceof Error ? error.message : "This challenge submission could not be updated. Please try again.");
     }
   };
 
@@ -73,12 +73,12 @@ export default function TeacherAthletes() {
     <StudioLayout>
       <StudioPage
         title="Athlete of the Month"
-        subtitle="Review challenge photos and choose this month's teacher-selected recognition."
+        subtitle="Review challenge photos and videos and choose this month's teacher-selected recognition."
       >
         <div className="mb-5 space-y-2">
-          <p className="text-sm text-foreground/75">Only approved photos appear publicly. Approvals, rejections, and monthly recognition are selected by a teacher. There is no voting or automatic winner.</p>
+          <p className="text-sm text-foreground/75">Only approved photos and videos appear publicly. Approvals, rejections, and monthly recognition are selected by a teacher. There is no voting or automatic winner.</p>
           {feedback && <Alert><AlertDescription data-testid="status-athlete-update">{feedback}</AlertDescription></Alert>}
-          {actionError && <Alert variant="destructive"><AlertTitle>Photo update failed</AlertTitle><AlertDescription>{actionError}</AlertDescription></Alert>}
+          {actionError && <Alert variant="destructive"><AlertTitle>Submission update failed</AlertTitle><AlertDescription>{actionError}</AlertDescription></Alert>}
         </div>
         {athletesQuery.isLoading ? (
           <div className="grid gap-4 md:grid-cols-2">
@@ -93,7 +93,7 @@ export default function TeacherAthletes() {
             </AlertDescription>
           </Alert>
         ) : !athletes.length ? (
-          <Card><CardContent className="p-8 text-sm text-foreground/75">There are no challenge photos to review yet.</CardContent></Card>
+          <Card><CardContent className="p-8 text-sm text-foreground/75">There are no challenge submissions to review yet.</CardContent></Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {athletes.map((athlete) => {
@@ -102,13 +102,25 @@ export default function TeacherAthletes() {
               return (
                 <Card key={athlete.id} data-testid={`card-teacher-athlete-${athlete.id}`}>
                   <CardContent className="grid gap-4 p-4 sm:grid-cols-2">
-                    <img
-                      src={athlete.imageUrl || `/api/athlete/${athlete.id}/image`}
-                      alt={`Challenge photo titled ${athlete.title} by ${athlete.athleteName}`}
-                      className="aspect-square w-full rounded-lg bg-muted object-cover"
-                      loading="lazy"
-                      data-testid={`img-teacher-athlete-${athlete.id}`}
-                    />
+                    {athlete.mediaType === "video" ? (
+                      <video
+                        src={athlete.imageUrl || `/api/athlete/${athlete.id}/image`}
+                        aria-label={`Challenge video titled ${athlete.title} by ${athlete.athleteName}`}
+                        className="aspect-square w-full rounded-lg bg-muted object-cover"
+                        controls
+                        preload="metadata"
+                        playsInline
+                        data-testid={`video-teacher-athlete-${athlete.id}`}
+                      />
+                    ) : (
+                      <img
+                        src={athlete.imageUrl || `/api/athlete/${athlete.id}/image`}
+                        alt={`Challenge photo titled ${athlete.title} by ${athlete.athleteName}`}
+                        className="aspect-square w-full rounded-lg bg-muted object-cover"
+                        loading="lazy"
+                        data-testid={`img-teacher-athlete-${athlete.id}`}
+                      />
+                    )}
                     <div className="flex min-w-0 flex-col items-start gap-3">
                       <Badge variant={statusVariant(athlete.status)} data-testid={`status-teacher-athlete-${athlete.id}`}>{athlete.status}</Badge>
                       <div>

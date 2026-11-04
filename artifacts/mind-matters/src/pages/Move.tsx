@@ -26,13 +26,25 @@ function AthleteOfTheMonth({ athlete }: { athlete: AthleteEntry }) {
   return (
     <Card className="overflow-hidden">
       <CardContent className="grid gap-5 p-5 sm:grid-cols-2 sm:items-center">
-        <img
-          src={athlete.imageUrl || `/api/athlete/${athlete.id}/image`}
-          alt={`Teacher-selected Athlete of the Month: ${athlete.athleteName}`}
-          className="aspect-square w-full rounded-lg bg-muted object-cover"
-          loading="lazy"
-          data-testid="img-athlete-of-month"
-        />
+        {athlete.mediaType === "video" ? (
+          <video
+            src={athlete.imageUrl || `/api/athlete/${athlete.id}/image`}
+            aria-label={`Teacher-selected Athlete of the Month video: ${athlete.athleteName}`}
+            className="aspect-square w-full rounded-lg bg-muted object-cover"
+            controls
+            preload="metadata"
+            playsInline
+            data-testid="video-athlete-of-month"
+          />
+        ) : (
+          <img
+            src={athlete.imageUrl || `/api/athlete/${athlete.id}/image`}
+            alt={`Teacher-selected Athlete of the Month: ${athlete.athleteName}`}
+            className="aspect-square w-full rounded-lg bg-muted object-cover"
+            loading="lazy"
+            data-testid="img-athlete-of-month"
+          />
+        )}
         <div className="space-y-3">
           <Badge variant="secondary">Teacher-selected · {athlete.featuredMonth}</Badge>
           <div>
@@ -42,7 +54,7 @@ function AthleteOfTheMonth({ athlete }: { athlete: AthleteEntry }) {
           </div>
           <p className="text-sm text-foreground/75">Celebrating movement, effort, and showing up in your own way.</p>
           <Button asChild variant="outline" size="sm" data-testid="link-athlete-gallery">
-            <Link href="/move/active-challenge">Explore challenge photos<ArrowRight aria-hidden="true" /></Link>
+            <Link href="/move/active-challenge">Explore challenge submissions<ArrowRight aria-hidden="true" /></Link>
           </Button>
         </div>
       </CardContent>

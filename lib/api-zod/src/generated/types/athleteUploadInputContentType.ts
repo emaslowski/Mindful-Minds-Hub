@@ -13,4 +13,8 @@ export const AthleteUploadInputContentType = {
   'image/jpeg': 'image/jpeg',
   'image/png': 'image/png',
   'image/webp': 'image/webp',
+  'video/mp4': 'video/mp4',
+  'video/webm': 'video/webm',
+  'video/quicktime': 'video/quicktime',
+  'video/ogg': 'video/ogg',
 } as const;
