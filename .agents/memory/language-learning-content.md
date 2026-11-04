@@ -16,3 +16,12 @@ verified educational handshape illustrations rather than invented or
 AI-generated signs. J and Z require movement and must not be tested as static
 handshape questions. Spanish pronunciation must be optional, with an honest
 fallback when the browser has no Spanish voice.
+
+Provide a Sign Language Videos collection in the Language Corner with a matching
+teacher publishing destination.
+
+**Why:** The user asked for a spot where they can post Sign Language videos.
+
+**How to apply:** Keep the existing language activities and ASL accuracy rules.
+Use teacher-approved website editions for videos; uploads and draft saves alone
+must not publish them.

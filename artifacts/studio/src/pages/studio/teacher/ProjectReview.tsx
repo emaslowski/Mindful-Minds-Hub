@@ -85,6 +85,7 @@ const DESTINATION_OPTIONS = [
   { value: 'blog', label: 'Blog / Articles' },
   { value: 'podcast', label: 'Podcast Page' },
   { value: 'learn', label: 'Learn / Strategies' },
+  { value: 'sign-language', label: 'Language Corner · Sign Language Videos' },
   { value: 'create', label: 'Creative Activities' },
   { value: 'dance-tutorials', label: 'Dance Tutorials' },
   { value: 'asmr', label: 'ASMR' },

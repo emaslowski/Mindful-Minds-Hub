@@ -6,6 +6,7 @@ import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/mind-matters-ds/components/ui/card";
 import { Input } from "@workspace/mind-matters-ds/components/ui/input";
 import { Progress } from "@workspace/mind-matters-ds/components/ui/progress";
+import { PublishedSection } from "@/components/PublishedSection";
 import { assetPath, buildPhrase, handshapeQuizLetters, phrasePuzzles, quizQuestions, shuffle, vocabulary } from "./languageGames";
 
 type Section = "Spanish" | "ASL" | "Practice";
@@ -185,6 +186,26 @@ function Practice() {
   </div>;
 }
 
+export function SignLanguageVideosPage() {
+  return (
+    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 md:py-12">
+      <Button asChild variant="outline" className="mb-6">
+        <Link href="/language-corner">Back to Language Corner</Link>
+      </Button>
+      <header className="mb-8">
+        <h1 className="font-serif text-4xl font-bold text-foreground sm:text-5xl">Sign Language Videos</h1>
+        <p className="mt-3 max-w-3xl text-foreground/80">Watch our teacher-published sign language videos. Pause and replay each lesson to practice at your own pace.</p>
+      </header>
+      <PublishedSection
+        section="sign-language"
+        heading="Watch & Practice"
+        featureVideos
+        emptyMessage="Sign language videos will appear here when your teacher publishes them."
+      />
+    </main>
+  );
+}
+
 export default function LanguageCenter() {
   const [section, setSection] = useState<Section>("Spanish");
   const [spanishGame, setSpanishGame] = useState<SpanishGame>("Cards");
@@ -194,6 +215,11 @@ export default function LanguageCenter() {
   return <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 md:py-12">
     <Link href="/" className="mb-6 inline-flex rounded-full border border-primary/40 px-5 py-2 font-semibold text-primary hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring" data-testid="link-language-home">Back to home</Link>
     <header className="mb-6"><p className="font-semibold uppercase tracking-wider text-secondary">A little learning, a lot of fun</p><h1 className="mt-1 font-serif text-4xl font-bold text-foreground sm:text-5xl">Language Corner</h1><p className="mt-3 max-w-3xl text-foreground/80">Play with Spanish words, explore ASL handshapes, and practice thoughtful conversations. Your activity progress lasts only for this visit and is not saved to an account.</p></header>
+    <div className="mb-6">
+      <Button asChild>
+        <Link href="/language-corner/sign-language-videos" data-testid="link-sign-language-videos">Sign Language Videos</Link>
+      </Button>
+    </div>
     <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Choose a language activity"><Button variant={section === "Spanish" ? "default" : "outline"} aria-pressed={section === "Spanish"} onClick={() => setSection("Spanish")} data-testid="button-category-spanish">Spanish games</Button><Button variant={section === "ASL" ? "default" : "outline"} aria-pressed={section === "ASL"} onClick={() => setSection("ASL")} data-testid="button-category-asl">ASL studio</Button><Button variant={section === "Practice" ? "default" : "outline"} aria-pressed={section === "Practice"} onClick={() => setSection("Practice")} data-testid="button-category-practice">Practice together</Button></div>
     <div hidden={section !== "Spanish"}>
       <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Choose a Spanish game">{spanishOptions.map((game) => <Button key={game} variant={spanishGame === game ? "secondary" : "outline"} aria-pressed={spanishGame === game} onClick={() => setSpanishGame(game)} data-testid={`button-spanish-game-${game.toLowerCase().replaceAll(" ", "-")}`}>{game}</Button>)}</div>

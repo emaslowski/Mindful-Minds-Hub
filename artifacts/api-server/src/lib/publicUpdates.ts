@@ -4,6 +4,7 @@ export const UPDATE_DESTINATIONS: Record<string, { href: string; label: string }
   podcast: { href: '/listen/podcast', label: 'Brightside Podcast' },
   podcasts: { href: '/listen/podcast', label: 'Brightside Podcast' },
   learn: { href: '/learn', label: 'Learning Center' },
+  'sign-language': { href: '/language-corner/sign-language-videos', label: 'Sign Language Videos' },
   create: { href: '/create', label: 'Creative Activities' },
   'calm-corner': { href: '/listen/meditations', label: 'Mindful Moments' },
   'dance-tutorials': { href: '/listen/dance-tutorials', label: 'Dance Tutorials' },
