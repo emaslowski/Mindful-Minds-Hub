@@ -1,13 +1,13 @@
 import { Link } from "wouter";
 import { WaveFooter } from "@/components/WaveFooter";
-import { Mic, Headphones, Leaf, Activity } from "lucide-react";
+import { Mic, Headphones, Leaf, Activity, Music2 } from "lucide-react";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 
 export default function Listen() {
   const tabs = [
     { label: "Calm Music", path: "/listen/calm-music", icon: <Headphones size={18} /> },
     { label: "Focus Sounds", path: "/listen/focus-sounds", icon: <Activity size={18} /> },
-    { label: "Meditations", path: "/listen/meditations", icon: <Leaf size={18} /> },
+    { label: "Dance Tutorials", path: "/listen/dance-tutorials", icon: <Music2 size={18} /> },
     { label: "Nature Sounds", path: "/listen/nature-sounds", icon: <Leaf size={18} /> }, // Replace Leaf with better if needed
     { label: "ASMR", path: "/listen/asmr", icon: <Headphones size={18} /> },
   ];
@@ -120,20 +120,18 @@ export default function Listen() {
             </div>
           </Link>
 
-          {/* Guided Meditations Card */}
+          {/* Dance Tutorials Card */}
           <div className="bg-gradient-to-br from-sage/20 to-dusty-rose/20 rounded-[3rem] p-8 flex flex-col items-center text-center border border-white/40 shadow-sm hover:shadow-md transition-shadow group">
              <div className="p-6 bg-white/30 rounded-full text-sage mb-6 transform group-hover:scale-110 transition-transform">
-               <Leaf size={48} />
+               <Music2 size={48} />
              </div>
-             <h3 className="text-3xl font-display italic text-foreground mb-3">Guided Meditations</h3>
+             <h3 className="text-3xl font-display italic text-foreground mb-3">Dance Tutorials</h3>
              <p className="text-foreground/70 font-sans mb-8 px-4 flex-1">
-               Take a few minutes to breathe and recenter with these short, guided tracks.
+               Learn the steps, follow along, and enjoy moving to the music.
              </p>
-             <Link href="/listen/meditations">
-               <button className="border-2 border-sage text-sage hover:bg-sage hover:text-white px-8 py-2.5 rounded-full font-sans font-bold uppercase tracking-wider text-sm transition-colors w-full">
-                 Listen
-               </button>
-             </Link>
+             <Button asChild variant="outline" className="w-full">
+               <Link href="/listen/dance-tutorials">Watch &amp; Dance</Link>
+             </Button>
           </div>
 
           {/* Focus & Study Card */}

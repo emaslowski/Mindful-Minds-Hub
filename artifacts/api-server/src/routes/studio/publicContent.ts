@@ -10,6 +10,7 @@ import { defaultPublicationAppearance } from '../../lib/publicationEditions';
 import type { PublicationEdition } from '@workspace/db';
 import { videoStorage, streamProjectVideo } from '../../lib/projectVideoStorage';
 import { Router } from 'express';
+import { publicationDestination } from '../../lib/publicationDestination';
 
 const router = Router();
 
@@ -38,9 +39,13 @@ router.get('/public/published', async (req, res) => {
     .where(eq(studioPublicationsTable.publicationStatus, 'active'))
     .orderBy(sql`COALESCE((${studioPublicationEditsTable.published}->>'pageOrder')::integer, 1000)`, desc(studioPublicationsTable.publishedAt));
 
+  const placed = publications.map((publication) => ({
+    ...publication,
+    destinationSection: publicationDestination(publication.destinationSection, publication.title),
+  }));
   const filtered = section
-    ? publications.filter((p) => p.destinationSection === section)
-    : publications;
+    ? placed.filter((p) => p.destinationSection === section)
+    : placed;
 
   res.json({ publications: filtered });
 });

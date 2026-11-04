@@ -124,6 +124,7 @@ function PublicRouter() {
         <Route path="/listen/focus-sounds">
           {() => <ListenMeditations focus />}
         </Route>
+        <Route path="/listen/dance-tutorials" component={ListenMeditations} />
         <Route path="/listen/meditations" component={ListenMeditations} />
         <Route path="/listen/nature-sounds">
           {() => <BlankTemplate title="Nature Sounds" subtitle="Nature sound playlists coming soon. Students can add content here!" />}

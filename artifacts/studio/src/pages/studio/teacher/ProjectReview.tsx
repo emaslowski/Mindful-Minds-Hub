@@ -86,7 +86,7 @@ const DESTINATION_OPTIONS = [
   { value: 'podcast', label: 'Podcast Page' },
   { value: 'learn', label: 'Learn / Strategies' },
   { value: 'create', label: 'Creative Activities' },
-  { value: 'calm-corner', label: 'Calm Corner (Meditation)' },
+  { value: 'dance-tutorials', label: 'Dance Tutorials' },
   { value: 'asmr', label: 'ASMR' },
   { value: 'focus-study', label: 'Focus & Study' },
   { value: 'move', label: 'Move Your Mind' },

@@ -8,6 +8,7 @@ import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/mind-matters-ds/components/ui/card";
 import { Label } from "@workspace/mind-matters-ds/components/ui/label";
 import { Skeleton } from "@workspace/mind-matters-ds/components/ui/skeleton";
+import { ScrollArea } from "@workspace/mind-matters-ds/components/ui/scroll-area";
 import { Textarea } from "@workspace/mind-matters-ds/components/ui/textarea";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -220,6 +221,7 @@ export function PublicFeedbackModeration({ data, isLoading, isError, refetch }: 
                   {pendingReviewCount} pending · {reviews.length - pendingReviewCount} approved. You can reply to or delete reviews of either status.
                 </CardDescription>
               </CardHeader>
+              <ScrollArea className="h-96" aria-label="Site reviews">
               <CardContent className="space-y-3">
                 {reviews.map((review) => (
                   <article key={review.id} className="rounded-lg border border-border p-4" data-testid={`moderation-review-${review.id}`}>
@@ -255,6 +257,7 @@ export function PublicFeedbackModeration({ data, isLoading, isError, refetch }: 
                   </article>
                 ))}
               </CardContent>
+              </ScrollArea>
             </Card>
           )}
         </div>

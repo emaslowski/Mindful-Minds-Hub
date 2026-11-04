@@ -6,6 +6,7 @@ import {
 } from '@workspace/db';
 import { isExampleBlogPost } from '../lib/exampleBlogPosts';
 import { newestUpdates, UPDATE_DESTINATIONS, type HomepageUpdate } from '../lib/publicUpdates';
+import { publicationDestination } from '../lib/publicationDestination';
 
 const router = Router();
 
@@ -34,7 +35,7 @@ router.get('/public/updates', async (_req, res): Promise<void> => {
   ]);
   const items: HomepageUpdate[] = [];
   for (const post of publications) {
-    const destination = UPDATE_DESTINATIONS[post.destination];
+    const destination = UPDATE_DESTINATIONS[publicationDestination(post.destination, post.title ?? '')];
     if (!destination) continue;
     items.push({
       id: `publication-${post.id}`, title: post.title?.trim() || 'New student post',

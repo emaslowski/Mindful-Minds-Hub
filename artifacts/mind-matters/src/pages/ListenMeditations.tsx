@@ -1,5 +1,5 @@
 import { WaveFooter } from "@/components/WaveFooter";
-import { Headphones, Leaf } from "lucide-react";
+import { Headphones, Music2 } from "lucide-react";
 import { Link } from "wouter";
 import { useGetPublishedContent } from "@workspace/api-client-react";
 import { PublishedArticle, type PublicationAppearance } from "@workspace/mind-matters-ds/components/PublishedArticle";
@@ -9,19 +9,17 @@ import { Skeleton } from "@workspace/mind-matters-ds/components/ui/skeleton";
 
 export default function ListenMeditations({ focus = false }: { focus?: boolean }) {
   const { data, isLoading, isError, refetch } = useGetPublishedContent({}, { query: { staleTime: 45_000, refetchOnWindowFocus: true } });
-  const section = focus ? "focus-study" : "calm-corner";
-  const meditations = (data?.publications ?? []).filter((post) => {
+  const section = focus ? "focus-study" : "dance-tutorials";
+  const posts = (data?.publications ?? []).filter((post) => {
     // Keep the existing published edition and its media intact while moving
     // this previously miscategorized post to its requested listening page.
     const destination = post.destinationSection === "calm-corner"
       && post.title.trim().toLowerCase() === "music for studying"
       ? "focus-study" : post.destinationSection;
-    const isAsmr = post.destinationSection === "calm-corner"
-      && (post.contentType === "ASMR video" || post.title.trim().toLowerCase() === "squishy asmr");
-    return destination === section && !(section === "calm-corner" && isAsmr);
+    return destination === section;
   });
-  const title = focus ? "Focus & Study" : "Guided Meditations";
-  const Icon = focus ? Headphones : Leaf;
+  const title = focus ? "Focus & Study" : "Dance Tutorials";
+  const Icon = focus ? Headphones : Music2;
 
   return (
     <div className="w-full flex flex-col flex-1 pt-12 relative">
@@ -38,7 +36,7 @@ export default function ListenMeditations({ focus = false }: { focus?: boolean }
             {title}
           </h1>
           <p className="text-xl md:text-2xl text-sage font-handwritten max-w-2xl mx-auto">
-            {focus ? "Music and focus sounds to keep you company while you study." : "Take a few minutes to breathe and recenter."}
+            {focus ? "Music and focus sounds to keep you company while you study." : "Learn the steps, follow along, and dance at your own pace."}
           </p>
         </div>
 
@@ -51,9 +49,9 @@ export default function ListenMeditations({ focus = false }: { focus?: boolean }
             <p className="mb-4 text-foreground/70">These posts could not be loaded.</p>
             <Button variant="outline" onClick={() => refetch()}>Try again</Button>
           </div>
-        ) : meditations.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {meditations.map((med) => (
+        ) : posts.length > 0 ? (
+          <div className={focus ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-6"}>
+            {posts.map((med) => (
               <div
                 key={med.id}
                 className="bg-gradient-to-br from-sage/20 to-dusty-rose/20 rounded-[2rem] p-8 flex flex-col border border-white/40 shadow-sm hover:shadow-md transition-shadow"
@@ -81,13 +79,13 @@ export default function ListenMeditations({ focus = false }: { focus?: boolean }
             </div>
             <h2 className="font-display italic text-3xl text-foreground/50 mb-2">Coming Soon</h2>
             <p className="font-sans text-foreground/50">
-              {focus ? "Focus and study content from our student team is on the way." : "Guided meditation content from our student team is on the way."}
+              {focus ? "Focus and study content from our student team is on the way." : "Dance tutorials from our team are on the way."}
             </p>
           </div>
         )}
       </div>
 
-      <WaveFooter quote={focus ? "One task at a time. You've got this." : "Breathe in. Breathe out. You are enough."} />
+      <WaveFooter quote={focus ? "One task at a time. You've got this." : "Move at your own pace. Every step counts."} />
     </div>
   );
 }

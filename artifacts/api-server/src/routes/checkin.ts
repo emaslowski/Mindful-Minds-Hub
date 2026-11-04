@@ -11,7 +11,7 @@ interface Recommendation {
 const MOOD_RECOMMENDATIONS: Record<string, Recommendation[]> = {
   anxious: [
     { section: "Learn", path: "/learn", reason: "Try breathing exercises and grounding techniques to calm anxiety." },
-    { section: "Listen", path: "/listen", reason: "Calming music and guided meditations can ease anxiety." },
+    { section: "Listen", path: "/listen", reason: "Calming music and focus sounds can ease anxiety." },
     { section: "Move", path: "/move", reason: "Physical movement can reduce anxious energy." },
   ],
   stressed: [

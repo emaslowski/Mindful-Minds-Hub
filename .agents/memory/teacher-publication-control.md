@@ -109,6 +109,16 @@ as the user explicitly requested.
 
 ## Podcast collection
 
+Replace Guided Meditations with Dance Tutorials and place the user's published
+“Dance Tutorial” video in that collection, rather than Creative Activities.
+Keep Dance Tutorials available as a teacher publishing destination.
+
+**Why:** The user asked to remove Guided Meditations, replace it with dance
+tutorials, and put their dance tutorial video in that section.
+
+**How to apply:** Preserve the existing recording and its approved public edition;
+do not replace it with sample content or expose unpublished work.
+
 ASMR has its own public listening destination and teacher publishing option. “Squishy ASMR” belongs on ASMR, not Guided Meditations.
 
 **Why:** The user explicitly requested ASMR publishing and moving that recording from Guided Meditations.
