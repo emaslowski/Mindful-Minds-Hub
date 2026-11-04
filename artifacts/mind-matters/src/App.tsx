@@ -17,7 +17,7 @@ import { Layout } from '@/components/Layout';
 import { WebsiteRulesGate } from '@/components/WebsiteRulesGate';
 import { ExplorationProvider } from '@/components/ExplorationProvider';
 import Home from '@/pages/Home';
-import { GardeningPage, LanguageCornerPage, GamesPage } from '@/pages/ActivityPages';
+import { GardeningPage, GardeningVideosPage, LanguageCornerPage, GamesPage } from '@/pages/ActivityPages';
 import Learn from '@/pages/Learn';
 import Create from '@/pages/Create';
 import ColoringStudio from '@/pages/ColoringStudio';
@@ -65,6 +65,7 @@ function PublicRouter() {
       <PageTracker />
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/gardening/bryan-the-plant-guy" component={GardeningVideosPage} />
         <Route path="/gardening" component={GardeningPage} />
         <Route path="/language-corner" component={LanguageCornerPage} />
         <Route path="/games" component={GamesPage} />

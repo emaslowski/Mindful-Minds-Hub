@@ -10,6 +10,7 @@ type PublishedSectionProps = {
   className?: string;
   excludeProjectIds?: number[];
   featureVideos?: boolean;
+  videoFilter?: "only" | "exclude";
   emptyMessage?: string;
 };
 
@@ -24,13 +25,17 @@ type PublicEditionItem = {
   projectId?: number;
 };
 
-export function PublishedSection({ section, heading = "From Our Students", className = "", excludeProjectIds = [], featureVideos = false, emptyMessage }: PublishedSectionProps) {
+export function PublishedSection({ section, heading = "From Our Students", className = "", excludeProjectIds = [], featureVideos = false, videoFilter, emptyMessage }: PublishedSectionProps) {
   const { data, isLoading, isError, refetch } = useGetPublishedContent(
     { section },
     { query: { queryKey: getGetPublishedContentQueryKey({ section }), staleTime: 45_000, refetchOnWindowFocus: true } },
   );
   const items = ((data?.publications ?? []) as PublicEditionItem[]).filter(
-    (item) => !excludeProjectIds.includes(item.projectId ?? item.id),
+    (item) => {
+      if (excludeProjectIds.includes(item.projectId ?? item.id)) return false;
+      const hasVideo = item.blocks?.some((block) => block.type === "video") ?? false;
+      return videoFilter === "only" ? hasVideo : videoFilter === "exclude" ? !hasVideo : true;
+    },
   ).sort(
     (a, b) => {
       if (featureVideos) {

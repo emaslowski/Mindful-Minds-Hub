@@ -35,13 +35,37 @@ export function GardeningPage() {
     <header className="mb-8">
       <h1 className="font-serif text-4xl font-bold text-foreground md:text-5xl">Plants &amp; Gardening</h1>
       <p className="mt-3 max-w-3xl text-foreground/80">Watch our student gardeners, try a growing experiment, and discover what plants need to thrive.</p>
+      <Button asChild className="mt-6">
+        <Link href="/gardening/bryan-the-plant-guy">Bryan the Plant Guy Videos</Link>
+      </Button>
     </header>
-    <PublishedSection section="gardening" heading="Watch Our Student Gardeners" featureVideos className="mb-10" />
+    <PublishedSection section="gardening" heading="From Our Student Gardeners" videoFilter="exclude" className="mb-10" />
     <GardeningActivities />
     <section className="mt-10" aria-label="Start growing a seed">
       <GardeningSection />
     </section>
   </main>;
+}
+
+export function GardeningVideosPage() {
+  return (
+    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:py-14">
+      <Button asChild variant="outline" className="mb-6">
+        <Link href="/gardening">Back to Gardening</Link>
+      </Button>
+      <header className="mb-8">
+        <h1 className="font-serif text-4xl font-bold text-foreground md:text-5xl">Bryan the Plant Guy Videos</h1>
+        <p className="mt-3 max-w-3xl text-foreground/80">Browse all the gardening videos and follow along at your own pace.</p>
+      </header>
+      <PublishedSection
+        section="gardening"
+        heading="Watch All Videos"
+        featureVideos
+        videoFilter="only"
+        emptyMessage="Bryan the Plant Guy videos will appear here when they are published."
+      />
+    </main>
+  );
 }
 
 export function LanguageCornerPage() {

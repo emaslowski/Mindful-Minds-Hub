@@ -64,15 +64,17 @@ automatically or introduce student voting without a new request.
 
 ## Gardening video priority
 
-On the Gardening page, keep student videos large and before the supplied
-activities.
+On the Gardening page, put a “Bryan the Plant Guy Videos” button at the top.
+It opens a collection of all gardening videos instead of listing the video
+players above the activities. Keep the players large in that collection.
 
-**Why:** The user explicitly asked for the student gardening video to be
-"bigger and first," followed by more things for students to do.
+**Why:** The user originally asked for the gardening video to be “bigger and
+first,” then requested a clickable button at the top of Gardening to see all
+Bryan the Plant Guy videos.
 
-**How to apply:** Preserve this student-first emphasis when adding or
-rearranging Gardening activities. Do not change the original published media
-or teacher-approved edition just to enlarge its page presentation.
+**How to apply:** Keep the collection button before the gardening activities,
+and preserve the original published media, teacher-approved editions, and
+discussions when reorganizing the collection.
 
 ## Food Reviews placement
 
