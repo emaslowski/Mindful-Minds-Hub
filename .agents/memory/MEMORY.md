@@ -22,3 +22,4 @@
 - [Blog publication style](blog-publication-style.md) — calming cover image, continuous writing without worksheet headings, and no sample articles.
 - [Language learning content](language-learning-content.md) — Spanish and ASL activity-center scope; verified handshapes, movement-aware instruction, and optional audio.
 - [Online coloring](online-coloring.md) — students should paint coloring pages directly on the website, without needing to print them.
+- [Daily puzzle schedule](daily-puzzle-schedule.md) — keep the shared daily-word schedule stable; rollover uses Eastern Time, not the visitor's timezone.

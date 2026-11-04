@@ -8,6 +8,7 @@ This includes older saved system bylines and branded team labels displayed in St
 The user explicitly chose this name over “Middle School Matters” when approving the illustrated reference website redesign.
 Keep Student Studio and its existing student work, teacher reviews, and publishing controls.
 Retain the reference-based illustrated design when making local refinements.
+The website is about connection and a sense of belonging with peers. The gaming section is not its main focus.
 Keep “How we create” as smaller circles arranged left to right, rather than a vertically stacked process.
 Do not include Calm & Coping Corner, Student Resources, or Connect with a Trusted Adult among the homepage’s Bright Spots.
 Use “Events” rather than “Student-Created Events” or “Student-Organized Events.”
@@ -21,6 +22,7 @@ They explicitly asked to remove those three Bright Spot buttons.
 They asked to remove student-created wording from the Events section.
 They explicitly requested those three top navigation buttons and removal of About Us.
 They reiterated that Student Studio should replace “Middle School Matters” anywhere it is used as product branding.
+The user explicitly emphasized connection and belonging with peers as the website's purpose, not gaming.
 
 **How to apply:** Keep the public website and Studio consistent without changing student-authored content, saved work, existing logins, or service URLs.
 

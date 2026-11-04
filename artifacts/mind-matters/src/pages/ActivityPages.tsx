@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "wouter";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import {
   GardeningSection,
 } from "@/components/HomeActivitySections";
@@ -9,6 +9,7 @@ import LanguageCenter from "@/components/language/LanguageCenter";
 import { SnakeGame } from "@/components/SnakeGame";
 import { HangmanGame } from "@/components/games/HangmanGame";
 import { ScrabbleGame } from "@/components/games/ScrabbleGame";
+import { DailyWordleGame } from "@/components/games/DailyWordleGame";
 import { PublishedSection } from "@/components/PublishedSection";
 import GardeningActivities from "@/components/gardening/GardeningActivities";
 
@@ -45,8 +46,9 @@ export function LanguageCornerPage() {
 }
 
 export function GamesPage() {
-  const [activeGame, setActiveGame] = useState<"snake" | "hangman" | "tiles">("snake");
+  const [activeGame, setActiveGame] = useState<"wordle" | "snake" | "hangman" | "tiles">("wordle");
   const games = [
+    { id: "wordle", label: "Daily Wordle" },
     { id: "snake", label: "Snake" },
     { id: "hangman", label: "Hangman" },
     { id: "tiles", label: "Scrabble-style" },
@@ -77,6 +79,9 @@ export function GamesPage() {
             {game.label}
           </Button>
         ))}
+      </div>
+      <div id="game-panel-wordle" aria-label="Daily Wordle game" hidden={activeGame !== "wordle"}>
+        <DailyWordleGame isActive={activeGame === "wordle"} />
       </div>
       <div id="game-panel-snake" aria-label="Snake game" hidden={activeGame !== "snake"}>
         <SnakeGame isActive={activeGame === "snake"} />

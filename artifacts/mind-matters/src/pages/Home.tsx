@@ -64,6 +64,9 @@ export default function Home() {
               <a href="#bright-spots">Explore the Centers <ArrowDown aria-hidden="true" /></a>
             </Button>
           </div>
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-foreground/85" data-testid="text-home-purpose">
+            The Brightside Project is about connection and a sense of belonging with peers. Games are just one activity here—not the main focus of this website.
+          </p>
         </div>
         <Card className="order-1 overflow-hidden border-0 bg-transparent shadow-none md:order-2">
           <img
