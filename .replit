@@ -31,3 +31,6 @@ SMTP_PORT = "587"
 ADMIN_EMAILS = "mindmatters0526@gmail.com"
 CREDENTIAL_EMAIL_CONNECTION_ID = "conn_google-mail_01M6EBGW80EPE435Q95TEZDK8R"
 CREDENTIAL_EMAIL_SENDER = "emaslowski@royhart.org"
+
+[objectStorage]
+defaultBucketID = "replit-objstore-599a0bed-107d-495a-9a7e-a9e88b934359"
