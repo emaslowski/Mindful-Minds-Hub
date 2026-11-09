@@ -9,7 +9,9 @@ import { cn } from '@/lib/utils';
 import {
   assistantApi,
   streamAssistantMessage,
+  type AssistantAccess,
   type AssistantAction,
+  type AssistantPlan,
   type TranscriptItem,
 } from '@/lib/assistantApi';
 import {
@@ -152,7 +154,27 @@ export default function Assistant() {
 
   const items: TranscriptItem[] = [...(conversation.data?.transcript ?? []), ...liveItems];
   const configured = status.data?.configured ?? true;
-  const usage = status.data?.usageThisMonth;
+  const access = status.data?.access;
+  const plans = status.data?.plans ?? [];
+  const blocked = access ? !access.allowed : false;
+  const canType = configured && !blocked && !streaming;
+
+  if (access && !access.isOwner && !access.membership && !streaming) {
+    return (
+      <StudioLayout>
+        <div className="p-4 sm:p-6 max-w-3xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <Sparkles className="h-6 w-6 text-[#c4622d]" />
+            <div>
+              <h1 className="text-2xl font-serif font-semibold text-[#453329]">Site Assistant</h1>
+              <p className="text-sm text-[#688a52]">Ask in plain English to look things up and change the website. Nothing changes until you click Apply.</p>
+            </div>
+          </div>
+          <RequestAccessPanel access={access} plans={plans} onDone={() => qc.invalidateQueries({ queryKey: ['assistant-status'] })} />
+        </div>
+      </StudioLayout>
+    );
+  }
 
   return (
     <StudioLayout>
@@ -187,9 +209,13 @@ export default function Assistant() {
               <p className="text-xs text-[#688a52] px-3 py-4">Your conversations will appear here.</p>
             )}
           </div>
-          {usage && (
+          {access && (
             <div className="p-3 border-t border-[#d5cabe] text-[11px] text-[#688a52]">
-              This month: {usage.requests} request{usage.requests === 1 ? '' : 's'}
+              {access.isOwner
+                ? <>Site owner · {access.usedThisMonth} request{access.usedThisMonth === 1 ? '' : 's'} this month</>
+                : access.membership?.monthlyRequestLimit != null
+                  ? <>{access.membership.planLabel} plan · {access.usedThisMonth} of {access.membership.monthlyRequestLimit} requests used · renews {new Date(access.renewsOn).toLocaleDateString()}</>
+                  : <>{access.membership?.planLabel ?? 'Member'} · {access.usedThisMonth} request{access.usedThisMonth === 1 ? '' : 's'} this month</>}
             </div>
           )}
         </aside>
@@ -209,6 +235,11 @@ export default function Assistant() {
             <div className="mx-4 sm:mx-6 mt-4 flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
               The assistant is not set up yet. The site owner needs to add the ANTHROPIC_API_KEY setting on the server.
+            </div>
+          )}
+          {access && blocked && (
+            <div className="mx-4 sm:mx-6 mt-4">
+              <RequestAccessPanel access={access} plans={plans} compact onDone={() => qc.invalidateQueries({ queryKey: ['assistant-status'] })} />
             </div>
           )}
 
@@ -235,15 +266,15 @@ export default function Assistant() {
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder={configured ? 'Ask the assistant to look something up or change the website…' : 'Assistant not available yet'}
-                disabled={!configured || streaming}
+                placeholder={!configured ? 'Assistant not available yet' : blocked ? 'Your plan has no requests left this month' : 'Ask the assistant to look something up or change the website…'}
+                disabled={!canType}
                 rows={2}
                 className="flex-1 resize-none bg-white border-[#d5cabe] focus-visible:ring-[#c4622d]"
               />
               {streaming ? (
                 <Button type="button" variant="outline" onClick={() => abortRef.current?.abort()} className="border-[#d5cabe]">Stop</Button>
               ) : (
-                <Button type="submit" disabled={!draft.trim() || !configured} className="bg-[#c4622d] hover:bg-[#a9521f] text-white" aria-label="Send">
+                <Button type="submit" disabled={!draft.trim() || !canType} className="bg-[#c4622d] hover:bg-[#a9521f] text-white" aria-label="Send">
                   <Send className="h-4 w-4" />
                 </Button>
               )}
@@ -253,6 +284,46 @@ export default function Assistant() {
         </section>
       </div>
     </StudioLayout>
+  );
+}
+
+function RequestAccessPanel({ access, plans, compact, onDone }: { access: AssistantAccess; plans: AssistantPlan[]; compact?: boolean; onDone: () => void }) {
+  const { toast } = useToast();
+  const [plan, setPlan] = useState(plans[1]?.id ?? plans[0]?.id ?? 'starter');
+  const [note, setNote] = useState('');
+  const request = useMutation({
+    mutationFn: () => assistantApi.requestAccess(plan, note),
+    onSuccess: () => { toast({ title: 'Request sent', description: 'The site owner will review it.' }); setNote(''); onDone(); },
+    onError: (e: Error) => toast({ title: 'Could not send the request', description: e.message, variant: 'destructive' }),
+  });
+  return (
+    <div className={cn('rounded-xl border border-[#d4a44c] bg-[#fff8e8] p-4', !compact && 'p-5')}>
+      <p className="text-sm text-[#453329]">{access.message}</p>
+      {access.pendingRequest ? (
+        <p className="mt-3 text-sm text-[#688a52]">
+          Your request for the <strong>{plans.find((p) => p.id === access.pendingRequest!.requestedPlan)?.label ?? access.pendingRequest.requestedPlan}</strong> plan
+          was sent {new Date(access.pendingRequest.createdAt).toLocaleDateString()} and is waiting for the site owner.
+        </p>
+      ) : (
+        <form className="mt-4 space-y-3" onSubmit={(e) => { e.preventDefault(); request.mutate(); }}>
+          <div className={cn('grid gap-2', compact ? 'sm:grid-cols-3' : 'sm:grid-cols-3')}>
+            {plans.map((p) => (
+              <label key={p.id} className={cn('cursor-pointer rounded-lg border bg-white p-3 text-sm', plan === p.id ? 'border-[#c4622d] ring-1 ring-[#c4622d]' : 'border-[#d5cabe]')}>
+                <input type="radio" name="plan" value={p.id} checked={plan === p.id} onChange={() => setPlan(p.id)} className="sr-only" />
+                <span className="block font-medium text-[#453329]">{p.label}</span>
+                <span className="block text-xs text-[#688a52]">{p.monthlyRequests == null ? 'Unlimited' : `${p.monthlyRequests} requests a month`}</span>
+                {!compact && <span className="mt-1 block text-xs text-[#453329]/75">{p.blurb}</span>}
+              </label>
+            ))}
+          </div>
+          <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} maxLength={1000}
+            placeholder="Optional note for the site owner (what you plan to use it for)" className="bg-white border-[#d5cabe]" />
+          <Button type="submit" disabled={request.isPending} className="bg-[#c4622d] hover:bg-[#a9521f] text-white">
+            {request.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : access.reason === 'limit_reached' ? 'Request more' : 'Request access'}
+          </Button>
+        </form>
+      )}
+    </div>
   );
 }
 

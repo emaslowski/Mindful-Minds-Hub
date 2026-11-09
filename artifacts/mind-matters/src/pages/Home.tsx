@@ -6,37 +6,9 @@ import { PublicationVideo } from "@workspace/mind-matters-ds/components/Publicat
 import { WaveFooter } from "@/components/WaveFooter";
 import { HomeUpdates } from "@/components/HomeUpdates";
 import { PublicationDiscussion } from "@/components/PublicationDiscussion";
+import { useSiteContent } from "@/lib/siteContent";
 
-const centers = [
-  { title: "Student Stories & Blogs", description: "Ideas, encouragement, and student voices.", href: "/connect", image: "tile-1.jpg", color: "bg-muted/30" },
-  { title: "Podcasts & Videos", description: "Listen, watch, and learn from peers.", href: "/listen/podcast", image: "tile-2.jpg", color: "bg-secondary/20" },
-  { title: "Art & Drawing Studio", description: "Create art and follow drawing tutorials.", href: "/create", image: "tile-3.jpg", color: "bg-accent/25" },
-  { title: "Games & Challenges", description: "Try quizzes, activities, and fun challenges.", href: "/games", image: "tile-4.jpg", color: "bg-accent/25" },
-  { title: "Plants & Gardening", description: "Grow plants, learn gardening tips, and explore student projects.", href: "/gardening", image: "tile-5.jpg", color: "bg-secondary/20" },
-  { title: "Journaling Center", description: "Reflect with private writing prompts.", href: "/grow/journal", image: "tile-6.jpg", color: "bg-muted/30" },
-  { title: "Movement & Sports", description: "Stretch, move, and learn new skills.", href: "/move", image: "tile-7.jpg", color: "bg-secondary/20" },
-  { title: "Music & Mindful Moments", description: "Find sounds and guided pauses.", href: "/listen", image: "tile-8.jpg", color: "bg-muted/30" },
-  { title: "Cooking & Healthy Recipes", description: "Discover recipes and kitchen creativity.", href: "/create/cooking", image: "tile-9.jpg", color: "bg-accent/25" },
-  { title: "Language Corner", description: "Play Spanish vocabulary and ASL handshape games.", href: "/language-corner", image: "tile-10.jpg", color: "bg-secondary/20" },
-  { title: "Friendship & Belonging", description: "Practice kindness, teamwork, and inclusion.", href: "/connect", image: "tile-11.jpg", color: "bg-muted/30" },
-  { title: "School & Community Events", description: "Discover events, clubs, and activities.", href: "/events", image: "tile-12.jpg", color: "bg-accent/25" },
-  { title: "Groups & Connections", description: "Find teacher-approved ways to join in.", href: "/connect", image: "tile-13.jpg", color: "bg-secondary/20" },
-  { title: "ASMR", description: "Listen to gentle, teacher-approved sounds created by students.", href: "/listen/asmr", image: "tile-8.jpg", color: "bg-muted/30" },
-];
-
-const creatorRoles = [
-  "Writers", "Researchers", "Artists", "Podcasters", "Video Creators", "Designers", "Community Reporters",
-];
-
-const processSteps = [
-  { title: "Listen to student ideas", image: "step-1.jpg" },
-  { title: "Research", image: "step-2.jpg" },
-  { title: "Create", image: "step-3.jpg" },
-  { title: "Collaborate", image: "step-4.jpg" },
-  { title: "Revise", image: "step-5.jpg" },
-  { title: "Teacher review", image: "step-6.jpg" },
-  { title: "Share", image: "step-7.jpg" },
-];
+const TILE_COLORS = ["bg-muted/30", "bg-secondary/20", "bg-accent/25", "bg-accent/25", "bg-secondary/20", "bg-muted/30", "bg-secondary/20", "bg-muted/30", "bg-accent/25", "bg-secondary/20", "bg-muted/30", "bg-accent/25", "bg-secondary/20", "bg-muted/30"];
 
 function SectionHeading({ children, id }: { children: string; id?: string }) {
   return (
@@ -49,23 +21,28 @@ function SectionHeading({ children, id }: { children: string; id?: string }) {
 }
 
 export default function Home() {
+  const hero = useSiteContent("home.hero");
+  const centers = useSiteContent("home.centers");
+  const creatorRoles = useSiteContent("home.creatorRoles");
+  const processSteps = useSiteContent("home.processSteps");
+  const [bannerLine1, ...bannerRest] = hero.bannerTagline.split(/(?<=\.)\s+/);
   return (
     <div className="home-page w-full pb-8">
       <section className="mx-auto grid w-full max-w-6xl items-center gap-5 px-2 pb-8 pt-5 md:grid-cols-2 md:gap-8 md:pb-10 md:pt-8" aria-labelledby="home-title">
         <div className="order-2 md:order-1">
           <h1 id="home-title" className="max-w-xl font-serif text-5xl font-bold leading-[0.93] tracking-tight text-foreground sm:text-6xl md:text-7xl">
-            A brighter school starts with us.
+            {hero.headline}
           </h1>
           <p className="mt-4 max-w-lg text-base leading-relaxed text-foreground/85 sm:text-lg">
-            A student-created community hub to learn, create, connect, and feel a sense of belonging.
+            {hero.intro}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Button asChild size="sm" variant="secondary" data-testid="link-explore-centers">
-              <a href="#bright-spots">Explore the Centers <ArrowDown aria-hidden="true" /></a>
+              <a href="#bright-spots">{hero.exploreButton} <ArrowDown aria-hidden="true" /></a>
             </Button>
           </div>
           <p className="mt-4 max-w-lg text-base leading-relaxed text-foreground/85" data-testid="text-home-purpose">
-            The Brightside Project is about connection and a sense of belonging with peers. Games are just one activity here—not the main focus of this website.
+            {hero.purpose}
           </p>
         </div>
         <Card className="order-1 overflow-hidden border-0 bg-transparent shadow-none md:order-2">
@@ -83,11 +60,11 @@ export default function Home() {
           <img src="/assets/bright/tile-13.jpg" alt="" className="h-12 w-14 object-cover" />
         </div>
         <p className="font-serif text-lg font-semibold leading-snug md:w-2/5 md:text-xl">
-          Created by students.<br />Connected by kindness.
+          {bannerLine1}{bannerRest.length > 0 && <><br />{bannerRest.join(" ")}</>}
         </p>
         <div className="hidden h-10 w-px bg-border md:block" aria-hidden="true" />
         <p className="text-sm leading-relaxed text-foreground/80 md:flex-1">
-          Students practice research, digital citizenship, collaboration, and creative communication while making useful content for our school community.
+          {hero.bannerMission}
         </p>
       </div>
 
@@ -111,16 +88,16 @@ export default function Home() {
       <HomeUpdates />
 
       <section id="bright-spots" className="mx-auto w-full max-w-6xl scroll-mt-6 px-1" aria-labelledby="bright-spots-title">
-        <SectionHeading id="bright-spots-title">Find your bright spot</SectionHeading>
+        <SectionHeading id="bright-spots-title">{hero.centersTitle}</SectionHeading>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {centers.map((center, index) => (
             <Link
-              key={center.title}
+              key={`${center.title}-${index}`}
               href={center.href}
               data-testid={`link-center-${index + 1}`}
               className="group rounded-2xl focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <Card className={`flex min-h-24 items-center gap-3 border-border/70 ${center.color} p-3 transition-transform group-hover:-translate-y-0.5 group-hover:shadow-md`}>
+              <Card className={`flex min-h-24 items-center gap-3 border-border/70 ${TILE_COLORS[index % TILE_COLORS.length]} p-3 transition-transform group-hover:-translate-y-0.5 group-hover:shadow-md`}>
                 <img
                   src={`/assets/bright/${center.image}`}
                   alt=""
@@ -139,13 +116,13 @@ export default function Home() {
       </section>
 
       <section id="student-creators" className="mx-auto mt-10 w-full max-w-6xl scroll-mt-6" aria-labelledby="creators-title">
-        <SectionHeading id="creators-title">Behind every bright idea is a student creator</SectionHeading>
+        <SectionHeading id="creators-title">{hero.creatorsTitle}</SectionHeading>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-7">
           {creatorRoles.map((role, index) => (
-            <div key={role} className="text-center">
+            <div key={`${role}-${index}`} className="text-center">
               <Card className="overflow-hidden border-border bg-card">
                 <img
-                  src={`/assets/bright/creator-${index + 1}.jpg`}
+                  src={`/assets/bright/creator-${(index % 7) + 1}.jpg`}
                   alt={`Illustration of a student ${role.toLowerCase()}`}
                   className="h-24 w-full object-cover sm:h-28"
                   loading="lazy"
@@ -158,11 +135,11 @@ export default function Home() {
       </section>
 
       <section className="mx-auto mt-10 w-full max-w-6xl" aria-labelledby="process-title">
-        <SectionHeading id="process-title">How we create</SectionHeading>
+        <SectionHeading id="process-title">{hero.processTitle}</SectionHeading>
         <div className="w-full overflow-x-auto pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" role="region" aria-label="Creation process, scroll left to right" tabIndex={0}>
         <ol className="flex min-w-max items-center justify-center gap-8 px-1 py-2" aria-label="Our creation process, in order">
           {processSteps.map((step, index) => (
-            <li key={step.title} className="relative flex size-24 shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-secondary/30 bg-card/70 p-2 text-center">
+            <li key={`${step.title}-${index}`} className="relative flex size-24 shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-secondary/30 bg-card/70 p-2 text-center">
               <img src={`/assets/bright/${step.image}`} alt="" className="h-8 w-10 rounded-full object-contain" loading="lazy" />
               <span className="text-xs font-bold leading-tight">{step.title}</span>
               {index < processSteps.length - 1 && (

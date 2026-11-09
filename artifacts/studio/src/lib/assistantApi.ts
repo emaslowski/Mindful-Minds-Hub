@@ -39,12 +39,73 @@ export type AssistantEvent =
   | { type: 'done'; usage: { inputTokens: number; outputTokens: number } }
   | { type: 'error'; message: string };
 
+export interface AssistantPlan {
+  id: string;
+  label: string;
+  monthlyRequests: number | null;
+  blurb: string;
+}
+
+export interface AssistantAccess {
+  isOwner: boolean;
+  allowed: boolean;
+  reason: 'no_membership' | 'paused' | 'limit_reached' | null;
+  message: string | null;
+  membership: { plan: string; planLabel: string; status: 'active' | 'paused'; monthlyRequestLimit: number | null } | null;
+  usedThisMonth: number;
+  remaining: number | null;
+  renewsOn: string;
+  pendingRequest: { id: number; requestedPlan: string; createdAt: string } | null;
+}
+
 export interface AssistantStatus {
   configured: boolean;
   model: string;
   capabilities: string[];
   usageThisMonth: { requests: number; inputTokens: number; outputTokens: number };
+  access: AssistantAccess;
+  plans: AssistantPlan[];
 }
+
+export interface AccessRequest {
+  id: number;
+  teacherId: string;
+  teacherName: string | null;
+  teacherEmail: string | null;
+  requestedPlan: string;
+  requestedPlanLabel: string;
+  note: string | null;
+  status: 'pending' | 'approved' | 'declined';
+  decidedBy: string | null;
+  decisionNote: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+}
+
+export interface Membership {
+  teacherId: string;
+  teacherName: string | null;
+  teacherEmail: string | null;
+  plan: string;
+  planLabel: string;
+  monthlyRequestLimit: number | null;
+  status: 'active' | 'paused';
+  note: string | null;
+  usedThisMonth: number;
+  grantedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const assistantAdminApi = {
+  overview: () => studioFetch<{ plans: AssistantPlan[]; requests: AccessRequest[]; memberships: Membership[] }>('/teacher/assistant/admin'),
+  decide: (id: number, body: { decision: 'approve' | 'decline'; plan?: string; monthlyRequestLimit?: number | null; decisionNote?: string }) =>
+    studioFetch<{ request: AccessRequest }>(`/teacher/assistant/admin/requests/${id}/decide`, { method: 'POST', body: JSON.stringify(body) }),
+  updateMembership: (teacherId: string, body: { plan?: string; monthlyRequestLimit?: number | null; status?: 'active' | 'paused'; note?: string | null }) =>
+    studioFetch<{ membership: Membership }>(`/teacher/assistant/admin/memberships/${encodeURIComponent(teacherId)}`, { method: 'PUT', body: JSON.stringify(body) }),
+  removeMembership: (teacherId: string) =>
+    studioFetch<{ success: boolean }>(`/teacher/assistant/admin/memberships/${encodeURIComponent(teacherId)}`, { method: 'DELETE' }),
+};
 
 export const assistantApi = {
   status: () => studioFetch<AssistantStatus>('/teacher/assistant/status'),
@@ -62,6 +123,8 @@ export const assistantApi = {
     studioFetch<{ action: AssistantAction }>(`/teacher/assistant/actions/${id}/apply`, { method: 'POST' }),
   declineAction: (id: number) =>
     studioFetch<{ action: AssistantAction }>(`/teacher/assistant/actions/${id}/decline`, { method: 'POST' }),
+  requestAccess: (plan: string, note: string) =>
+    studioFetch<{ request: AccessRequest }>('/teacher/assistant/access-requests', { method: 'POST', body: JSON.stringify({ plan, note }) }),
 };
 
 /**

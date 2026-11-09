@@ -10,6 +10,8 @@ export interface StudioUser {
   displayName: string;
   role: 'teacher' | 'student';
   accountStatus: 'active' | 'disabled';
+  /** Site owner: approves Site Assistant memberships. Teachers only. */
+  isOwner?: boolean;
   teamId?: number | null;
   jobId?: number | null;
   cycleId?: number | null;

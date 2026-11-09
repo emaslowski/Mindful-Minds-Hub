@@ -60,7 +60,10 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
 
   const isEditorGroup = isEditorialGroup(user?.jobTitle);
   const isProducer = user?.role === 'student' && isVideoProducer(user.jobTitle);
-  const nav = user?.role === 'teacher' ? TEACHER_NAV : STUDENT_NAV.map((item) =>
+  const ownerNav: NavItem[] = user?.isOwner
+    ? [{ href: '/studio/teacher/assistant-access', label: 'Assistant Access', icon: <KeyRound className="h-4 w-4" /> }]
+    : [];
+  const nav = user?.role === 'teacher' ? [...TEACHER_NAV, ...ownerNav] : STUDENT_NAV.map((item) =>
     (isEditorGroup || isProducer) && item.href === '/studio' ? { ...item, label: 'Command Center' } : item)
     .filter((item) => item.href !== '/studio/video-productions' || isProducer);
   const dashboardRoot = user?.role === 'teacher' ? '/studio/teacher' : '/studio';

@@ -63,6 +63,56 @@ export const assistantUsageTable = pgTable('assistant_usage', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
+// ── Memberships and access requests ────────────────────────────────────────
+//
+// A teacher needs an active membership (or owner status) to use the
+// assistant. `monthlyRequestLimit` counts teacher messages per calendar
+// month; null means unlimited. Owners (SITE_OWNER_EMAILS, or the first
+// ADMIN_EMAILS entry) approve requests and set limits.
+
+export type AssistantMembershipStatus = 'active' | 'paused';
+
+export const assistantMembershipsTable = pgTable('assistant_memberships', {
+  teacherId: varchar('teacher_id').primaryKey(),
+  teacherName: text('teacher_name'),
+  teacherEmail: text('teacher_email'),
+  plan: text('plan').notNull().default('starter'),
+  monthlyRequestLimit: integer('monthly_request_limit'),
+  status: text('status').$type<AssistantMembershipStatus>().notNull().default('active'),
+  note: text('note'),
+  grantedBy: varchar('granted_by'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export type AssistantAccessRequestStatus = 'pending' | 'approved' | 'declined';
+
+export const assistantAccessRequestsTable = pgTable('assistant_access_requests', {
+  id: serial('id').primaryKey(),
+  teacherId: varchar('teacher_id').notNull(),
+  teacherName: text('teacher_name'),
+  teacherEmail: text('teacher_email'),
+  requestedPlan: text('requested_plan').notNull(),
+  note: text('note'),
+  status: text('status').$type<AssistantAccessRequestStatus>().notNull().default('pending'),
+  decidedBy: varchar('decided_by'),
+  decisionNote: text('decision_note'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  decidedAt: timestamp('decided_at'),
+});
+
+// One row per teacher message (a "request" in membership terms).
+export const assistantRequestsTable = pgTable('assistant_requests', {
+  id: serial('id').primaryKey(),
+  teacherId: varchar('teacher_id').notNull(),
+  conversationId: integer('conversation_id')
+    .references(() => assistantConversationsTable.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export type AssistantMembership = typeof assistantMembershipsTable.$inferSelect;
+export type AssistantAccessRequest = typeof assistantAccessRequestsTable.$inferSelect;
+
 export type AssistantTranscriptItem =
   | { kind: 'user'; text: string; at: string }
   | { kind: 'assistant'; text: string; at: string }

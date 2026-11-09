@@ -11,8 +11,14 @@
  * the request is sent when the teacher clicks Apply in the Studio.
  */
 import type Anthropic from '@anthropic-ai/sdk';
+import { SITE_CONTENT, SITE_CONTENT_KEYS } from '@workspace/site-content';
 
 type JsonSchema = Anthropic.Beta.BetaTool.InputSchema;
+
+const SITE_CONTENT_GUIDE = SITE_CONTENT_KEYS.map((key) => {
+  const e = SITE_CONTENT[key];
+  return `- ${key} (${e.page}): ${e.label}. ${e.description}\n  Shape example: ${JSON.stringify(e.default).slice(0, 700)}`;
+}).join('\n');
 
 export interface SiteRequest {
   method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
@@ -251,10 +257,74 @@ export const ASSISTANT_TOOLS: AssistantTool[] = [
   {
     name: 'list_events',
     mode: 'read',
-    description: 'List events shown on the Events page. Events cannot be edited through the assistant yet.',
+    description: 'List events shown on the Events page (id, title, description, eventDate, location).',
     inputSchema: obj({}),
     toRequest: () => ({ method: 'GET', path: '/events' }),
     summarize: () => 'List events',
+  },
+  {
+    name: 'get_site_content',
+    mode: 'read',
+    description: `Read the editable text and lists of the main site: for every entry, its current value, its default, and whether a teacher has changed it. Call this before update_site_content so you edit the current value. Entries:\n${SITE_CONTENT_GUIDE}`,
+    inputSchema: obj({}),
+    toRequest: () => ({ method: 'GET', path: '/teacher/site-content' }),
+    summarize: () => 'Read editable site text',
+  },
+
+  // ── Site text and events ─────────────────────────────────────────────────
+  {
+    name: 'update_site_content',
+    mode: 'write',
+    description: 'Replace one editable site entry (see get_site_content for the keys). Send the COMPLETE new value with the same shape as the current one: every field present, same types; lists may gain or lose items. Keep the writing warm, clear and suitable for children.',
+    inputSchema: obj({
+      key: { type: 'string', enum: SITE_CONTENT_KEYS, description: 'Which entry to change.' },
+      value: { description: 'The complete new value, same shape as the current value.' },
+    }, ['key', 'value']),
+    toRequest: (i) => ({ method: 'PUT', path: `/teacher/site-content/${encodeURIComponent(String(i.key))}`, body: { value: i.value } }),
+    summarize: (i) => `Update site text: ${SITE_CONTENT[i.key as keyof typeof SITE_CONTENT]?.label ?? i.key}`,
+  },
+  {
+    name: 'reset_site_content',
+    mode: 'write',
+    description: 'Put one editable site entry back to its original default text.',
+    inputSchema: obj({ key: { type: 'string', enum: SITE_CONTENT_KEYS } }, ['key']),
+    toRequest: (i) => ({ method: 'DELETE', path: `/teacher/site-content/${encodeURIComponent(String(i.key))}` }),
+    summarize: (i) => `Reset site text to default: ${SITE_CONTENT[i.key as keyof typeof SITE_CONTENT]?.label ?? i.key}`,
+  },
+  {
+    name: 'create_event',
+    mode: 'write',
+    description: 'Add an event to the Events page.',
+    inputSchema: obj({
+      title: str('Event title.', { minLength: 1, maxLength: 200 }),
+      eventDate: str('Date as YYYY-MM-DD.', { pattern: '^\\d{4}-\\d{2}-\\d{2}$' }),
+      description: str('Optional description.'),
+      location: str('Optional location.'),
+    }, ['title', 'eventDate']),
+    toRequest: (i) => ({ method: 'POST', path: '/teacher/events', body: pick(i, ['title', 'eventDate', 'description', 'location']) }),
+    summarize: (i) => `Add event "${i.title}" on ${i.eventDate}`,
+  },
+  {
+    name: 'update_event',
+    mode: 'write',
+    description: 'Change an event\'s title, date, description or location. Use null to clear description or location.',
+    inputSchema: obj({
+      eventId: id('Event id from list_events.'),
+      title: str('New title.'),
+      eventDate: str('New date as YYYY-MM-DD.', { pattern: '^\\d{4}-\\d{2}-\\d{2}$' }),
+      description: { type: ['string', 'null'] },
+      location: { type: ['string', 'null'] },
+    }, ['eventId']),
+    toRequest: (i) => ({ method: 'PATCH', path: `/teacher/events/${i.eventId}`, body: pick(i, ['title', 'eventDate', 'description', 'location']) }),
+    summarize: (i) => `Update event ${i.eventId}`,
+  },
+  {
+    name: 'delete_event',
+    mode: 'write',
+    description: 'Remove an event from the Events page permanently.',
+    inputSchema: obj({ eventId: id('Event id from list_events.') }, ['eventId']),
+    toRequest: (i) => ({ method: 'DELETE', path: `/teacher/events/${i.eventId}` }),
+    summarize: (i) => `Delete event ${i.eventId}`,
   },
   {
     name: 'list_friendship_requests',

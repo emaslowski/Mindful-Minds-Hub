@@ -73,6 +73,7 @@
     "zod": "catalog:"
   },
   "dependencies": {
-    "@workspace/mind-matters-ds": "workspace:*"
+    "@workspace/mind-matters-ds": "workspace:*",
+    "@workspace/site-content": "workspace:*"
   }
 }

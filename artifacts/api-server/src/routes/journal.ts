@@ -7,10 +7,11 @@ import {
 } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import nodemailer from "nodemailer";
+import { getSiteContent } from "../lib/siteContent";
 
 const router = Router();
 
-// Rotating daily prompts (7 days)
+// Fallback prompts, used only if the editable list is ever empty.
 const DAILY_PROMPTS = [
   "What is something that made you smile today? Why?",
   "Describe a challenge you faced recently. How did you handle it?",
@@ -257,10 +258,15 @@ function isJournalOpen(): boolean {
 }
 
 // GET /api/today-prompt
-router.get("/today-prompt", (_req, res) => {
-  const dayIndex = new Date().getDay(); // 0=Sun … 6=Sat
-  const prompt = DAILY_PROMPTS[dayIndex];
-  const date = new Date().toISOString().split("T")[0];
+router.get("/today-prompt", async (_req, res) => {
+  // Teachers can edit the prompt list in the Studio (Site Assistant / site
+  // content). The day of the year cycles through however many prompts exist.
+  const prompts = await getSiteContent("journal.dailyPrompts");
+  const pool = prompts.length > 0 ? prompts : DAILY_PROMPTS;
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - Date.UTC(now.getUTCFullYear(), 0, 0)) / 86_400_000);
+  const prompt = pool[dayOfYear % pool.length];
+  const date = now.toISOString().split("T")[0];
   res.json({ prompt, date });
 });
 

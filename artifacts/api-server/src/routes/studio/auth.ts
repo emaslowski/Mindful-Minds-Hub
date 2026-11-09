@@ -17,6 +17,7 @@ import {
 } from '../../lib/studioAuth';
 import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
 import { verifyPassword } from '../../lib/password';
+import { isOwner } from '../../lib/assistant/access';
 
 const router = Router();
 
@@ -93,7 +94,7 @@ router.get('/studio/auth/me', (req: Request, res: Response) => {
     res.json({ user: null });
     return;
   }
-  res.json({ user: req.studioUser });
+  res.json({ user: { ...req.studioUser, isOwner: isOwner(req.studioUser) } });
 });
 
 // POST /api/studio/auth/logout

@@ -30,10 +30,32 @@ import {
 } from '../../../lib/assistant/engine';
 import { siteCallerFromRequest } from '../../../lib/assistant/siteApi';
 import { ASSISTANT_TOOLS } from '../../../lib/assistant/tools';
+import {
+  ASSISTANT_PLANS,
+  getAssistantAccess,
+  isOwner,
+  monthStart,
+  planById,
+  publicAccessRequest,
+  recordRequest,
+} from '../../../lib/assistant/access';
+import {
+  assistantAccessRequestsTable,
+  assistantMembershipsTable,
+  assistantRequestsTable,
+} from '@workspace/db/schema';
 
 const router = Router();
 const teacherOnly = requireStudioRole('teacher');
 const MAX_MESSAGE_CHARS = 8_000;
+
+function ownerOnly(req: Request, res: Response, next: () => void): void {
+  if (!req.studioUser || !isOwner(req.studioUser)) {
+    res.status(403).json({ error: 'Only the site owner can manage assistant access.' });
+    return;
+  }
+  next();
+}
 
 function teacherName(req: Request): string {
   const user = req.studioUser!;
@@ -65,7 +87,134 @@ router.get('/teacher/assistant/status', teacherOnly, async (req: Request, res: R
     model: ASSISTANT_MODEL,
     capabilities: ASSISTANT_TOOLS.filter((t) => t.mode === 'write').map((t) => t.name),
     usageThisMonth: usage ?? { requests: 0, inputTokens: 0, outputTokens: 0 },
+    access: await getAssistantAccess(req.studioUser!),
+    plans: ASSISTANT_PLANS,
   });
+});
+
+// ── Membership requests (any teacher) ───────────────────────────────────────
+
+router.post('/teacher/assistant/access-requests', teacherOnly, async (req: Request, res: Response) => {
+  const { plan, note } = (req.body ?? {}) as { plan?: unknown; note?: unknown };
+  if (typeof plan !== 'string' || !planById(plan)) { res.status(400).json({ error: 'Choose a plan.' }); return; }
+  if (note !== undefined && (typeof note !== 'string' || note.length > 1000)) { res.status(400).json({ error: 'Keep the note under 1000 characters.' }); return; }
+  const user = req.studioUser!;
+  const [existing] = await db.select().from(assistantAccessRequestsTable)
+    .where(and(eq(assistantAccessRequestsTable.teacherId, user.id), eq(assistantAccessRequestsTable.status, 'pending')));
+  if (existing) { res.status(409).json({ error: 'You already have a request waiting for the site owner.', request: publicAccessRequest(existing) }); return; }
+  const [created] = await db.insert(assistantAccessRequestsTable).values({
+    teacherId: user.id, teacherName: user.displayName, teacherEmail: user.email,
+    requestedPlan: plan, note: typeof note === 'string' && note.trim() ? note.trim() : null,
+  }).returning();
+  res.status(201).json({ request: publicAccessRequest(created!) });
+});
+
+// ── Owner administration ────────────────────────────────────────────────────
+
+router.get('/teacher/assistant/admin', teacherOnly, ownerOnly, async (_req: Request, res: Response) => {
+  const [requests, memberships, usage] = await Promise.all([
+    db.select().from(assistantAccessRequestsTable).orderBy(desc(assistantAccessRequestsTable.createdAt)).limit(200),
+    db.select().from(assistantMembershipsTable).orderBy(assistantMembershipsTable.createdAt),
+    db.select({ teacherId: assistantRequestsTable.teacherId, used: sql<number>`count(*)::int` })
+      .from(assistantRequestsTable).where(gte(assistantRequestsTable.createdAt, monthStart()))
+      .groupBy(assistantRequestsTable.teacherId),
+  ]);
+  const usedBy = new Map(usage.map((u) => [u.teacherId, u.used]));
+  res.json({
+    plans: ASSISTANT_PLANS,
+    requests: requests.map(publicAccessRequest),
+    memberships: memberships.map((m) => ({
+      teacherId: m.teacherId, teacherName: m.teacherName, teacherEmail: m.teacherEmail,
+      plan: m.plan, planLabel: planById(m.plan)?.label ?? m.plan,
+      monthlyRequestLimit: m.monthlyRequestLimit, status: m.status, note: m.note,
+      usedThisMonth: usedBy.get(m.teacherId) ?? 0,
+      grantedBy: m.grantedBy, createdAt: m.createdAt.toISOString(), updatedAt: m.updatedAt.toISOString(),
+    })),
+  });
+});
+
+interface MembershipInput { plan?: unknown; monthlyRequestLimit?: unknown; status?: unknown; note?: unknown }
+
+function parseMembership(body: MembershipInput): { error: string } | { plan?: string; monthlyRequestLimit?: number | null; status?: 'active' | 'paused'; note?: string | null } {
+  const out: { plan?: string; monthlyRequestLimit?: number | null; status?: 'active' | 'paused'; note?: string | null } = {};
+  if (body.plan !== undefined) {
+    if (typeof body.plan !== 'string' || (!planById(body.plan) && body.plan !== 'custom')) return { error: 'Unknown plan.' };
+    out.plan = body.plan;
+  }
+  if (body.monthlyRequestLimit !== undefined) {
+    if (body.monthlyRequestLimit !== null && (!Number.isSafeInteger(body.monthlyRequestLimit) || (body.monthlyRequestLimit as number) < 0)) return { error: 'monthlyRequestLimit must be a whole number or null for unlimited.' };
+    out.monthlyRequestLimit = body.monthlyRequestLimit as number | null;
+  }
+  if (body.status !== undefined) {
+    if (body.status !== 'active' && body.status !== 'paused') return { error: 'status must be active or paused.' };
+    out.status = body.status;
+  }
+  if (body.note !== undefined) {
+    if (body.note !== null && (typeof body.note !== 'string' || body.note.length > 1000)) return { error: 'Keep the note under 1000 characters.' };
+    out.note = body.note === null ? null : (body.note as string).trim() || null;
+  }
+  return out;
+}
+
+router.post('/teacher/assistant/admin/requests/:id/decide', teacherOnly, ownerOnly, async (req: Request, res: Response) => {
+  const id = positiveId(req.params.id);
+  const [request] = id ? await db.select().from(assistantAccessRequestsTable).where(eq(assistantAccessRequestsTable.id, id)) : [];
+  if (!request) { res.status(404).json({ error: 'Request not found' }); return; }
+  if (request.status !== 'pending') { res.status(409).json({ error: `This request was already ${request.status}.` }); return; }
+  const { decision, decisionNote, ...rest } = (req.body ?? {}) as { decision?: unknown; decisionNote?: unknown } & MembershipInput;
+  if (decision !== 'approve' && decision !== 'decline') { res.status(400).json({ error: 'decision must be approve or decline.' }); return; }
+  const parsed = parseMembership(rest);
+  if ('error' in parsed) { res.status(400).json({ error: parsed.error }); return; }
+  const note = typeof decisionNote === 'string' ? decisionNote.trim().slice(0, 1000) || null : null;
+
+  if (decision === 'approve') {
+    const plan = parsed.plan ?? request.requestedPlan;
+    const limit = parsed.monthlyRequestLimit !== undefined ? parsed.monthlyRequestLimit : (planById(plan)?.monthlyRequests ?? null);
+    await db.insert(assistantMembershipsTable).values({
+      teacherId: request.teacherId, teacherName: request.teacherName, teacherEmail: request.teacherEmail,
+      plan, monthlyRequestLimit: limit, status: 'active', note: parsed.note ?? null, grantedBy: req.studioUser!.id,
+    }).onConflictDoUpdate({
+      target: assistantMembershipsTable.teacherId,
+      set: { plan, monthlyRequestLimit: limit, status: 'active', grantedBy: req.studioUser!.id, updatedAt: new Date(), ...(parsed.note !== undefined ? { note: parsed.note } : {}) },
+    });
+  }
+  const [updated] = await db.update(assistantAccessRequestsTable)
+    .set({ status: decision === 'approve' ? 'approved' : 'declined', decidedBy: req.studioUser!.id, decisionNote: note, decidedAt: new Date() })
+    .where(eq(assistantAccessRequestsTable.id, request.id)).returning();
+  res.json({ request: publicAccessRequest(updated!) });
+});
+
+router.put('/teacher/assistant/admin/memberships/:teacherId', teacherOnly, ownerOnly, async (req: Request, res: Response) => {
+  const teacherId = String(req.params.teacherId);
+  const body = (req.body ?? {}) as MembershipInput & { teacherName?: unknown; teacherEmail?: unknown };
+  const parsed = parseMembership(body);
+  if ('error' in parsed) { res.status(400).json({ error: parsed.error }); return; }
+  const [existing] = await db.select().from(assistantMembershipsTable).where(eq(assistantMembershipsTable.teacherId, teacherId));
+  if (!existing && !parsed.plan) { res.status(400).json({ error: 'Choose a plan for the new membership.' }); return; }
+  const plan = parsed.plan ?? existing!.plan;
+  const limit = parsed.monthlyRequestLimit !== undefined ? parsed.monthlyRequestLimit
+    : existing ? existing.monthlyRequestLimit : (planById(plan)?.monthlyRequests ?? null);
+  const [row] = await db.insert(assistantMembershipsTable).values({
+    teacherId,
+    teacherName: typeof body.teacherName === 'string' ? body.teacherName : existing?.teacherName ?? null,
+    teacherEmail: typeof body.teacherEmail === 'string' ? body.teacherEmail : existing?.teacherEmail ?? null,
+    plan, monthlyRequestLimit: limit, status: parsed.status ?? 'active', note: parsed.note ?? null, grantedBy: req.studioUser!.id,
+  }).onConflictDoUpdate({
+    target: assistantMembershipsTable.teacherId,
+    set: {
+      plan, monthlyRequestLimit: limit, updatedAt: new Date(),
+      ...(parsed.status !== undefined ? { status: parsed.status } : {}),
+      ...(parsed.note !== undefined ? { note: parsed.note } : {}),
+    },
+  }).returning();
+  res.json({ membership: row });
+});
+
+router.delete('/teacher/assistant/admin/memberships/:teacherId', teacherOnly, ownerOnly, async (req: Request, res: Response) => {
+  const deleted = await db.delete(assistantMembershipsTable)
+    .where(eq(assistantMembershipsTable.teacherId, String(req.params.teacherId))).returning({ teacherId: assistantMembershipsTable.teacherId });
+  if (deleted.length === 0) { res.status(404).json({ error: 'Membership not found' }); return; }
+  res.json({ success: true });
 });
 
 router.get('/teacher/assistant/conversations', teacherOnly, async (req: Request, res: Response) => {
@@ -119,6 +268,11 @@ router.post('/teacher/assistant/conversations/:id/messages', teacherOnly, async 
   if (!isAssistantConfigured()) {
     res.status(503).json({ error: 'The Site Assistant is not set up yet. The site owner needs to add the ANTHROPIC_API_KEY setting.' }); return;
   }
+  const access = await getAssistantAccess(req.studioUser!);
+  if (!access.allowed) {
+    res.status(403).json({ error: access.message, code: access.reason, access }); return;
+  }
+  await recordRequest(req.studioUser!.id, conversation.id);
 
   res.status(200);
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');

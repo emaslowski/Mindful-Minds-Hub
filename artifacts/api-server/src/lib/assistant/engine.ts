@@ -151,6 +151,7 @@ export async function runAssistantTurn(params: TurnParams): Promise<void> {
     }
 
     if (assistantText.trim()) transcript.push({ kind: 'assistant', text: assistantText, at: now() });
+    await persist();
     emit({ type: 'done', usage });
   } catch (err) {
     const text = describeError(err);
@@ -164,15 +165,31 @@ export async function runAssistantTurn(params: TurnParams): Promise<void> {
       const last = messages[messages.length - 1]!;
       if ((last.content as Anthropic.Beta.BetaContentBlockParam[]).some((b) => b.type === 'tool_result')) messages.pop();
     }
+    await persist();
   } finally {
+    inFlight.delete(conversation.id);
+  }
+
+  async function persist(): Promise<void> {
     const title = conversation.title === 'New conversation'
       ? params.userText.trim().replace(/\s+/g, ' ').slice(0, 60) || 'New conversation'
       : conversation.title;
-    await db.update(assistantConversationsTable)
-      .set({ messages, transcript, title, updatedAt: new Date() })
-      .where(eq(assistantConversationsTable.id, conversation.id));
-    inFlight.delete(conversation.id);
+    try {
+      await db.update(assistantConversationsTable)
+        .set({ messages: sanitizeForJsonb(messages), transcript: sanitizeForJsonb(transcript), title, updatedAt: new Date() })
+        .where(eq(assistantConversationsTable.id, conversation.id));
+    } catch (err) {
+      const cause = (err as { cause?: { message?: string; code?: string } }).cause;
+      logger.error({ err, cause: cause?.message, code: cause?.code, conversationId: conversation.id }, 'could not save assistant conversation');
+      const text = 'The reply could not be saved to this conversation. Your applied changes are safe, but start a new conversation to continue.';
+      emit({ type: 'error', message: text });
+    }
   }
+}
+
+/** Postgres jsonb cannot hold U+0000; strip it anywhere in the structure. */
+function sanitizeForJsonb<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value).replace(/\\u0000/g, '')) as T;
 }
 
 function turnContext(teacherName: string): string {

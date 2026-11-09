@@ -19,6 +19,7 @@ import athleteRouter from "./athlete";
 import homepageVideoRouter from "./homepageVideo";
 import featuredChefVideoRouter from "./featuredChefVideo";
 import coloringPagesRouter from "./coloringPages";
+import siteContentRouter from "./siteContent";
 // Studio routes
 import studioAuthRouter from "./studio/auth";
 import studioProjectsRouter from "./studio/projects";
@@ -61,6 +62,7 @@ router.use(athleteRouter);
 router.use(homepageVideoRouter);
 router.use(featuredChefVideoRouter);
 router.use(coloringPagesRouter);
+router.use(siteContentRouter);
 // Studio — student
 router.use(studioAuthRouter);
 router.use(studioProjectsRouter);
