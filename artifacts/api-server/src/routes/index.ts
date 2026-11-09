@@ -35,6 +35,7 @@ import teacherHandoffsRouter from "./studio/teacher/handoffs";
 import teacherAnalyticsRouter from "./studio/teacher/analytics";
 import teacherSettingsRouter from "./studio/teacher/settings";
 import teacherModerationRouter from "./studio/teacher/moderation";
+import teacherAssistantRouter from "./studio/teacher/assistant";
 import publicContentRouter from "./studio/publicContent";
 import { requireRole } from "../middlewares/requireRoleMiddleware";
 
@@ -77,6 +78,7 @@ router.use(teacherHandoffsRouter);
 router.use(teacherAnalyticsRouter);
 router.use(teacherSettingsRouter);
 router.use(teacherModerationRouter);
+router.use(teacherAssistantRouter);
 // Public (no auth)
 router.use(publicContentRouter);
 

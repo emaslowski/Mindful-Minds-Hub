@@ -32,6 +32,7 @@ import Settings from '@/pages/studio/teacher/Settings';
 import AnonymousAccess from '@/pages/studio/teacher/AnonymousAccess';
 import TeacherArtwork from '@/pages/studio/teacher/Artwork';
 import TeacherAthletes from '@/pages/studio/teacher/Athletes';
+import Assistant from '@/pages/studio/teacher/Assistant';
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ function StudioRouter() {
       <Route path="/studio" component={StudentDashboard} />
 
       {/* Teacher routes */}
+      <Route path="/studio/teacher/assistant" component={Assistant} />
       <Route path="/studio/teacher/artwork" component={TeacherArtwork} />
       <Route path="/studio/teacher/athletes" component={TeacherAthletes} />
       <Route path="/studio/teacher/review/:id" component={ProjectReview} />
