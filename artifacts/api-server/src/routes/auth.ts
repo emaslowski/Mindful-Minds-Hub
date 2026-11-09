@@ -1,22 +1,6 @@
 import {
   GetCurrentAuthUserResponse,
 } from '@workspace/api-zod';
-
-function parseMobileTokenBody(body: unknown): { code: string; code_verifier: string; redirect_uri: string; state: string; nonce?: string } | null {
-  if (!body || typeof body !== 'object') return null;
-  const b = body as Record<string, unknown>;
-  if (typeof b.code !== 'string' || !b.code) return null;
-  if (typeof b.code_verifier !== 'string' || !b.code_verifier) return null;
-  if (typeof b.redirect_uri !== 'string' || !b.redirect_uri) return null;
-  if (typeof b.state !== 'string' || !b.state) return null;
-  return {
-    code: b.code,
-    code_verifier: b.code_verifier,
-    redirect_uri: b.redirect_uri,
-    state: b.state,
-    nonce: typeof b.nonce === 'string' ? b.nonce : undefined,
-  };
-}
 import { db, usersTable, studioProfilesTable } from '@workspace/db';
 import { Router, type IRouter, type Request, type Response } from 'express';
 import * as oidc from 'openid-client';
@@ -27,12 +11,9 @@ import {
   clearAnonymousSession,
   createSession,
   deleteSession,
-  getSession,
   getGoogleOidcConfig,
   getAnonymousSessionId,
-  getOidcConfig,
   getSessionId,
-  ISSUER_URL,
   SESSION_COOKIE,
   SESSION_TTL,
   type SessionData,
@@ -43,6 +24,9 @@ const OIDC_COOKIE_TTL = 10 * 60 * 1000;
 const router: IRouter = Router();
 
 function getOrigin(req: Request): string {
+  // APP_URL pins the public origin (e.g. https://brightsideproject.org) so the
+  // OAuth callback URL matches what is registered with Google.
+  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/+$/, '');
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const host =
     req.headers['x-forwarded-host'] || req.headers['host'] || 'localhost';
@@ -317,104 +301,15 @@ router.get('/auth/google/logout', async (req: Request, res: Response) => {
   res.redirect(returnTo);
 });
 
-// ─── Legacy Replit OIDC (kept for mobile / backward compat) ───────────────────
+// ─── Generic login/logout (Google sign-in is the only identity provider) ──────
 
-router.get('/login', async (req: Request, res: Response) => {
-  const config = await getOidcConfig();
-  const callbackUrl = `${getOrigin(req)}/api/callback`;
-
+router.get('/login', (req: Request, res: Response) => {
   const returnTo = getSafeReturnTo(req.query.returnTo);
-
-  const state = oidc.randomState();
-  const nonce = oidc.randomNonce();
-  const codeVerifier = oidc.randomPKCECodeVerifier();
-  const codeChallenge = await oidc.calculatePKCECodeChallenge(codeVerifier);
-
-  const redirectTo = oidc.buildAuthorizationUrl(config, {
-    redirect_uri: callbackUrl,
-    scope: 'openid email profile offline_access',
-    code_challenge: codeChallenge,
-    code_challenge_method: 'S256',
-    prompt: 'login consent',
-    state,
-    nonce,
-  });
-
-  setOidcCookie(res, 'code_verifier', codeVerifier);
-  setOidcCookie(res, 'nonce', nonce);
-  setOidcCookie(res, 'state', state);
-  setOidcCookie(res, 'return_to', returnTo);
-
-  res.redirect(redirectTo.href);
+  res.redirect(`/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`);
 });
 
-// Query params are not validated because the OIDC provider may include
-// parameters not expressed in the schema.
-router.get('/callback', async (req: Request, res: Response) => {
-  const config = await getOidcConfig();
-  const callbackUrl = `${getOrigin(req)}/api/callback`;
-
-  const codeVerifier = req.cookies?.code_verifier;
-  const nonce = req.cookies?.nonce;
-  const expectedState = req.cookies?.state;
-
-  if (!codeVerifier || !expectedState) {
-    res.redirect('/api/login');
-    return;
-  }
-
-  const currentUrl = new URL(
-    `${callbackUrl}?${new URL(req.url, `http://${req.headers.host}`).searchParams}`,
-  );
-
-  let tokens: oidc.TokenEndpointResponse & oidc.TokenEndpointResponseHelpers;
-  try {
-    tokens = await oidc.authorizationCodeGrant(config, currentUrl, {
-      pkceCodeVerifier: codeVerifier,
-      expectedNonce: nonce,
-      expectedState,
-      idTokenExpected: true,
-    });
-  } catch {
-    res.redirect('/api/login');
-    return;
-  }
-
-  const returnTo = getSafeReturnTo(req.cookies?.return_to);
-
-  res.clearCookie('code_verifier', { path: '/' });
-  res.clearCookie('nonce', { path: '/' });
-  res.clearCookie('state', { path: '/' });
-  res.clearCookie('return_to', { path: '/' });
-
-  const claims = tokens.claims();
-  if (!claims) {
-    res.redirect('/api/login');
-    return;
-  }
-
-  const dbUser = await upsertUser(claims as unknown as Record<string, unknown>);
-
-  const now = Math.floor(Date.now() / 1000);
-  const sessionData: SessionData = {
-    user: {
-      id: dbUser.id,
-      email: dbUser.email,
-      firstName: dbUser.firstName,
-      lastName: dbUser.lastName,
-      profileImageUrl: dbUser.profileImageUrl,
-      displayName: null,
-      role: 'none',
-    },
-    provider: 'replit',
-    access_token: tokens.access_token,
-    refresh_token: tokens.refresh_token,
-    expires_at: tokens.expiresIn() ? now + tokens.expiresIn()! : claims.exp,
-  };
-
-  const sid = await createSession(sessionData);
-  setSessionCookie(res, sid);
-  res.redirect(returnTo);
+router.get('/callback', (_req: Request, res: Response) => {
+  res.redirect('/api/auth/google');
 });
 
 router.get('/logout', async (req: Request, res: Response) => {
@@ -436,88 +331,10 @@ router.get('/logout', async (req: Request, res: Response) => {
   const anonymousSid = getAnonymousSessionId(req);
   if (anonymousSid) await clearAnonymousSession(res, anonymousSid);
 
-  const session = sid ? await getSession(sid) : null;
+  // Sessions are stored server-side, so deleting the row signs the user out.
   await clearSession(res, sid);
-
-  // A legacy anonymous session stored in the primary cookie should still use
-  // the local return flow rather than invoking OIDC logout.
-  if (session?.provider === 'anonymous') {
-    res.redirect(returnTo);
-    return;
-  }
-
-  const config = await getOidcConfig();
-  const origin = getOrigin(req);
-  const postLogoutRedirectUrl = new URL(returnTo, `${origin}/`).href;
-  const endSessionUrl = oidc.buildEndSessionUrl(config, {
-    client_id: process.env.REPL_ID!,
-    post_logout_redirect_uri: postLogoutRedirectUrl,
-  });
-
-  res.redirect(endSessionUrl.href);
+  res.redirect(returnTo);
 });
-
-router.post(
-  '/mobile-auth/token-exchange',
-  async (req: Request, res: Response) => {
-    const parsed = parseMobileTokenBody(req.body);
-    if (!parsed) {
-      res.status(400).json({ error: 'Missing or invalid required parameters' });
-      return;
-    }
-
-    const { code, code_verifier, redirect_uri, state, nonce } = parsed;
-
-    try {
-      const config = await getOidcConfig();
-
-      const callbackUrl = new URL(redirect_uri);
-      callbackUrl.searchParams.set('code', code);
-      callbackUrl.searchParams.set('state', state);
-      callbackUrl.searchParams.set('iss', ISSUER_URL);
-
-      const tokens = await oidc.authorizationCodeGrant(config, callbackUrl, {
-        pkceCodeVerifier: code_verifier,
-        expectedNonce: nonce ?? undefined,
-        expectedState: state,
-        idTokenExpected: true,
-      });
-
-      const claims = tokens.claims();
-      if (!claims) {
-        res.status(401).json({ error: 'No claims in ID token' });
-        return;
-      }
-
-      const dbUser = await upsertUser(
-        claims as unknown as Record<string, unknown>,
-      );
-
-      const now = Math.floor(Date.now() / 1000);
-      const sessionData: SessionData = {
-        user: {
-          id: dbUser.id,
-          email: dbUser.email,
-          firstName: dbUser.firstName,
-          lastName: dbUser.lastName,
-          profileImageUrl: dbUser.profileImageUrl,
-          displayName: null,
-          role: 'none',
-        },
-        provider: 'replit',
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_at: tokens.expiresIn() ? now + tokens.expiresIn()! : claims.exp,
-      };
-
-      const sid = await createSession(sessionData);
-      res.json({ token: sid });
-    } catch (err) {
-      req.log.error(getSafeErrorMetadata(err), 'Mobile token exchange error');
-      res.status(500).json({ error: 'Token exchange failed' });
-    }
-  },
-);
 
 router.post('/mobile-auth/logout', async (req: Request, res: Response) => {
   const sid = getSessionId(req);

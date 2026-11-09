@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { WaveFooter } from "@/components/WaveFooter";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@workspace/auth-web";
 import { useGetTodayPrompt, useCreateJournalEntry, useGetJournalEntries } from "@workspace/api-client-react";
 import { Lock, PenTool, Send, Info, Moon } from "lucide-react";
 import { format } from "date-fns";

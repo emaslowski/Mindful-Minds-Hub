@@ -5,7 +5,6 @@ import { eq } from 'drizzle-orm';
 import { type Request, type Response } from 'express';
 import * as client from 'openid-client';
 
-export const ISSUER_URL = process.env.ISSUER_URL ?? 'https://replit.com/oidc';
 export const GOOGLE_ISSUER_URL = 'https://accounts.google.com';
 export const SESSION_COOKIE = 'sid';
 export const ANONYMOUS_SESSION_COOKIE = 'anonymous_sid';
@@ -13,24 +12,13 @@ export const SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
 
 export interface SessionData {
   user: AuthUser;
-  provider: 'replit' | 'google' | 'anonymous';
+  provider: 'google' | 'anonymous';
   access_token: string;
   refresh_token?: string;
   expires_at?: number;
 }
 
-let oidcConfig: client.Configuration | null = null;
 let googleOidcConfig: client.Configuration | null = null;
-
-export async function getOidcConfig(): Promise<client.Configuration> {
-  if (!oidcConfig) {
-    oidcConfig = await client.discovery(
-      new URL(ISSUER_URL),
-      process.env.REPL_ID!,
-    );
-  }
-  return oidcConfig;
-}
 
 export async function getGoogleOidcConfig(): Promise<client.Configuration> {
   if (!googleOidcConfig) {

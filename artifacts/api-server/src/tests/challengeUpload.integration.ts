@@ -21,10 +21,12 @@ const base = `http://127.0.0.1:${address.port}/api`;
 const rowIds: number[] = [];
 const objectPaths = new Set<string>();
 async function call(path: string, cookie = "", method = "GET", body?: unknown) {
-  return fetch(base + path, {
+  const res = await fetch(base + path, {
     method, headers: { cookie, ...(body ? { "Content-Type": "application/json" } : {}) },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
+  // Response bodies are checked field-by-field with assert, so leave them untyped.
+  return res as Omit<Response, "json"> & { json(): Promise<any> };
 }
 try {
   const mov = process.argv.includes("--mov");

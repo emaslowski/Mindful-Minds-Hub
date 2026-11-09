@@ -6,7 +6,6 @@ import { once } from "node:events";
 import { db, pool, sessionsTable, usersTable, anonymousAccessAccountsTable, anonymousAccessRequestsTable } from "@workspace/db";
 import { eq, inArray } from "drizzle-orm";
 import app from "../app";
-import { ensurePlantJournal } from "../lib/plantJournalMigration";
 import type { PlantJournal, PlantObservation } from "@workspace/api-zod";
 
 const suffix = randomUUID();
@@ -15,7 +14,8 @@ const sids = ids.map((id) => `plant-session-${id}`);
 const anonSid = `plant-anon-${suffix}`;
 const groupSid = `plant-group-${suffix}`;
 let requestId: number | undefined;
-await ensurePlantJournal();
+// The plant_observations table comes from lib/db/post-merge/plant-observations.sql
+// (`pnpm run db:migrate`), so run that before this test.
 const server = app.listen(0, "127.0.0.1");
 await once(server, "listening");
 const address = server.address();

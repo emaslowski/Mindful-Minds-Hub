@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { HeartHandshake, Sparkles } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@workspace/auth-web";
 import {
   FriendshipProfileInputInterestsItem,
   FriendshipProfileInputQualitiesItem,

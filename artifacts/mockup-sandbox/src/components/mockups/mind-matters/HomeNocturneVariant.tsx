@@ -36,7 +36,7 @@ export default function HomeNocturneVariant() {
         <div className="flex items-center gap-3">
           <Heart className="h-6 w-6" style={{ color: "var(--amber)" }} strokeWidth={1.5} />
           <span className="nocturne-display text-xl font-semibold italic tracking-wide md:text-2xl">
-            Mind Matters
+            The Brightside Project
           </span>
         </div>
         <button
@@ -49,7 +49,7 @@ export default function HomeNocturneVariant() {
         </button>
         {menuOpen && (
           <div className="nocturne-menu rounded-2xl p-2">
-            {["About Mind Matters", "Resources", "Contact"].map((item) => (
+            {["About The Brightside Project", "Resources", "Contact"].map((item) => (
               <button type="button" key={item} onClick={() => setMenuOpen(false)} className="block w-full rounded-xl px-4 py-3 text-left text-sm text-[var(--paper-muted)] hover:bg-[rgba(245,239,227,.1)] hover:text-[var(--paper)]">
                 {item}
               </button>

@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../../lib/utils"
 
 /**
- * Mind Matters Button
+ * The Brightside Project Button
  *
  * Default shape is pill (rounded-full) matching the wellness platform's
  * organic, soft aesthetic. All variants use the earthy token palette.

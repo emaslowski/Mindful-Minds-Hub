@@ -1,6 +1,6 @@
 /**
  * Studio API helpers — used by all student and teacher dashboard pages.
- * Uses relative /api paths which are proxied to the API server by Replit.
+ * Uses relative /api paths which are served by the same origin as the API server (proxied by Vite in development).
  */
 import { normalizeStudioBranding } from './studioBranding';
 

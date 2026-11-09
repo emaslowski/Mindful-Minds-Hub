@@ -33,7 +33,7 @@ export default function HomeQuietVariant() {
           <span className="quiet-mark" aria-hidden="true">
             <Heart size={17} strokeWidth={1.5} />
           </span>
-          <span className="quiet-display text-xl italic tracking-wide md:text-2xl">Mind Matters</span>
+          <span className="quiet-display text-xl italic tracking-wide md:text-2xl">The Brightside Project</span>
         </a>
         <button
           type="button"

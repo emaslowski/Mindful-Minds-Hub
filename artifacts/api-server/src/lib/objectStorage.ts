@@ -10,25 +10,33 @@ import {
   setObjectAclPolicy,
 } from './objectAcl';
 
-const REPLIT_SIDECAR_ENDPOINT = 'http://127.0.0.1:1106';
+/**
+ * Google Cloud Storage client.
+ *
+ * Credentials, in order of preference:
+ * 1. GCS_SERVICE_ACCOUNT_KEY — the full JSON key of a service account, pasted
+ *    into an env var (easiest on most hosting platforms).
+ * 2. Application Default Credentials — GOOGLE_APPLICATION_CREDENTIALS pointing
+ *    at a key file, or the attached service account when hosted on Google Cloud.
+ *
+ * The service account must be able to read/write objects and sign URLs
+ * (a JSON key can always sign; ADC on Google Cloud needs the
+ * "Service Account Token Creator" role on itself).
+ */
+function createStorageClient(): Storage {
+  const keyJson = process.env.GCS_SERVICE_ACCOUNT_KEY;
+  if (keyJson) {
+    const credentials = JSON.parse(keyJson) as {
+      project_id?: string;
+      client_email?: string;
+      private_key?: string;
+    };
+    return new Storage({ credentials, projectId: credentials.project_id });
+  }
+  return new Storage();
+}
 
-export const objectStorageClient = new Storage({
-  credentials: {
-    audience: 'replit',
-    subject_token_type: 'access_token',
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: 'external_account',
-    credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-      format: {
-        type: 'json',
-        subject_token_field_name: 'access_token',
-      },
-    },
-    universe_domain: 'googleapis.com',
-  },
-  projectId: '',
-});
+export const objectStorageClient = createStorageClient();
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -53,8 +61,8 @@ export class ObjectStorageService {
     );
     if (paths.length === 0) {
       throw new Error(
-        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
-          'tool and set PUBLIC_OBJECT_SEARCH_PATHS env var (comma-separated paths).',
+        'PUBLIC_OBJECT_SEARCH_PATHS not set. Set it to one or more /bucket/folder ' +
+          'paths (comma-separated) in your Google Cloud Storage bucket.',
       );
     }
     return paths;
@@ -64,8 +72,8 @@ export class ObjectStorageService {
     const dir = process.env.PRIVATE_OBJECT_DIR || '';
     if (!dir) {
       throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          'tool and set PRIVATE_OBJECT_DIR env var.',
+        'PRIVATE_OBJECT_DIR not set. Set it to a /bucket/folder path in your ' +
+          'Google Cloud Storage bucket.',
       );
     }
     return dir;
@@ -115,8 +123,8 @@ export class ObjectStorageService {
     const privateObjectDir = this.getPrivateObjectDir();
     if (!privateObjectDir) {
       throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          'tool and set PRIVATE_OBJECT_DIR env var.',
+        'PRIVATE_OBJECT_DIR not set. Set it to a /bucket/folder path in your ' +
+          'Google Cloud Storage bucket.',
       );
     }
 
@@ -243,31 +251,14 @@ async function signObjectURL({
   method: 'GET' | 'PUT' | 'DELETE' | 'HEAD';
   ttlSec: number;
 }): Promise<string> {
-  const request = {
-    bucket_name: bucketName,
-    object_name: objectName,
-    method,
-    expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
-  };
-  const response = await fetch(
-    `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-      signal: AbortSignal.timeout(30_000),
-    },
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, ` +
-        `make sure you're running on Replit`,
-    );
-  }
-
-  const body = await response.json() as { signed_url?: unknown };
-  if (typeof body.signed_url !== 'string') throw new Error('Object storage did not return an upload URL');
-  return body.signed_url;
+  const action = ({ GET: 'read', HEAD: 'read', PUT: 'write', DELETE: 'delete' } as const)[method];
+  const [url] = await objectStorageClient
+    .bucket(bucketName)
+    .file(objectName)
+    .getSignedUrl({
+      version: 'v4',
+      action,
+      expires: Date.now() + ttlSec * 1000,
+    });
+  return url;
 }

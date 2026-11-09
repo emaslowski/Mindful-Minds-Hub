@@ -60,7 +60,7 @@ export function WaveDividerDemo() {
           </p>
           <p className="mt-1 font-sans text-sm text-muted-foreground">
             The full three-layered botanical hills footer with the deep-forest band — used at
-            the bottom of the Mind Matters Home page.
+            the bottom of The Brightside Project Home page.
           </p>
         </div>
         <GreenHillsFooter />

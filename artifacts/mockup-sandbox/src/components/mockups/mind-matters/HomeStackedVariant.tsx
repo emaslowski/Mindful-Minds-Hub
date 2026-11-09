@@ -50,7 +50,7 @@ export default function HomeStackedVariant() {
                 <Heart size={17} strokeWidth={1.5} />
               </span>
               <span className="text-xl italic tracking-wide md:text-2xl" style={{ fontFamily: "Georgia, serif" }}>
-                Mind Matters
+                The Brightside Project
               </span>
             </a>
             <button

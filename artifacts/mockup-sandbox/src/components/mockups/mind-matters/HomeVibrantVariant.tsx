@@ -84,7 +84,7 @@ export default function HomeVibrantVariant() {
             <Heart className="w-6 h-6 text-white" strokeWidth={2.5} />
           </div>
           <span className="font-display font-black text-2xl tracking-tighter text-black uppercase">
-            Mind Matters
+            The Brightside Project
           </span>
         </div>
         <button className="bg-[#00E5FF] p-3 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] transition-all active:shadow-none active:translate-y-2">

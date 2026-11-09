@@ -174,7 +174,7 @@ const TooltipDemo = lazyPage(() =>
   import('./demos/tooltip').then(({ TooltipDemo }) => TooltipDemo),
 );
 
-// Mind Matters-specific demos
+// The Brightside Project-specific demos
 const WaveDividerDemo = lazyPage(() =>
   import('./demos/wave-divider').then(({ WaveDividerDemo }) => WaveDividerDemo),
 );
@@ -192,15 +192,15 @@ export type NavGroup = {
 };
 
 export const DESIGN_SYSTEM = {
-  title: 'Mind Matters Design System',
+  title: 'The Brightside Project Design System',
   description:
-    'Warm boho wellness — earthy terracotta, sage green, and amber with editorial serif type for the Mind Matters student mental wellness platform.',
+    'Warm boho wellness — earthy terracotta, sage green, and amber with editorial serif type for The Brightside Project student mental wellness platform.',
 } as const;
 
 export const OVERVIEW_ENTRY: PreviewEntry = {
   id: 'overview',
   name: 'Overview',
-  description: 'The visual foundations and principles that shape Mind Matters.',
+  description: 'The visual foundations and principles that shape The Brightside Project.',
   Page: OverviewPage,
 };
 
@@ -586,7 +586,7 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    name: 'Mind Matters',
+    name: 'The Brightside Project',
     entries: [
       {
         id: 'wave-divider',

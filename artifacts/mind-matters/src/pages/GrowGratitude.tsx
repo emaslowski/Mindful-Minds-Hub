@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { WaveFooter } from "@/components/WaveFooter";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@workspace/auth-web";
 import { useGetGratitudeEntries, useCreateGratitudeEntry } from "@workspace/api-client-react";
 import { Lock, Heart, Plus } from "lucide-react";
 import { format } from "date-fns";

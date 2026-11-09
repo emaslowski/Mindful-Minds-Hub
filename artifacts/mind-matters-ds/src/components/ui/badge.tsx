@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../../lib/utils"
 
 /**
- * Mind Matters Badge
+ * The Brightside Project Badge
  *
  * Pill-shaped status / category chips in earthy palette colors.
  * All variants use rounded-full to match the organic wellness aesthetic.

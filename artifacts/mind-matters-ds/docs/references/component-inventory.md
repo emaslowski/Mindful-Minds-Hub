@@ -1,7 +1,7 @@
-# Mind Matters Component Inventory
+# The Brightside Project Component Inventory
 
 Extracted from `artifacts/mind-matters` source — scaffold-seeded families themed
-by the Mind Matters token set. All families below are implemented; the scaffold
+by The Brightside Project token set. All families below are implemented; the scaffold
 library is kept in full and themed via `tokens.json`.
 
 ## Status legend
@@ -28,4 +28,4 @@ library is kept in full and themed via `tokens.json`.
 - **Badge**: pill chip (`rounded-full`), earthy variants (default/secondary/accent/muted/outline/destructive).
 - **Card**: warm-beige surface, `rounded-2xl` default; large hero panels use `rounded-[3rem]`. CardTitle styled as serif italic.
 - **Input**: warm border tokens, terracotta focus ring.
-- **WaveDivider**: custom Mind Matters component — organic SVG wave/hills section separator and GreenHillsFooter.
+- **WaveDivider**: custom The Brightside Project component — organic SVG wave/hills section separator and GreenHillsFooter.

@@ -1,4 +1,4 @@
-# Consuming Mind Matters Design System in web apps
+# Consuming The Brightside Project Design System in web apps
 
 Read `artifacts/mind-matters-ds/docs/AGENTS.md` first. This guide covers
 React/Vite and other shadcn/Tailwind web consumers. If the app already contains

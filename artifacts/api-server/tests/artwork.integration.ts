@@ -8,7 +8,7 @@ import { videoStorage } from "../src/lib/projectVideoStorage";
 if (process.env.NODE_ENV === "production") throw new Error("Development checks only");
 const fixturePath = "/tmp/brightside-artwork-ui-fixtures.json";
 const owners = ["artwork-test-student", "artwork-test-other", "artwork-test-teacher"];
-const origin = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+const origin = (process.env.APP_URL ?? 'http://localhost:8080').replace(/\/+$/, '');
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=", "base64");
 async function clean() {
   const rows = await db.delete(artworkTable).where(inArray(artworkTable.ownerId, owners)).returning();

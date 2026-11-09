@@ -3,17 +3,14 @@ import { db } from '@workspace/db';
 import { anonymousAccessAccountsTable } from '@workspace/db/schema';
 import { eq } from 'drizzle-orm';
 import { type NextFunction, type Request, type Response } from 'express';
-import * as oidc from 'openid-client';
 
 import {
   clearSession,
   clearAnonymousSession,
   deleteSession,
   getAnonymousSessionId,
-  getOidcConfig,
   getSession,
   getSessionId,
-  updateSession,
   type SessionData,
 } from '../lib/auth';
 
@@ -35,32 +32,15 @@ declare global {
   }
 }
 
-async function refreshIfExpired(
-  sid: string,
-  session: SessionData,
-): Promise<SessionData | null> {
-  // Google sessions do not use Replit's token refresh — the session itself
-  // is the source of truth (7-day TTL). Skip refresh for Google provider.
-  if (session.provider === 'google' || session.provider === 'anonymous') return session;
-
-  const now = Math.floor(Date.now() / 1000);
-  if (!session.expires_at || now <= session.expires_at) return session;
-
-  if (!session.refresh_token) return null;
-
-  try {
-    const config = await getOidcConfig();
-    const tokens = await oidc.refreshTokenGrant(config, session.refresh_token);
-    session.access_token = tokens.access_token;
-    session.refresh_token = tokens.refresh_token ?? session.refresh_token;
-    session.expires_at = tokens.expiresIn()
-      ? now + tokens.expiresIn()!
-      : session.expires_at;
-    await updateSession(sid, session);
-    return session;
-  } catch {
-    return null;
-  }
+/**
+ * The server-side session row (7-day TTL) is the source of truth for Google
+ * and anonymous sessions. Sessions from any other provider (e.g. the retired
+ * Replit sign-in) are no longer valid and force a fresh login.
+ */
+function validateProvider(session: SessionData): SessionData | null {
+  return session.provider === 'google' || session.provider === 'anonymous'
+    ? session
+    : null;
 }
 
 export async function authMiddleware(
@@ -73,7 +53,7 @@ export async function authMiddleware(
   } as Request['isAuthenticated'];
 
   // Anonymous wellness access uses a dedicated identity so it never replaces
-  // Replit/Google authentication. Wellness routes opt into anonymousUser;
+  // Google authentication. Wellness routes opt into anonymousUser;
   // generic and Studio routes continue to use the primary user session.
   const anonymousSid = getAnonymousSessionId(req);
   if (anonymousSid) {
@@ -108,7 +88,7 @@ export async function authMiddleware(
     return;
   }
 
-  const refreshed = await refreshIfExpired(sid, session);
+  const refreshed = validateProvider(session);
   if (!refreshed) {
     await clearSession(res, sid);
     next();

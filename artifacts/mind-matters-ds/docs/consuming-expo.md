@@ -1,4 +1,4 @@
-# Consuming Mind Matters Design System in Expo apps
+# Consuming The Brightside Project Design System in Expo apps
 
 Read `artifacts/mind-matters-ds/docs/AGENTS.md` first. React Native does
 not consume the web CSS or DOM components. It imports portable tokens, native

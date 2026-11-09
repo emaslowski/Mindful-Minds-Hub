@@ -1,6 +1,6 @@
 import { useLayoutEffect, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@workspace/auth-web";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { CheckCircle, Home, LogIn, LogOut, PenLine, Star, Sun, User } from "lucide-react";
 import { ContentComments, normalizePublicCommentSection } from "@/components/ContentComments";

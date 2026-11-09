@@ -5,7 +5,7 @@ import { createStudioSession, deleteStudioSession } from '../src/lib/studioAuth'
 
 // Development only: exercises real teacher publishing and removes its own data.
 if (process.env.NODE_ENV === 'production') throw new Error('Development test only');
-const origin = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+const origin = (process.env.APP_URL ?? 'http://localhost:8080').replace(/\/+$/, '');
 const destinations = [
   'move-morning-stretch', 'move-soccer-skills', 'move-basketball-drills',
   'move-yoga-for-calm', 'move-stretch-break', 'move-active-challenge', 'directed-draws',

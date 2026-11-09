@@ -29,11 +29,11 @@ export default function HomeRefinedVariant() {
     <div className="refined-home">
       <div className="refined-orbit" aria-hidden="true" />
       <nav className="refined-nav relative z-10 flex items-center justify-between px-6 py-5 md:px-12 md:py-6">
-        <a href="/" className="flex items-center gap-3" aria-label="Mind Matters home">
+        <a href="/" className="flex items-center gap-3" aria-label="The Brightside Project home">
           <span className="grid h-9 w-9 place-items-center rounded-full border border-[var(--refined-terracotta)] text-[var(--refined-terracotta)]">
             <Heart size={17} strokeWidth={1.6} />
           </span>
-          <span className="refined-display text-xl font-semibold italic tracking-wide md:text-2xl">Mind Matters</span>
+          <span className="refined-display text-xl font-semibold italic tracking-wide md:text-2xl">The Brightside Project</span>
         </a>
         <button type="button" className="refined-menu rounded-full p-3" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
           {menuOpen ? <X size={18} strokeWidth={1.6} /> : <Menu size={18} strokeWidth={1.6} />}

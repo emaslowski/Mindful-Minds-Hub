@@ -9,21 +9,18 @@ const message = {
   html: '<p>Access code: TEST-CODE</p>',
 };
 const sender = 'teacher@example.test';
-const connectionId = 'test-school-connection';
 
-test('sends valid MIME through the selected school Gmail connection', async () => {
+test('sends valid MIME through the school Gmail account', async () => {
   const calls: Array<{ path: string; options: any }> = [];
   const id = await sendCredentialEmail(message, {
     sender,
-    connectionId,
-    connectors: {
-      async proxy(connector, path, options) {
-        assert.equal(connector, 'google-mail');
+    gmail: {
+      async request(path, options) {
         calls.push({ path, options });
         if (path.endsWith('/profile')) {
           return Response.json({ emailAddress: sender });
         }
-        const raw = (options!.body as { raw: string }).raw;
+        const raw = (options.body as { raw: string }).raw;
         assert.match(raw, /^[A-Za-z0-9_-]+$/);
         const mime = Buffer.from(raw, 'base64url').toString('utf8');
         assert.match(mime, /From: The Brightside Project <teacher@example.test>/);
@@ -37,22 +34,22 @@ test('sends valid MIME through the selected school Gmail connection', async () =
   assert.equal(id, 'accepted-message');
   assert.equal(calls.length, 2);
   assert.equal(calls[1].path, '/gmail/v1/users/me/messages/send');
-  assert.equal(calls[1].options.connectionId, connectionId);
+  assert.equal(calls[1].options.method, 'POST');
 });
 
 test('missing configuration fails without calling Gmail', async () => {
   await assert.rejects(sendCredentialEmail(message, {
-    connectors: { async proxy() { throw new Error('Must not call Gmail'); } },
+    gmail: { async request() { throw new Error('Must not call Gmail'); } },
   }), /not configured/);
+  await assert.rejects(sendCredentialEmail(message, { sender, gmail: null }), /not configured/);
 });
 
-test('a different connected account cannot send student credentials', async () => {
+test('a different Gmail account cannot send student credentials', async () => {
   let calls = 0;
   await assert.rejects(sendCredentialEmail(message, {
     sender,
-    connectionId,
-    connectors: {
-      async proxy() {
+    gmail: {
+      async request() {
         calls++;
         return Response.json({ emailAddress: 'other@example.test' });
       },
@@ -64,8 +61,7 @@ test('a different connected account cannot send student credentials', async () =
 test('authorization failures are explicit and do not send', async () => {
   await assert.rejects(sendCredentialEmail(message, {
     sender,
-    connectionId,
-    connectors: { async proxy() { return new Response(null, { status: 403 }); } },
+    gmail: { async request() { return new Response(null, { status: 403 }); } },
   }), /authorization check failed \(HTTP 403\)/);
 });
 
@@ -74,9 +70,8 @@ test('rejected or unconfirmed sends fail without retries or SMTP fallback', asyn
     let calls = 0;
     await assert.rejects(sendCredentialEmail(message, {
       sender,
-      connectionId,
-      connectors: {
-        async proxy() {
+      gmail: {
+        async request() {
           calls++;
           return calls === 1
             ? Response.json({ emailAddress: sender })

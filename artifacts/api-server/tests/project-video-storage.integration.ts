@@ -11,7 +11,7 @@ const size = Number(sizeText);
 if (!objectPath?.startsWith('/objects/') || !Number.isSafeInteger(size) || size <= 4 * 1024 * 1024) {
   throw new Error('Pass an existing video object path and its size (larger than 4 MiB)');
 }
-const origin = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+const origin = (process.env.APP_URL ?? 'http://localhost:8080').replace(/\/+$/, '');
 const session = await createStudioSession({ studioUser: {
   id: 'video-streaming-integration', email: null, displayName: 'Streaming test',
   role: 'teacher', accountStatus: 'active',

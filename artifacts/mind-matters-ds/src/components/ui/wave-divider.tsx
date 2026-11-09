@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 /**
  * WaveDivider — organic SVG wave / green-hills section separator.
  *
- * Extracted from the Mind Matters app (artifacts/mind-matters/src/pages/Home.tsx
+ * Extracted from The Brightside Project app (artifacts/mind-matters/src/pages/Home.tsx
  * and the WaveFooter component). Used to split page sections with a botanical,
  * hand-drawn feel. The wave fills with the provided color token so it blends
  * into the section below it.
@@ -99,7 +99,7 @@ export function GreenHillsFooter({ className }: { className?: string }) {
           You are never alone 🌿
         </p>
         <p className="mt-1 font-sans text-sm text-white/50">
-          Mind Matters · Student Wellness
+          The Brightside Project · Student Wellness
         </p>
       </div>
     </footer>

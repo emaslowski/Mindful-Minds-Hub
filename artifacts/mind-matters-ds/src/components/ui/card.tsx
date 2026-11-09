@@ -3,7 +3,7 @@ import * as React from "react"
 import { cn } from "../../lib/utils"
 
 /**
- * Mind Matters Card
+ * The Brightside Project Card
  *
  * Warm beige card surface (--card / #eee6d8) with generous rounding.
  * The base rounded-2xl (16px) is the default for list/input cards.

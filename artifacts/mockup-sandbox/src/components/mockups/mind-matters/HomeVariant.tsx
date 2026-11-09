@@ -99,7 +99,7 @@ export default function HomeVariant() {
         <div className="flex items-center gap-3">
           <Heart className="w-6 h-6 text-[#C86B43]" strokeWidth={1.5} />
           <span className="mm-font-display italic font-semibold text-xl md:text-2xl tracking-wide text-[#4A3B32]">
-            Mind Matters
+            The Brightside Project
           </span>
         </div>
         <button className="p-2 rounded-full hover:bg-[#E3D6C5] transition-colors duration-300">

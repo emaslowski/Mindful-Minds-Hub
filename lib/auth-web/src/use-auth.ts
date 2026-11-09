@@ -61,7 +61,7 @@ export function useAuth(): AuthState {
 
   const login = useCallback(() => {
     const base = getBasePath();
-    window.location.href = `/api/login?returnTo=${encodeURIComponent(base)}`;
+    window.location.href = `/api/auth/google?returnTo=${encodeURIComponent(base)}`;
   }, []);
 
   const logout = useCallback(() => {

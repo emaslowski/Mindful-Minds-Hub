@@ -239,7 +239,7 @@ export function FontsPage() {
           Display · Cormorant Garamond
         </h2>
         <p className="font-serif text-5xl italic font-semibold leading-tight">
-          Mind Matters
+          The Brightside Project
         </p>
         <p className="font-sans text-sm text-muted-foreground">
           Cormorant Garamond — editorial serif for hero headings (italic, 600 weight)

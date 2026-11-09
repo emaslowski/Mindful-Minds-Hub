@@ -1,4 +1,4 @@
-# Migrating Expo UI to Mind Matters Design System
+# Migrating Expo UI to The Brightside Project Design System
 
 Read `artifacts/mind-matters-ds/docs/AGENTS.md` and
 `artifacts/mind-matters-ds/docs/consuming-expo.md` first. Use this guide

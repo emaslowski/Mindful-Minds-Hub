@@ -1,4 +1,4 @@
-# Migrating web UI to Mind Matters Design System
+# Migrating web UI to The Brightside Project Design System
 
 Read `artifacts/mind-matters-ds/docs/AGENTS.md` and
 `artifacts/mind-matters-ds/docs/consuming-web.md` first. Use this guide

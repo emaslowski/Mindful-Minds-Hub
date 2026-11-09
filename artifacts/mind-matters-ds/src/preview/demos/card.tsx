@@ -77,7 +77,7 @@ export function CardDemo() {
               You are not alone in this.
             </CardTitle>
             <CardDescription className="text-base">
-              Mind Matters connects you with tools, resources, and a community
+              The Brightside Project connects you with tools, resources, and a community
               of peers who understand what you're going through.
             </CardDescription>
           </CardHeader>

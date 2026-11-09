@@ -36,7 +36,7 @@ import TeacherAthletes from '@/pages/studio/teacher/Athletes';
 const queryClient = new QueryClient();
 
 /**
- * The studio artifact lives at /studio/ in Replit's path router.
+ * The studio artifact lives at /studio/ (served by the API server in production).
  * We use an empty wouter base so all route paths stay as /studio/* —
  * matching the navigate() calls and Link hrefs in every page file.
  */

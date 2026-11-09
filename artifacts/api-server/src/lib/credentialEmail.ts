@@ -1,7 +1,13 @@
 import nodemailer from 'nodemailer';
-import { ReplitConnectors } from '@replit/connectors-sdk';
+import { OAuth2Client } from 'google-auth-library';
 
-type GmailProxy = Pick<ReplitConnectors, 'proxy'>;
+/** Minimal Gmail REST client: performs an authorized request against gmail.googleapis.com. */
+export interface GmailClient {
+  request(
+    path: string,
+    options: { method: 'GET' | 'POST'; body?: unknown },
+  ): Promise<Response>;
+}
 
 interface CredentialMessage {
   to: string;
@@ -12,31 +18,62 @@ interface CredentialMessage {
 
 interface SenderOptions {
   sender?: string;
-  connectionId?: string;
-  connectors: GmailProxy;
+  gmail: GmailClient | null;
+}
+
+const GMAIL_API = 'https://gmail.googleapis.com';
+
+/**
+ * Builds a Gmail client for the school mailbox from an OAuth refresh token.
+ * Returns null when not configured so callers report a clear failure.
+ *
+ * Env: GMAIL_REFRESH_TOKEN (required), GMAIL_CLIENT_ID / GMAIL_CLIENT_SECRET
+ * (default to GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET). The token must be
+ * granted the https://www.googleapis.com/auth/gmail.send and
+ * https://www.googleapis.com/auth/gmail.readonly (or gmail.metadata) scopes.
+ */
+export function createGmailClientFromEnv(): GmailClient | null {
+  const clientId = process.env.GMAIL_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GMAIL_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
+  const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
+  if (!clientId || !clientSecret || !refreshToken) return null;
+
+  const oauth = new OAuth2Client({ clientId, clientSecret });
+  oauth.setCredentials({ refresh_token: refreshToken });
+
+  return {
+    async request(path, { method, body }) {
+      const { token } = await oauth.getAccessToken();
+      if (!token) return new Response(null, { status: 401 });
+      return fetch(`${GMAIL_API}${path}`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        },
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(30_000),
+      });
+    },
+  };
 }
 
 // Never fall back to SMTP: credentials must only leave through the authorized
-// school mailbox, and a missing/revoked connection must be reported as failure.
+// school mailbox, and a missing/revoked authorization must be reported as failure.
 export async function sendCredentialEmail(
   message: CredentialMessage,
   options: SenderOptions = {
     sender: process.env.CREDENTIAL_EMAIL_SENDER,
-    connectionId: process.env.CREDENTIAL_EMAIL_CONNECTION_ID,
-    connectors: new ReplitConnectors(),
+    gmail: createGmailClientFromEnv(),
   },
 ): Promise<string> {
   const sender = options.sender?.trim().toLowerCase();
-  if (!sender || !options.connectionId) {
+  const gmail = options.gmail;
+  if (!sender || !gmail) {
     throw new Error('The school Gmail sender is not configured');
   }
 
-  const selection = { connectionId: options.connectionId };
-  const profileResponse = await options.connectors.proxy(
-    'google-mail',
-    '/gmail/v1/users/me/profile',
-    { ...selection, method: 'GET' },
-  );
+  const profileResponse = await gmail.request('/gmail/v1/users/me/profile', { method: 'GET' });
   if (!profileResponse.ok) {
     // Do not log provider bodies: they may contain recipient or message data.
     throw new Error(`School Gmail authorization check failed (HTTP ${profileResponse.status})`);
@@ -47,7 +84,7 @@ export async function sendCredentialEmail(
   }
 
   // Nodemailer builds a standards-compliant MIME message only; Gmail performs
-  // delivery using OAuth. No SMTP password or access token is handled here.
+  // delivery using OAuth. No SMTP password is handled here.
   const composer = nodemailer.createTransport({
     streamTransport: true,
     buffer: true,
@@ -66,11 +103,10 @@ export async function sendCredentialEmail(
     throw new Error('Unable to compose the credential email');
   }
   const raw = compiled.message.toString('base64url');
-  const response = await options.connectors.proxy(
-    'google-mail',
-    '/gmail/v1/users/me/messages/send',
-    { ...selection, method: 'POST', body: { raw } },
-  );
+  const response = await gmail.request('/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    body: { raw },
+  });
   if (!response.ok) {
     throw new Error(`School Gmail did not accept the credential email (HTTP ${response.status})`);
   }

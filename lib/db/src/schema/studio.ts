@@ -202,7 +202,7 @@ export const studioPublicationsTable = pgTable('studio_publications', {
   destinationSection: text('destination_section').notNull(),
   // nullable — set when a publication gets a public URL (task 8)
   slug: text('slug').unique(),
-  authorDisplay: text('author_display').notNull().default('Mind Matters Student Team'),
+  authorDisplay: text('author_display').notNull().default('The Brightside Project Team'),
   publicationStatus: publicationStatusEnum('publication_status').notNull().default('active'),
   featured: boolean('featured').notNull().default(false),
   publishedAt: timestamp('published_at').notNull().defaultNow(),
