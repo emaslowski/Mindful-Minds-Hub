@@ -14,6 +14,19 @@ Pages:
 | `/kits`   | Product page: gallery, the three kits, comparison table, district buying |
 | `/order`  | Order / quote form (`?kit=classroom`, `school` or `district`)    |
 | `/thanks` | Confirmation (also the return page for Stripe checkout)          |
+| `/school-login` | School login: a school enters its access code and gets its hub links |
+
+## School login (access codes)
+
+Each school that buys a kit gets an access code and a hub address. The list
+lives in the hub's editable site content under the key `kits.schools`, so you
+add a school without a deploy: open the Teacher Command Center → Site
+Assistant and say, for example, "Add Lincoln Middle School to the kit schools
+with code LINCOLN-2026 and hub URL https://…". Each entry has `name`, `code`,
+`hubUrl` and an optional `note`. The kits site looks codes up through
+`GET /api/kits/schools/:code` and only ever returns the one matching school.
+A demo entry (`BRIGHT-DEMO`) points at the main hub; remove it when you no
+longer want it.
 
 ## Edit the content
 
@@ -71,26 +84,17 @@ VITE_API_BASE_URL=https://thebrightsidehub-480156548115.us-east1.run.app pnpm ru
 
 ### Google Cloud Run (same project as the hub)
 
-```bash
-gcloud run deploy brightside-kits \
-  --source . \
-  --region us-east1 \
-  --allow-unauthenticated
-```
-
-Cloud Run's `--source` build needs the Dockerfile at the repo root, so either
-copy `artifacts/brightside-kits/Dockerfile` there temporarily, or build the
-image yourself:
+Cloud Build builds the image (no local Docker needed) and Cloud Run serves it
+as the service `brightside-kits`. From the repository root:
 
 ```bash
-docker build -f artifacts/brightside-kits/Dockerfile \
-  --build-arg VITE_API_BASE_URL=https://thebrightsidehub-480156548115.us-east1.run.app \
-  -t us-east1-docker.pkg.dev/the-brightside-project-llc/cloud-run-source-deploy/brightside-kits:1 .
-docker push us-east1-docker.pkg.dev/the-brightside-project-llc/cloud-run-source-deploy/brightside-kits:1
+gcloud builds submit --config artifacts/brightside-kits/cloudbuild.yaml .
 gcloud run deploy brightside-kits \
-  --image us-east1-docker.pkg.dev/the-brightside-project-llc/cloud-run-source-deploy/brightside-kits:1 \
-  --region us-east1 --allow-unauthenticated
+  --image us-east1-docker.pkg.dev/the-brightside-project-llc/cloud-run-source-deploy/brightside-kits:latest \
+  --region us-east1 --port 8080 --allow-unauthenticated
 ```
+
+Repeat both commands whenever the site changes.
 
 ### Connect thebrightsidewellnessproject.com
 
