@@ -41,6 +41,7 @@ import Events from '@/pages/Events';
 import CheckIn from '@/pages/CheckIn';
 import Review from '@/pages/Review';
 import Contact from '@/pages/Contact';
+import SectionPage from '@/pages/SectionPage';
 import ListenPodcast from '@/pages/ListenPodcast';
 import ListenMeditations from '@/pages/ListenMeditations';
 import AnonymousAccess from '@/pages/AnonymousAccess';
@@ -76,6 +77,7 @@ function PublicRouter() {
         <Route path="/about"><Redirect to="/" /></Route>
         <Route path="/resources" component={Resources} />
         <Route path="/events" component={Events} />
+        <Route path="/s/:slug" component={SectionPage} />
         <Route path="/contact" component={Contact} />
         <Route path="/anonymous-access" component={AnonymousAccess} />
 

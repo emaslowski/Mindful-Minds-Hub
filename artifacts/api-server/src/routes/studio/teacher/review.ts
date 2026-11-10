@@ -17,6 +17,7 @@ import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
 import { originalPublicationEdition, parsePublicationDraft, storePublicationEdition } from '../../../lib/publicationEditions';
 import { publicationMediaError } from '../../../lib/publicationMedia';
+import { allPublishDestinations } from '../../../lib/sections';
 
 const router = Router();
 
@@ -249,12 +250,8 @@ router.post(
     if (publicationDraft !== undefined && !editionInput) {
       res.status(400).json({ error: 'Website draft settings are invalid. Check the title and formatting before publishing.' }); return;
     }
-    const destinations = [
-      'blog', 'podcast', 'learn', 'sign-language', 'create', 'calm-corner', 'dance-tutorials', 'focus-study', 'asmr', 'move', 'cooking', 'gardening', 'grow', 'events', 'resources',
-      'move-morning-stretch', 'move-soccer-skills', 'move-basketball-drills',
-      'move-yoga-for-calm', 'move-stretch-break', 'move-active-challenge',
-      'directed-draws', 'cooking-food-reviews',
-    ];
+    // Built-in pages plus teacher-created sections (see routes/sections.ts).
+    const destinations = decision === 'approve_and_publish' ? await allPublishDestinations() : [];
     if (decision === 'approve_and_publish' && !destinations.includes(destinationSection!)) {
       res.status(400).json({ error: 'Choose a supported destination page.' }); return;
     }

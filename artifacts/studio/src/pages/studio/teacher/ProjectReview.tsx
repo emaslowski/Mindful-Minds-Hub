@@ -3,7 +3,7 @@ import { useParams, useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage, StatusBadge } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherReview, teacherSettings, AUTHOR_DISPLAY_OPTIONS, DESTINATION_SECTIONS, type DecisionData, type PublicationAppearance, type PublicationEdition } from '@/lib/studioApi';
+import { studioFetch, teacherReview, teacherSettings, AUTHOR_DISPLAY_OPTIONS, DESTINATION_SECTIONS, type DecisionData, type PublicationAppearance, type PublicationEdition } from '@/lib/studioApi';
 import { PublishedArticle } from '@workspace/mind-matters-ds/components/PublishedArticle';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/mind-matters-ds/components/ui/card';
 import { Button } from '@workspace/mind-matters-ds/components/ui/button';
@@ -169,6 +169,13 @@ export default function ProjectReview() {
 
   const [feedback, setFeedback] = useState('');
   const [destinationSection, setDestinationSection] = useState('');
+  // Teacher-created sections (e.g. "Jokes") are publish destinations too.
+  const { data: customSections } = useQuery({
+    queryKey: ['site-sections'],
+    queryFn: () => studioFetch<{ sections: Array<{ slug: string; title: string; emoji: string | null }> }>('/public/sections').then((r) => r.sections),
+    staleTime: 60_000,
+  });
+  const customSectionOptions = (customSections ?? []).map((s) => ({ value: s.slug, label: `${s.emoji ? `${s.emoji} ` : ''}${s.title} (custom section)` }));
   const [authorDisplay, setAuthorDisplay] = useState('');
   const [publicationDraft, setPublicationDraft] = useState<PublicationEdition>(EMPTY_EDITION);
   const [draftVersion, setDraftVersion] = useState(0);
@@ -627,7 +634,7 @@ export default function ProjectReview() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {DESTINATION_OPTIONS.map((o) => (
+                      {[...DESTINATION_OPTIONS, ...customSectionOptions].map((o) => (
                         <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                       ))}
                     </SelectContent>

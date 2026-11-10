@@ -4,8 +4,9 @@ import { useAuth } from "@workspace/auth-web";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { CheckCircle, Home, LogIn, LogOut, PenLine, Star, Sun, User } from "lucide-react";
 import { ContentComments, normalizePublicCommentSection } from "@/components/ContentComments";
+import { useSiteSections } from "@/lib/sections";
 
-const mainLinks = [
+const BUILT_IN_LINKS = [
   { href: "/", label: "Home" },
   { href: "/events", label: "Events" },
   { href: "/contact", label: "Contact Us" },
@@ -14,6 +15,12 @@ const mainLinks = [
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const { data: customSections } = useSiteSections();
+  // Teacher-created sections slot in after the built-in links.
+  const mainLinks = [
+    ...BUILT_IN_LINKS,
+    ...(customSections ?? []).filter((s) => s.showInNav).map((s) => ({ href: s.path, label: s.emoji ? `${s.emoji} ${s.title}` : s.title })),
+  ];
 
   useLayoutEffect(() => {
     const previousRestoration = window.history.scrollRestoration;
