@@ -94,14 +94,14 @@ export default function Listen() {
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Podcast Card (Large) */}
-          <Link href="/listen/podcast" aria-label="The Brightside Project Podcast — view all episodes" className="md:col-span-2 bg-gradient-to-br from-terracotta/20 to-amber/20 rounded-[3rem] p-10 flex flex-col md:flex-row items-center justify-between border border-white/40 shadow-sm hover:shadow-md transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+          <Link href="/listen/podcast" aria-label="The Brightside Wellness Project Podcast — view all episodes" className="md:col-span-2 bg-gradient-to-br from-terracotta/20 to-amber/20 rounded-[3rem] p-10 flex flex-col md:flex-row items-center justify-between border border-white/40 shadow-sm hover:shadow-md transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
             <div className="text-left mb-6 md:mb-0 md:mr-8 flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-terracotta/20 rounded-full text-terracotta">
                   <Mic size={32} />
                 </div>
                 <h2 className="text-3xl md:text-5xl font-display italic text-foreground">
-                  The Brightside Project Podcast
+                  The Brightside Wellness Project Podcast
                 </h2>
               </div>
               <p className="text-lg font-sans text-foreground/80 mt-4 max-w-lg leading-relaxed">

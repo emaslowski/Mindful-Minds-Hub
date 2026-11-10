@@ -23,7 +23,7 @@ test('sends valid MIME through the school Gmail account', async () => {
         const raw = (options.body as { raw: string }).raw;
         assert.match(raw, /^[A-Za-z0-9_-]+$/);
         const mime = Buffer.from(raw, 'base64url').toString('utf8');
-        assert.match(mime, /From: The Brightside Project <teacher@example.test>/);
+        assert.match(mime, /From: The Brightside Wellness Project LLC <teacher@example.test>/);
         assert.match(mime, /To: student@example.test/);
         assert.match(mime, /multipart\/alternative/);
         assert.match(mime, /test-only-password/);

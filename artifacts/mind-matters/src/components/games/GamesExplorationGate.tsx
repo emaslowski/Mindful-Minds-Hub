@@ -37,7 +37,7 @@ export function GamesExplorationGate() {
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 md:py-20">
       <h1 className="font-display text-4xl font-bold">Explore before you play</h1>
       <p className="mt-4 leading-relaxed text-foreground/85">
-        The Brightside Project is about connection and a sense of belonging with peers.
+        The Brightside Wellness Project is about connection and a sense of belonging with peers.
         Visit three different sections and submit at least one kind, on-topic comment outside Games before playing.
       </p>
       <p className="mb-5 font-semibold" data-testid="games-comment-progress" role="status">

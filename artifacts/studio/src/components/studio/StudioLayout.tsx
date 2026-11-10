@@ -72,7 +72,7 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-dvh flex-col md:flex-row bg-[#f5efe5] overflow-hidden">
       <div className="flex flex-shrink-0 items-center justify-between bg-[#453329] px-4 py-3 text-[#f5efe5] md:hidden">
-        <span className="font-serif font-semibold">The Brightside Project Studio</span>
+        <span className="font-serif font-semibold">The Brightside Wellness Project Studio</span>
         <Button
           variant="ghost"
           size="icon"
@@ -169,7 +169,7 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
           {/* Plain <a> so clicking does a full-page navigation to the public site */}
           <a href="/" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#d5cabe] hover:bg-[#5a4035] hover:text-white transition-colors">
             <Globe className="h-4 w-4" />
-            The Brightside Project Website
+            The Brightside Wellness Project Website
           </a>
           <button
             onClick={() => logout()}

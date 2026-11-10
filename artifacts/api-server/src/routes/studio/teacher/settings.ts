@@ -9,23 +9,27 @@ const router = Router();
 const SETTINGS_KEY_AUTHOR_OPTIONS = 'author_display_options';
 
 const DEFAULT_AUTHOR_OPTIONS = [
-  'The Brightside Project Team',
-  'The Brightside Project Blog Team',
+  'The Brightside Wellness Project Team',
+  'The Brightside Wellness Project Blog Team',
   'Student Wellness Team',
-  'Grade 5 Brightside Project Team',
+  'Grade 5 Brightside Wellness Project Team',
   'Anonymous Student Contributor',
 ];
 
 const LEGACY_AUTHOR_LABELS: Record<string, string> = {
-  'Mind Matter Team': 'The Brightside Project Team',
-  'Mind Matters Team': 'The Brightside Project Team',
-  'Mind Matters Student Team': 'The Brightside Project Team',
-  'Mind Matters Blog Team': 'The Brightside Project Blog Team',
-  'Grade 5 Mind Matters Team': 'Grade 5 Brightside Project Team',
-  'Middle School Matters Team': 'The Brightside Project Team',
-  'Middle School Matters Student Team': 'The Brightside Project Team',
-  'Middle School Matters Blog Team': 'The Brightside Project Blog Team',
-  'Grade 5 Middle School Matters Team': 'Grade 5 Brightside Project Team',
+  'The Brightside Project Team': 'The Brightside Wellness Project Team',
+  'The Brightside Project Blog Team': 'The Brightside Wellness Project Blog Team',
+  'The Brightside Project Student Team': 'The Brightside Wellness Project Student Team',
+  'Grade 5 Brightside Project Team': 'Grade 5 Brightside Wellness Project Team',
+  'Mind Matter Team': 'The Brightside Wellness Project Team',
+  'Mind Matters Team': 'The Brightside Wellness Project Team',
+  'Mind Matters Student Team': 'The Brightside Wellness Project Team',
+  'Mind Matters Blog Team': 'The Brightside Wellness Project Blog Team',
+  'Grade 5 Mind Matters Team': 'Grade 5 Brightside Wellness Project Team',
+  'Middle School Matters Team': 'The Brightside Wellness Project Team',
+  'Middle School Matters Student Team': 'The Brightside Wellness Project Team',
+  'Middle School Matters Blog Team': 'The Brightside Wellness Project Blog Team',
+  'Grade 5 Middle School Matters Team': 'Grade 5 Brightside Wellness Project Team',
 };
 
 async function getAuthorDisplayOptions(): Promise<string[]> {

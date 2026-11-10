@@ -53,7 +53,7 @@ async function sendModeratorEmail({
 
   try {
     const info = await mailer.transporter.sendMail({
-      from: { name: "The Brightside Project", address: mailer.smtpUser },
+      from: { name: "The Brightside Wellness Project LLC", address: mailer.smtpUser },
       replyTo: mailer.smtpUser,
       to: MODERATOR_EMAIL,
       subject,
@@ -95,13 +95,13 @@ async function notifyAdminNewPost(authorName: string, content: string) {
   await sendModeratorEmail({
     notificationType: "post",
     subject: "New Collaboration Board Post — Awaiting Approval",
-    text: `A student submitted a new collaboration board post.\n\nAuthor: ${authorName}\n\nPost:\n${content}\n\nLog into The Brightside Project Command Center to authorize or leave this post pending.`,
+    text: `A student submitted a new collaboration board post.\n\nAuthor: ${authorName}\n\nPost:\n${content}\n\nLog into The Brightside Wellness Project Command Center to authorize or leave this post pending.`,
     html: `<h2>New Collaboration Board Post</h2>
         <p>A student submitted a post for the collaboration board. Please review it.</p>
         <p><strong>Author:</strong> ${authorName}</p>
         <p><strong>Post:</strong></p>
         <blockquote style="background:#f5f5f5;padding:12px;border-left:4px solid #688A52">${content.replace(/\n/g, "<br>")}</blockquote>
-        <p>Log into The Brightside Project Command Center to authorize or leave this post pending.</p>`,
+        <p>Log into The Brightside Wellness Project Command Center to authorize or leave this post pending.</p>`,
   });
 }
 
@@ -234,13 +234,13 @@ async function notifyAdminNewComment(authorName: string, content: string, postId
   await sendModeratorEmail({
     notificationType: "comment",
     subject: "New Collaboration Board Comment — Awaiting Approval",
-    text: `A student submitted a new collaboration board comment for post #${postId}.\n\nAuthor: ${authorName}\n\nComment:\n${content}\n\nLog into The Brightside Project Command Center to authorize it.`,
+    text: `A student submitted a new collaboration board comment for post #${postId}.\n\nAuthor: ${authorName}\n\nComment:\n${content}\n\nLog into The Brightside Wellness Project Command Center to authorize it.`,
     html: `<h2>New Collaboration Board Comment</h2>
         <p>A student submitted a comment for the collaboration board. Please review it.</p>
         <p><strong>Author:</strong> ${authorName}</p>
         <p><strong>Comment:</strong></p>
         <blockquote style="background:#f5f5f5;padding:12px;border-left:4px solid #688A52">${content.replace(/\n/g, "<br>")}</blockquote>
-        <p>Log into The Brightside Project Command Center to authorize or leave this comment pending.</p>`,
+        <p>Log into The Brightside Wellness Project Command Center to authorize or leave this comment pending.</p>`,
   });
 }
 

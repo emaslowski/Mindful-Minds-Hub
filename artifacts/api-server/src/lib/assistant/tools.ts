@@ -410,7 +410,7 @@ export const ASSISTANT_TOOLS: AssistantTool[] = [
       decision: { type: 'string', enum: ['approve', 'approve_and_publish', 'return_for_revision', 'save_for_later', 'archive'] },
       feedback: str('Feedback for the student. Required in spirit for return_for_revision.'),
       destinationSection: { type: 'string', description: `Website section. Required for approve_and_publish. One of the built-in sections (${PUBLICATION_SECTIONS.join(', ')}) or the slug of a teacher-created section from list_sections.` },
-      authorDisplay: str('Author line shown on the page, e.g. "The Brightside Project Student Team". Must be one of the author display options from get_settings.'),
+      authorDisplay: str('Author line shown on the page, e.g. "The Brightside Wellness Project Student Team". Must be one of the author display options from get_settings.'),
     }, ['projectId', 'decision']),
     toRequest: (i) => ({
       method: 'POST', path: `/teacher/projects/${i.projectId}/decision`,

@@ -702,9 +702,9 @@ export const STATUS_COLORS: Record<string, string> = {
 };
 
 export const AUTHOR_DISPLAY_OPTIONS = [
-  'The Brightside Project Team',
-  'The Brightside Project Blog Team',
+  'The Brightside Wellness Project Team',
+  'The Brightside Wellness Project Blog Team',
   'Student Wellness Team',
-  'Grade 5 Brightside Project Team',
+  'Grade 5 Brightside Wellness Project Team',
   'Anonymous Student Contributor',
 ];

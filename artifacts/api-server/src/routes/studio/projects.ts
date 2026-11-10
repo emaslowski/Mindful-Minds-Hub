@@ -65,7 +65,7 @@ async function sendReadyForReviewEmail(
       `Project: ${projectTitle}`,
       `Student: ${studentDisplayName}`,
       ``,
-      `Please log in to The Brightside Project Command Center to review and provide feedback.`,
+      `Please log in to The Brightside Wellness Project Command Center to review and provide feedback.`,
     ].join('\n'),
     html: `
       <h2 style="color:#4a4a8a">📬 New Submission Ready for Review</h2>
@@ -80,7 +80,7 @@ async function sendReadyForReviewEmail(
           <td style="padding:6px 0">${studentDisplayName}</td>
         </tr>
       </table>
-      <p>Please log in to <strong>The Brightside Project Command Center</strong> to review and provide feedback.</p>
+      <p>Please log in to <strong>The Brightside Wellness Project Command Center</strong> to review and provide feedback.</p>
     `,
   });
 }

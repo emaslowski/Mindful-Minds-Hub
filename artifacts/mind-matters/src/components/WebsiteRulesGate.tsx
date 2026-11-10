@@ -51,7 +51,7 @@ export function WebsiteRulesGate({ children }: { children?: ReactNode }) {
       >
         <AlertDialogHeader className="text-left">
           <AlertDialogTitle className="font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-            The Brightside Project Website Rules
+            The Brightside Wellness Project Website Rules
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm leading-relaxed text-foreground/80">
             Please read these rules before entering the website.

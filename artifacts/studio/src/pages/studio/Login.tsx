@@ -73,7 +73,7 @@ export default function StudioLogin() {
           {urlError === 'not_enrolled' && (
             <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 mb-4">
               <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <p>Your account hasn't been added to The Brightside Project Studio yet. Ask your teacher.</p>
+              <p>Your account hasn't been added to The Brightside Wellness Project Studio yet. Ask your teacher.</p>
             </div>
           )}
 

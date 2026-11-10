@@ -1,8 +1,8 @@
 /** Update branding metadata without rewriting student content or account names. */
 export function formatStudioBrandLabel(label: string): string {
   return label
-    .replace(/\b(?:the\s+)?(?:middle\s+school\s+matters|mind\s+matters|mind\s+matter)\b/gi, 'The Brightside Project')
-    .replace(/^Grade 5 The Brightside Project Team$/i, 'Grade 5 Brightside Project Team');
+    .replace(/\b(?:the\s+)?(?:middle\s+school\s+matters|mind\s+matters|mind\s+matter|brightside\s+project)\b/gi, 'The Brightside Wellness Project')
+    .replace(/^Grade 5 The Brightside Wellness Project Team$/i, 'Grade 5 Brightside Wellness Project Team');
 }
 
 export function normalizeStudioBranding<T>(data: T, teamNames = false): T {

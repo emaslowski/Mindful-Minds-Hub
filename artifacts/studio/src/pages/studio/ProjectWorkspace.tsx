@@ -287,7 +287,7 @@ export default function ProjectWorkspace() {
         <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 flex gap-2">
           <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
           <span>
-            Do not include private information about yourself or another student. The Brightside Project provides
+            Do not include private information about yourself or another student. The Brightside Wellness Project provides
             general educational wellness information and does not replace help from a trusted adult or professional.
           </span>
         </div>

@@ -68,7 +68,7 @@ export default function Home() {
         </p>
       </div>
 
-      <section className="mx-auto mb-8 w-full max-w-3xl px-1 md:mb-10" aria-label="The Brightside Project homepage video">
+      <section className="mx-auto mb-8 w-full max-w-3xl px-1 md:mb-10" aria-label="The Brightside Wellness Project homepage video">
         <Card className="overflow-hidden border-border bg-card p-3 sm:p-4">
           <div className="[&_video]:mx-auto [&_video]:aspect-video [&_video]:max-h-[60dvh] [&_video]:w-full [&_video]:rounded-xl">
             <PublicationVideo

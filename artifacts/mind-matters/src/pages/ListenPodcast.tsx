@@ -13,7 +13,7 @@ export default function ListenPodcast() {
         </Button>
         <Mic className="mx-auto mb-4 text-terracotta" size={40} aria-hidden="true" />
         <h1 className="font-display text-4xl italic text-foreground md:text-6xl">
-          The Brightside Project Podcast
+          The Brightside Wellness Project Podcast
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/75">
           Browse all our student podcasts. Watch video episodes or listen to audio

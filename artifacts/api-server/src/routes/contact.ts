@@ -38,11 +38,11 @@ router.post("/contact", async (req, res) => {
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: "elittle9514@gmail.com",
-      subject: `💌 New Message from ${name}${gradeLabel} — The Brightside Project`,
-      text: `You have a new message from a student on The Brightside Project.\n\nName: ${name}${gradeLabel}\n\nMessage:\n${message}`,
+      subject: `💌 New Message from ${name}${gradeLabel} — The Brightside Wellness Project LLC`,
+      text: `You have a new message from a student on The Brightside Wellness Project.\n\nName: ${name}${gradeLabel}\n\nMessage:\n${message}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#fdf8f3;padding:32px;border-radius:16px;">
-          <h2 style="color:#C4622D;margin-top:0">💌 New Message — The Brightside Project</h2>
+          <h2 style="color:#C4622D;margin-top:0">💌 New Message — The Brightside Wellness Project</h2>
           <p style="color:#555">A student has sent you a message through the website.</p>
           <table style="width:100%;border-collapse:collapse;margin:16px 0">
             <tr>
@@ -57,7 +57,7 @@ router.post("/contact", async (req, res) => {
           <div style="background:#fff;border-left:4px solid #C4622D;padding:16px;border-radius:8px;margin-top:8px">
             <p style="color:#333;margin:0;white-space:pre-wrap">${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
           </div>
-          <p style="color:#999;font-size:13px;margin-top:24px">Sent via The Brightside Project contact form.</p>
+          <p style="color:#999;font-size:13px;margin-top:24px">Sent via The Brightside Wellness Project contact form.</p>
         </div>
       `,
     });

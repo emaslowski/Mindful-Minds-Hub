@@ -91,7 +91,7 @@ export async function sendCredentialEmail(
     newline: 'windows',
   });
   const compiled = await composer.sendMail({
-    from: { name: 'The Brightside Project', address: sender },
+    from: { name: 'The Brightside Wellness Project LLC', address: sender },
     to: message.to,
     subject: message.subject,
     text: message.text,

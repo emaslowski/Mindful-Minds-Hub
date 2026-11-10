@@ -46,7 +46,7 @@ export default function Review() {
       <div className="z-10 mx-auto mb-16 flex w-full max-w-4xl flex-1 flex-col items-center px-4">
         <h1 className="mb-4 text-center font-display text-5xl italic text-foreground md:text-7xl">Was this site helpful?</h1>
         <p className="mb-10 text-center font-sans text-xl text-secondary md:text-2xl">
-          We want to make The Brightside Project the best it can be. Let us know how we're doing.
+          We want to make The Brightside Wellness Project the best it can be. Let us know how we're doing.
         </p>
 
         {!submitted ? (

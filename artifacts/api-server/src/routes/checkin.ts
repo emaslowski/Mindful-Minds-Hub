@@ -78,7 +78,7 @@ router.post("/checkin", (req, res) => {
 
   const message =
     MOOD_MESSAGES[normalizedMood] ??
-    "Whatever you're feeling, The Brightside Project is here for you. Here are some places to explore:";
+    "Whatever you're feeling, The Brightside Wellness Project is here for you. Here are some places to explore:";
 
   res.json({ message, recommendations });
 });

@@ -315,7 +315,7 @@ router.post(
         // have the optional slug/featured/unpublished_at columns.
         await tx.execute(sql`
           INSERT INTO studio_publications (project_id, destination_section, author_display, publication_status)
-          VALUES (${id}, ${destinationSection!}, ${authorDisplay ?? 'The Brightside Project Student Team'}, 'active')
+          VALUES (${id}, ${destinationSection!}, ${authorDisplay ?? 'The Brightside Wellness Project Student Team'}, 'active')
           ON CONFLICT (project_id) DO UPDATE SET
             destination_section = EXCLUDED.destination_section, author_display = EXCLUDED.author_display,
             publication_status = 'active', published_at = now()

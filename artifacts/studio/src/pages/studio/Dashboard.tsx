@@ -228,7 +228,7 @@ export default function StudentDashboard() {
         <div className="mt-8 bg-[#eee6d8] border border-[#d5cabe] rounded-xl p-4 text-sm text-[#453329]">
           <p className="font-medium mb-1">Reminder</p>
           <p className="text-[#688a52] leading-relaxed">
-            Do not include private information about yourself or another student. The Brightside Project provides
+            Do not include private information about yourself or another student. The Brightside Wellness Project provides
             general educational wellness information and does not replace help from a trusted adult or professional.
           </p>
         </div>

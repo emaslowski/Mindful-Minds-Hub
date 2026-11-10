@@ -159,7 +159,7 @@ export default function CommandCenter() {
 
   return (
     <StudioLayout>
-      <StudioPage title="Command Center" subtitle="The Brightside Project Teacher Dashboard">
+      <StudioPage title="Command Center" subtitle="The Brightside Wellness Project Teacher Dashboard">
         <div className="mb-5 flex justify-end">
           <Link href="/studio/teacher/projects" className="inline-flex items-center justify-center rounded-full bg-[#c4622d] px-4 py-2 text-sm font-medium text-white hover:bg-[#a85226]">
             New Website Post
