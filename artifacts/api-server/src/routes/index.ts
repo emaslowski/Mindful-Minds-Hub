@@ -22,6 +22,7 @@ import coloringPagesRouter from "./coloringPages";
 import siteContentRouter from "./siteContent";
 import sectionsRouter from "./sections";
 import kitOrdersRouter from "./kitOrders";
+import kitSchoolsRouter from "./kitSchools";
 // Studio routes
 import studioAuthRouter from "./studio/auth";
 import studioProjectsRouter from "./studio/projects";
@@ -67,6 +68,7 @@ router.use(coloringPagesRouter);
 router.use(siteContentRouter);
 router.use(sectionsRouter);
 router.use(kitOrdersRouter);
+router.use(kitSchoolsRouter);
 // Studio — student
 router.use(studioAuthRouter);
 router.use(studioProjectsRouter);

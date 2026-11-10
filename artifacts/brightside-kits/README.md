@@ -21,8 +21,9 @@ Everything you are likely to change is in [src/config.ts](src/config.ts):
 prices, what each kit includes, the contact email, the hub URL, the FAQ and
 the list of hub centers. Page copy lives in `src/pages/`.
 
-The logo is `public/logo.jpg` (a 1000px web copy); the full-resolution
-original is `public/logo-print.png`. The four product illustrations are SVG
+The logo is `public/logo.png` (1000px, transparent background). Full-resolution
+copies: `public/logo-transparent-print.png` (transparent) and
+`public/logo-print.png` (the original with its cream background). The four product illustrations are SVG
 components in `src/components/KitArt.tsx`; replace any of them with a real
 photo by swapping the component for an `<img>`.
 

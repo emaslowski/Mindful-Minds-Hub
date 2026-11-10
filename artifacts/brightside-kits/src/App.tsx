@@ -7,6 +7,7 @@ import Home from '@/pages/Home';
 import Kits from '@/pages/Kits';
 import Order from '@/pages/Order';
 import Thanks from '@/pages/Thanks';
+import SchoolLogin from '@/pages/SchoolLogin';
 import NotFound from '@/pages/NotFound';
 
 /** Scroll to the top on route change, or to a #hash when one is given. */
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/kits" component={Kits} />
           <Route path="/order" component={Order} />
           <Route path="/thanks" component={Thanks} />
+          <Route path="/school-login" component={SchoolLogin} />
           <Route component={NotFound} />
         </Switch>
       </main>

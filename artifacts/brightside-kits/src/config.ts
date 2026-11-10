@@ -14,7 +14,7 @@ export const SITE = {
   shortName: 'Brightside Kits',
   tagline: 'A complete wellness curriculum, ready for your classroom.',
   /** Public address of this site. */
-  siteUrl: 'https://thebrightsidewellnessproject.com',
+  siteUrl: 'https://www.thebrightsidewellnessproject.com',
   /** Where buyers' questions and orders are sent (shown on the site). */
   contactEmail: 'elittle9514@gmail.com',
   /** The live student wellness website that comes with every kit. */

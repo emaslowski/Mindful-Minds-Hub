@@ -1,0 +1,27 @@
+# Builds the kits site image with Cloud Build (no local Docker needed) and
+# pushes it to Artifact Registry. Run from the repository root:
+#
+#   gcloud builds submit --config artifacts/brightside-kits/cloudbuild.yaml .
+#
+# Then deploy the pushed image to Cloud Run (see artifacts/brightside-kits/README.md).
+substitutions:
+  _IMAGE: us-east1-docker.pkg.dev/the-brightside-project-llc/cloud-run-source-deploy/brightside-kits
+  _API_BASE_URL: https://thebrightsidehub-480156548115.us-east1.run.app
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - artifacts/brightside-kits/Dockerfile
+      - --build-arg
+      - VITE_API_BASE_URL=${_API_BASE_URL}
+      - -t
+      - ${_IMAGE}:${BUILD_ID}
+      - -t
+      - ${_IMAGE}:latest
+      - .
+images:
+  - ${_IMAGE}:${BUILD_ID}
+  - ${_IMAGE}:latest
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -45,7 +45,11 @@ export default function Home() {
               <ButtonLink href="/kits" size="lg">See kits & pricing</ButtonLink>
               <ButtonLink href="/order?kit=district" size="lg" variant="ghost">Request a district quote</ButtonLink>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-cocoa-soft">
+            <p className="mt-4 text-sm text-cocoa-soft">
+              Already a Brightside school?{' '}
+              <Link href="/school-login" className="font-semibold text-coral underline-offset-4 hover:underline">Find your school's hub</Link>
+            </p>
+            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-cocoa-soft">
               {['Teacher manual', 'Slide decks', 'Student workbooks', `${SITE.accessMonths}-month hub access`].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-mustard" aria-hidden="true" />
@@ -58,10 +62,10 @@ export default function Home() {
             <div className="relative">
               <div className="absolute inset-0 -z-10 rounded-full bg-[radial-gradient(circle,rgba(246,227,181,0.9),rgba(251,244,238,0)_68%)]" aria-hidden="true" />
               <img
-                src="/logo.jpg"
+                src="/logo.png"
                 alt="The Brightside Wellness Project"
-                width={560}
-                height={560}
+                width={1000}
+                height={796}
                 className="w-[300px] max-w-full drop-shadow-[0_18px_30px_rgba(58,45,35,0.18)] sm:w-[400px] lg:w-[520px]"
                 fetchPriority="high"
               />

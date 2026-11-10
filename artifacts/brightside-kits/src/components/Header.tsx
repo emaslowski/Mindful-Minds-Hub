@@ -21,14 +21,14 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-cocoa/10 bg-cream/85 backdrop-blur">
       <Container className="flex h-18 items-center justify-between gap-4 py-2">
         <Link href="/" className="flex items-center gap-3" aria-label={`${SITE.name} home`} onClick={() => setOpen(false)}>
-          <img src="/logo.jpg" alt="" className="h-12 w-12 rounded-full object-cover object-[50%_42%] ring-2 ring-white" />
+          <img src="/logo.png" alt="" width={1000} height={796} className="h-12 w-auto" />
           <span className="font-display text-lg font-semibold leading-tight text-cocoa sm:text-xl">
             The Brightside
             <span className="block font-script text-base font-medium text-coral sm:text-lg">Wellness Project</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-6 md:flex" aria-label="Main">
           {NAV.map((item) => (
             <Link
               key={item.href}
@@ -41,6 +41,7 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+          <ButtonLink href="/school-login" size="md" variant="ghost">School login</ButtonLink>
           <ButtonLink href="/order" size="md">Order a kit</ButtonLink>
         </nav>
 
@@ -69,6 +70,9 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            <ButtonLink href="/school-login" className="mt-2" variant="ghost" onClick={() => setOpen(false)}>
+              School login
+            </ButtonLink>
             <ButtonLink href="/order" className="mt-2" onClick={() => setOpen(false)}>
               Order a kit
             </ButtonLink>

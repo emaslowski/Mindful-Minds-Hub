@@ -12,8 +12,9 @@ ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 WORKDIR /app
 RUN npm install -g pnpm@10
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.base.json ./
-COPY artifacts/brightside-kits ./artifacts/brightside-kits
+# The whole workspace is copied (root .dockerignore drops node_modules, dist
+# and .env) so the lockfile matches; only this package's deps are installed.
+COPY . .
 RUN pnpm install --frozen-lockfile --filter @workspace/brightside-kits
 RUN pnpm --filter @workspace/brightside-kits run build
 

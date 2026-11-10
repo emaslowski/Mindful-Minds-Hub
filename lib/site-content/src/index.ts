@@ -84,6 +84,14 @@ export const SITE_CONTENT = {
       { title: 'Share', image: 'step-7.jpg' },
     ],
   }),
+  'kits.schools': entry({
+    label: 'Kit schools (school login on the kits site)',
+    page: 'Kits site → School login',
+    description: 'Schools and districts that bought a learning kit. Each has a name, the access code printed in their welcome email (letters, numbers and dashes; not case-sensitive), the URL of their hub (the student site; the teacher sign-in is that URL plus /studio/), and an optional note shown to them after signing in. On the kits site, a school types its code on the School login page to get its links. Add an entry when a kit is sold; remove the demo entry when you no longer need it.',
+    default: [
+      { name: 'Demo School', code: 'BRIGHT-DEMO', hubUrl: 'https://thebrightsidehub-480156548115.us-east1.run.app', note: 'This is the demo hub. Your school gets its own address when your kit is set up.' },
+    ],
+  }),
   'journal.dailyPrompts': entry({
     label: 'Daily journal prompts',
     page: 'Grow → Journal',

@@ -8,7 +8,7 @@ export function Footer() {
     <footer className="mt-16 border-t border-cocoa/10 bg-cream-deep/60">
       <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2">
-          <img src="/logo.jpg" alt={SITE.name} className="h-28 w-28 rounded-3xl object-cover object-[50%_45%]" />
+          <img src="/logo.png" alt={SITE.name} width={1000} height={796} className="h-28 w-auto" />
           <p className="mt-4 max-w-sm text-cocoa-soft">
             Learning kits that help students learn, create, connect and belong. Built by educators,
             shaped by students.
@@ -22,6 +22,7 @@ export function Footer() {
             <li><Link href="/kits" className="hover:text-cocoa">Kits & pricing</Link></li>
             <li><Link href="/#faq" className="hover:text-cocoa">FAQ</Link></li>
             <li><Link href="/order" className="hover:text-cocoa">Order a kit</Link></li>
+            <li><Link href="/school-login" className="hover:text-cocoa">School login</Link></li>
           </ul>
         </div>
         <div>
