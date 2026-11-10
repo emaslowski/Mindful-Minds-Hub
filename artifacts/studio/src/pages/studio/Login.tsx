@@ -57,6 +57,7 @@ export default function StudioLogin() {
           </svg>
         </div>
         <h1 className="font-serif text-4xl font-semibold text-[#453329]">The Brightside Project</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#8a6a55] mt-1">A Student-Led Wellness Hub</p>
         <p className="text-[#688a52] mt-1 text-lg font-medium">Student Studio</p>
         <p className="text-[#8a6a55] mt-1 text-sm">Your creative workspace</p>
       </div>
@@ -238,7 +239,7 @@ export default function StudioLogin() {
       </Card>
 
       <a href="/" className="mt-6 text-sm text-[#688a52] hover:text-[#453329] underline transition-colors">
-        ← Back to The Brightside Project
+        ← Back to The Brightside Project: A Student-Led Wellness Hub
       </a>
     </div>
   );

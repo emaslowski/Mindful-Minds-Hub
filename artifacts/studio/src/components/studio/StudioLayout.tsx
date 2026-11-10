@@ -99,6 +99,7 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
             <h1 className="font-serif text-lg font-semibold leading-tight">
               The Brightside Project
             </h1>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-[#d5cabe]">A Student-Led Wellness Hub</p>
             <p className="text-xs text-[#d5cabe] mt-0.5">
               {user?.role === 'teacher' || isEditorGroup || isProducer ? 'Command Center' : 'Studio'}
             </p>

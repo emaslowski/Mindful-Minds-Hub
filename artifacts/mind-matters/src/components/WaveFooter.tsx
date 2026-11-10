@@ -15,6 +15,7 @@ export function WaveFooter({ quote = "Learn. Create. Connect. Belong." }: WaveFo
             <Sun aria-hidden="true" className="h-8 w-8 shrink-0 fill-accent/30 text-accent" />
             The Brightside Project
           </p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-foreground/70">A Student-Led Wellness Hub</p>
           <p className="text-sm text-foreground/80">{quote}</p>
         </div>
         <img

@@ -35,12 +35,13 @@ export function Layout({ children }: { children: ReactNode }) {
         <Link
           data-testid="link-home-logo"
           href="/"
-          aria-label="The Brightside Project home"
+          aria-label="The Brightside Project: A Student-Led Wellness Hub, home"
           className="flex items-center gap-2 self-center rounded-md text-foreground transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring md:self-auto"
         >
           <Sun aria-hidden="true" className="h-9 w-9 fill-accent/50 text-accent" />
-          <span className="font-serif text-xl font-bold leading-tight sm:text-2xl">
-            The Brightside Project
+          <span className="flex flex-col leading-tight">
+            <span className="font-serif text-xl font-bold sm:text-2xl">The Brightside Project</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-foreground/70 sm:text-xs">A Student-Led Wellness Hub</span>
           </span>
         </Link>
 
