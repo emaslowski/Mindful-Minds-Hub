@@ -13,9 +13,8 @@ export function WaveFooter({ quote = "Learn. Create. Connect. Belong." }: WaveFo
         <div className="flex max-w-sm flex-col items-center gap-1 md:items-start">
           <p className="flex items-center gap-2 font-serif text-2xl font-bold leading-tight">
             <Sun aria-hidden="true" className="h-8 w-8 shrink-0 fill-accent/30 text-accent" />
-            The Brightside Project
+            The Brightside Wellness Project LLC
           </p>
-          <p className="text-sm font-semibold uppercase tracking-wide text-foreground/70">A Student-Led Wellness Hub</p>
           <p className="text-sm text-foreground/80">{quote}</p>
         </div>
         <img
