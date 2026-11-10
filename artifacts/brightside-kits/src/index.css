@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@source "./**/*.{ts,tsx}";
+
+/* Brand palette, taken from the Brightside Wellness Project logo. */
+@theme {
+  --color-cream: #fbf4ee;
+  --color-cream-deep: #f3e7dc;
+  --color-paper: #fffdfa;
+  --color-peach: #f4a995;
+  --color-peach-soft: #fbd9cf;
+  --color-coral: #d96b5a;
+  --color-rose: #e8a0a0;
+  --color-mustard: #d9a23a;
+  --color-mustard-soft: #f6e3b5;
+  --color-olive: #9ba06e;
+  --color-sage: #8e9e82;
+  --color-sage-soft: #dde5d6;
+  --color-cocoa: #3a2d23;
+  --color-cocoa-soft: #6b5a4e;
+  --color-ink: #2a211b;
+
+  --font-display: "Fredoka", "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-script: "Caveat", "Segoe Script", cursive;
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-blob: 2.25rem;
+  --shadow-soft: 0 18px 50px -24px rgb(58 45 35 / 0.35);
+  --shadow-card: 0 10px 30px -18px rgb(58 45 35 / 0.3);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-cream font-sans text-ink antialiased;
+    background-image:
+      radial-gradient(circle at 6% 10%, rgb(217 162 58 / 0.14), transparent 26%),
+      radial-gradient(circle at 94% 16%, rgb(244 169 149 / 0.16), transparent 24%),
+      radial-gradient(circle at 50% 100%, rgb(142 158 130 / 0.12), transparent 30%);
+    background-attachment: fixed;
+  }
+  ::selection {
+    background: #f6e3b5;
+    color: #2a211b;
+  }
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mustard focus-visible:ring-offset-2 focus-visible:ring-offset-cream;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-script {
+    font-family: var(--font-script);
+  }
+  .sticker {
+    -webkit-text-stroke: 0;
+    text-shadow:
+      -1px -1px 0 #fff,
+      1px -1px 0 #fff,
+      -1px 1px 0 #fff,
+      1px 1px 0 #fff,
+      0 3px 0 rgb(58 45 35 / 0.12);
+  }
+  .wavy-underline {
+    text-decoration: underline wavy;
+    text-decoration-color: #d9a23a;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+  .float-slow {
+    animation: float 7s ease-in-out infinite;
+  }
+  .float-slower {
+    animation: float 10s ease-in-out infinite reverse;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: translateY(-10px) rotate(var(--tilt, 0deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

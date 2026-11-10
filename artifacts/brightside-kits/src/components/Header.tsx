@@ -1,0 +1,80 @@
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { Menu, X } from 'lucide-react';
+import clsx from 'clsx';
+
+import { ButtonLink, Container } from './ui';
+import { SITE } from '@/config';
+
+const NAV = [
+  { href: '/#inside', label: "What's inside" },
+  { href: '/#hub', label: 'The hub' },
+  { href: '/kits', label: 'Kits & pricing' },
+  { href: '/#faq', label: 'FAQ' },
+];
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+  const [location] = useLocation();
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-cocoa/10 bg-cream/85 backdrop-blur">
+      <Container className="flex h-18 items-center justify-between gap-4 py-2">
+        <Link href="/" className="flex items-center gap-3" aria-label={`${SITE.name} home`} onClick={() => setOpen(false)}>
+          <img src="/logo.jpg" alt="" className="h-12 w-12 rounded-full object-cover object-[50%_42%] ring-2 ring-white" />
+          <span className="font-display text-lg font-semibold leading-tight text-cocoa sm:text-xl">
+            The Brightside
+            <span className="block font-script text-base font-medium text-coral sm:text-lg">Wellness Project</span>
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-7 md:flex" aria-label="Main">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={clsx(
+                'font-display text-[15px] font-medium text-cocoa-soft transition hover:text-cocoa',
+                location === item.href && 'text-cocoa',
+              )}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <ButtonLink href="/order" size="md">Order a kit</ButtonLink>
+        </nav>
+
+        <button
+          type="button"
+          className="rounded-full p-2 text-cocoa md:hidden"
+          aria-expanded={open}
+          aria-controls="mobile-nav"
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </Container>
+
+      {open && (
+        <nav id="mobile-nav" className="border-t border-cocoa/10 bg-cream md:hidden" aria-label="Main">
+          <Container className="flex flex-col gap-1 py-3">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-3 py-3 font-display text-lg font-medium text-cocoa hover:bg-paper"
+              >
+                {item.label}
+              </Link>
+            ))}
+            <ButtonLink href="/order" className="mt-2" onClick={() => setOpen(false)}>
+              Order a kit
+            </ButtonLink>
+          </Container>
+        </nav>
+      )}
+    </header>
+  );
+}
