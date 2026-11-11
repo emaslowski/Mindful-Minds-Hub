@@ -10,3 +10,4 @@ export * from "./athlete";
 export * from "./plantObservations";
 export * from "./assistant";
 export * from "./siteContent";
+export * from "./codingLab";

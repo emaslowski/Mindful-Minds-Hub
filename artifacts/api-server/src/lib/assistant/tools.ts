@@ -136,6 +136,44 @@ function pick(input: Record<string, unknown>, keys: string[]): Record<string, un
   return out;
 }
 
+const CODING_LAB_BLOCK_TYPES = ['heading', 'paragraph', 'list', 'quote', 'tip', 'button', 'divider'];
+
+const CODING_LAB_STEP_GUIDE = `Steps run in order. Four step types:
+- read: { type:"read", title, body } — body is Markdown (**bold**, \`code\`, "- " lists, "> " quotes, "## " headings). Keep paragraphs short and concrete.
+- quiz: { type:"quiz", title, question, options:[2-6 strings], answer:<index of the correct option>, explanation } — students click answers until they get it right, then see the explanation.
+- build: { type:"build", title, instructions (Markdown), required:[block types the page must include], minBlocks } — students build a page by clicking blocks (${CODING_LAB_BLOCK_TYPES.join(', ')}), see the HTML in a Code tab, and can send the page to the teacher as a Studio project.
+- prompt: { type:"prompt", title, instructions (Markdown), groups:[{label, chips:[1-12 strings]}] (1-6 groups), allowAi } — students click one chip per group to assemble a prompt; with allowAi and the teacher's AI helper turned on, they can send it to the AI and read the reply.
+Write for children: warm, clear, no last names or private details, and end most lessons with a quiz.`;
+
+const CODING_LAB_STEPS_SCHEMA = {
+  type: 'array',
+  minItems: 1,
+  maxItems: 40,
+  description: 'The ordered steps of the lesson.',
+  items: {
+    type: 'object',
+    properties: {
+      type: { type: 'string', enum: ['read', 'quiz', 'build', 'prompt'] },
+      title: { type: 'string', maxLength: 120 },
+      body: { type: 'string', description: 'read: Markdown text.' },
+      question: { type: 'string', description: 'quiz' },
+      options: { type: 'array', items: { type: 'string' }, description: 'quiz: 2-6 answers.' },
+      answer: { type: 'integer', description: 'quiz: index of the correct option.' },
+      explanation: { type: 'string', description: 'quiz: shown after the right answer.' },
+      instructions: { type: 'string', description: 'build, prompt: Markdown instructions.' },
+      required: { type: 'array', items: { type: 'string', enum: CODING_LAB_BLOCK_TYPES }, description: 'build: block types the page must include.' },
+      minBlocks: { type: 'integer', minimum: 0, maximum: 50, description: 'build: minimum number of blocks.' },
+      groups: {
+        type: 'array',
+        items: { type: 'object', properties: { label: { type: 'string' }, chips: { type: 'array', items: { type: 'string' } } }, required: ['label', 'chips'] },
+        description: 'prompt: 1-6 chip groups.',
+      },
+      allowAi: { type: 'boolean', description: 'prompt: let students send the prompt to the AI helper.' },
+    },
+    required: ['type', 'title'],
+  },
+};
+
 export const ASSISTANT_TOOLS: AssistantTool[] = [
   // ── Reading ──────────────────────────────────────────────────────────────
   {
@@ -673,6 +711,71 @@ export const ASSISTANT_TOOLS: AssistantTool[] = [
     inputSchema: obj({ userId: str('Student userId.', { minLength: 1 }), decision: { type: 'string', enum: ['approve', 'reject'] } }, ['userId', 'decision']),
     toRequest: (i) => ({ method: 'POST', path: `/teacher/friendship/requests/${encodeURIComponent(String(i.userId))}/decision`, body: { decision: i.decision } }),
     summarize: (i) => `${i.decision === 'approve' ? 'Approve' : 'Reject'} friendship request from ${i.userId}`,
+  },
+
+  // ── Coding Lab ───────────────────────────────────────────────────────────
+  {
+    name: 'list_coding_lab_lessons',
+    mode: 'read',
+    description: 'List Coding Lab lessons (id, slug, title, emoji, summary, stepCount, published, sortOrder, how many students started and finished). The Coding Lab is where students learn about AI and how the website is built, and build pages by clicking blocks.',
+    inputSchema: obj({}),
+    toRequest: () => ({ method: 'GET', path: '/teacher/coding-lab/lessons' }),
+    summarize: () => 'List Coding Lab lessons',
+  },
+  {
+    name: 'get_coding_lab_lesson',
+    mode: 'read',
+    description: 'Read one Coding Lab lesson with all its steps. Call this before update_coding_lab_lesson so you send back the complete, edited step list.',
+    inputSchema: obj({ lessonId: id('Lesson id from list_coding_lab_lessons.') }, ['lessonId']),
+    toRequest: (i) => ({ method: 'GET', path: `/teacher/coding-lab/lessons/${i.lessonId}` }),
+    summarize: (i) => `Read Coding Lab lesson ${i.lessonId}`,
+  },
+  {
+    name: 'get_coding_lab_progress',
+    mode: 'read',
+    description: 'Student progress in the Coding Lab: which lessons each student started or finished, pages students built (and whether they were sent as projects), and the AI helper prompts and answers.',
+    inputSchema: obj({}),
+    toRequest: () => ({ method: 'GET', path: '/teacher/coding-lab/progress' }),
+    summarize: () => 'Read Coding Lab progress',
+  },
+  {
+    name: 'create_coding_lab_lesson',
+    mode: 'write',
+    description: `Create a Coding Lab lesson for students (about age 9-14). ${CODING_LAB_STEP_GUIDE}`,
+    inputSchema: obj({
+      title: str('Lesson title.', { minLength: 1, maxLength: 120 }),
+      emoji: str('One emoji for the lesson card.'),
+      summary: str('One or two sentences shown on the lesson card.', { maxLength: 500 }),
+      steps: CODING_LAB_STEPS_SCHEMA,
+      published: { type: 'boolean', description: 'Visible to students. Default true.' },
+      sortOrder: { type: 'integer', description: 'Lower numbers come first. Starter lessons use 10-60.' },
+    }, ['title', 'steps']),
+    toRequest: (i) => ({ method: 'POST', path: '/teacher/coding-lab/lessons', body: pick(i, ['title', 'emoji', 'summary', 'steps', 'published', 'sortOrder']) }),
+    summarize: (i) => `Create Coding Lab lesson "${i.title}"`,
+  },
+  {
+    name: 'update_coding_lab_lesson',
+    mode: 'write',
+    description: `Change a Coding Lab lesson. Fields left out stay as they are; if you send steps, send the COMPLETE list (it replaces all steps). ${CODING_LAB_STEP_GUIDE}`,
+    inputSchema: obj({
+      lessonId: id('Lesson id.'),
+      title: str('New title.', { minLength: 1, maxLength: 120 }),
+      emoji: str('New emoji.'),
+      summary: str('New summary.', { maxLength: 500 }),
+      steps: CODING_LAB_STEPS_SCHEMA,
+      published: { type: 'boolean' },
+      sortOrder: { type: 'integer' },
+    }, ['lessonId']),
+    toRequest: (i) => ({ method: 'PATCH', path: `/teacher/coding-lab/lessons/${i.lessonId}`, body: pick(i, ['title', 'emoji', 'summary', 'steps', 'published', 'sortOrder']) }),
+    summarize: (i) => `Update Coding Lab lesson ${i.lessonId} (${Object.keys(pick(i, ['title', 'emoji', 'summary', 'steps', 'published', 'sortOrder'])).join(', ')})`,
+  },
+  {
+    name: 'delete_coding_lab_lesson',
+    mode: 'write',
+    description: 'Delete a Coding Lab lesson. Student progress for it is deleted too; pages students built are kept. Prefer published:false (update_coding_lab_lesson) to hide a lesson without losing it.',
+    inputSchema: obj({ lessonId: id('Lesson id.') }, ['lessonId']),
+    toRequest: (i) => ({ method: 'DELETE', path: `/teacher/coding-lab/lessons/${i.lessonId}` }),
+    summarize: (i) => `Delete Coding Lab lesson ${i.lessonId}`,
   },
 ];
 

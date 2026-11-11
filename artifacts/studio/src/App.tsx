@@ -17,6 +17,8 @@ import HandoffNew from '@/pages/studio/HandoffNew';
 import IncomingHandoffs from '@/pages/studio/IncomingHandoffs';
 import VideoProductions from '@/pages/studio/VideoProductions';
 import VideoProductionDetail from '@/pages/studio/VideoProductionDetail';
+import CodingLab from '@/pages/studio/CodingLab';
+import CodingLabLesson from '@/pages/studio/CodingLabLesson';
 
 // Studio pages — teacher
 import CommandCenter from '@/pages/studio/teacher/CommandCenter';
@@ -34,6 +36,7 @@ import TeacherArtwork from '@/pages/studio/teacher/Artwork';
 import TeacherAthletes from '@/pages/studio/teacher/Athletes';
 import Assistant from '@/pages/studio/teacher/Assistant';
 import AssistantAccess from '@/pages/studio/teacher/AssistantAccess';
+import CodingLabAdmin from '@/pages/studio/teacher/CodingLabAdmin';
 
 const queryClient = new QueryClient();
 
@@ -58,11 +61,14 @@ function StudioRouter() {
       <Route path="/studio/handoff/new" component={HandoffNew} />
       <Route path="/studio/handoffs/incoming" component={IncomingHandoffs} />
       <Route path="/studio/portfolio" component={Portfolio} />
+      <Route path="/studio/coding-lab/:slug" component={CodingLabLesson} />
+      <Route path="/studio/coding-lab" component={CodingLab} />
       <Route path="/studio" component={StudentDashboard} />
 
       {/* Teacher routes */}
       <Route path="/studio/teacher/assistant-access" component={AssistantAccess} />
       <Route path="/studio/teacher/assistant" component={Assistant} />
+      <Route path="/studio/teacher/coding-lab" component={CodingLabAdmin} />
       <Route path="/studio/teacher/artwork" component={TeacherArtwork} />
       <Route path="/studio/teacher/athletes" component={TeacherAthletes} />
       <Route path="/studio/teacher/review/:id" component={ProjectReview} />

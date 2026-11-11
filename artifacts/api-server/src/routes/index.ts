@@ -30,6 +30,8 @@ import studioSourcesRouter from "./studio/sources";
 import studioPeerReviewRouter from "./studio/peerReview";
 import studioVideoProductionsRouter from "./studio/videoProductions";
 import studioPortfolioRouter from "./studio/portfolio";
+import studioCodingLabRouter from "./studio/codingLab";
+import teacherCodingLabRouter from "./studio/teacher/codingLab";
 import teacherStudentsRouter from "./studio/teacher/students";
 import teacherTeamsJobsRouter from "./studio/teacher/teamsJobs";
 import teacherCyclesRouter from "./studio/teacher/cycles";
@@ -76,6 +78,7 @@ router.use(studioSourcesRouter);
 router.use(studioPeerReviewRouter);
 router.use(studioVideoProductionsRouter);
 router.use(studioPortfolioRouter);
+router.use(studioCodingLabRouter);
 // Studio — teacher
 router.use(teacherStudentsRouter);
 router.use(teacherTeamsJobsRouter);
@@ -87,6 +90,7 @@ router.use(teacherAnalyticsRouter);
 router.use(teacherSettingsRouter);
 router.use(teacherModerationRouter);
 router.use(teacherAssistantRouter);
+router.use(teacherCodingLabRouter);
 // Public (no auth)
 router.use(publicContentRouter);
 
