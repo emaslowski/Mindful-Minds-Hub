@@ -1,6 +1,6 @@
 import { Link } from 'wouter';
 
-import { Container, Heart } from './ui';
+import { Container } from './ui';
 import { SITE } from '@/config';
 
 export function Footer() {
@@ -19,6 +19,7 @@ export function Footer() {
           <ul className="mt-3 space-y-2 text-cocoa-soft">
             <li><Link href="/#inside" className="hover:text-cocoa">What's inside</Link></li>
             <li><Link href="/#hub" className="hover:text-cocoa">The hub</Link></li>
+            <li><Link href="/#pd" className="hover:text-cocoa">Professional development</Link></li>
             <li><Link href="/kits" className="hover:text-cocoa">Kits & pricing</Link></li>
             <li><Link href="/#faq" className="hover:text-cocoa">FAQ</Link></li>
             <li><Link href="/order" className="hover:text-cocoa">Order a kit</Link></li>
@@ -36,9 +37,7 @@ export function Footer() {
       <div className="border-t border-cocoa/10">
         <Container className="flex flex-col gap-2 py-5 text-sm text-cocoa-soft sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {SITE.name}. All rights reserved.</p>
-          <p className="flex items-center gap-1.5">
-            Made with <Heart className="h-4 w-4" /> for students and teachers.
-          </p>
+          <p>Built by educators, for students and teachers.</p>
         </Container>
       </div>
     </footer>

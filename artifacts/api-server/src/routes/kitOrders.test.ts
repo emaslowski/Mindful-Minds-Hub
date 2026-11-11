@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
-import kitOrdersRouter, { parseKitOrder, kitOrderRecipients } from "./kitOrders";
+import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays } from "./kitOrders";
 
 const valid = {
   kit: "school",
@@ -45,6 +45,27 @@ describe("parseKitOrder", () => {
     const district = parseKitOrder({ ...valid, kit: "district", address: "", payment: "quote", quantity: 99 });
     assert.equal(district.ok, true);
     if (district.ok) assert.equal(district.order.quantity, 1);
+  });
+
+  it("accepts the professional-development add-on only as 2 or 3 days", () => {
+    assert.equal(parsePdDays(2), 2);
+    assert.equal(parsePdDays("3"), 3);
+    assert.equal(parsePdDays(0), 0);
+    assert.equal(parsePdDays(5), 0);
+    assert.equal(parsePdDays("lots"), 0);
+    assert.equal(parsePdDays(undefined), 0);
+
+    const none = parseKitOrder(valid);
+    assert.equal(none.ok && none.order.pdDays, 0);
+
+    const withPd = parseKitOrder({ ...valid, pdDays: 3, pdTiming: "late August", pdParticipants: "24", pdLocation: "District office, Middleport NY" });
+    assert.equal(withPd.ok, true);
+    if (withPd.ok) {
+      assert.equal(withPd.order.pdDays, 3);
+      assert.equal(withPd.order.pdTiming, "late August");
+      assert.equal(withPd.order.pdParticipants, "24");
+      assert.equal(withPd.order.pdLocation, "District office, Middleport NY");
+    }
   });
 
   it("clamps quantity and trims long text", () => {

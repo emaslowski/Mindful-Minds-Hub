@@ -9,6 +9,7 @@ import { SITE } from '@/config';
 const NAV = [
   { href: '/#inside', label: "What's inside" },
   { href: '/#hub', label: 'The hub' },
+  { href: '/#pd', label: 'Professional development' },
   { href: '/kits', label: 'Kits & pricing' },
   { href: '/#faq', label: 'FAQ' },
 ];
@@ -22,13 +23,13 @@ export function Header() {
       <Container className="flex h-18 items-center justify-between gap-4 py-2">
         <Link href="/" className="flex items-center gap-3" aria-label={`${SITE.name} home`} onClick={() => setOpen(false)}>
           <img src="/logo.png" alt="" width={1000} height={796} className="h-12 w-auto" />
-          <span className="font-display text-lg font-semibold leading-tight text-cocoa sm:text-xl">
+          <span className="font-display text-base font-bold leading-tight text-cocoa sm:text-lg">
             The Brightside
-            <span className="block font-script text-base font-medium text-coral sm:text-lg">Wellness Project</span>
+            <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-coral">Wellness Project</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-5 lg:flex" aria-label="Main">
           {NAV.map((item) => (
             <Link
               key={item.href}
@@ -47,7 +48,7 @@ export function Header() {
 
         <button
           type="button"
-          className="rounded-full p-2 text-cocoa md:hidden"
+          className="rounded-full p-2 text-cocoa lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -58,14 +59,14 @@ export function Header() {
       </Container>
 
       {open && (
-        <nav id="mobile-nav" className="border-t border-cocoa/10 bg-cream md:hidden" aria-label="Main">
+        <nav id="mobile-nav" className="border-t border-cocoa/10 bg-cream lg:hidden" aria-label="Main">
           <Container className="flex flex-col gap-1 py-3">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-3 font-display text-lg font-medium text-cocoa hover:bg-paper"
+                className="rounded-lg px-3 py-3 font-display text-lg font-medium text-cocoa hover:bg-paper"
               >
                 {item.label}
               </Link>

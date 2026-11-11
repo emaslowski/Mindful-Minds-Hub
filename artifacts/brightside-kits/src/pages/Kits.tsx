@@ -3,8 +3,10 @@ import { Check as CheckIcon, Minus } from 'lucide-react';
 
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { KIT_ART } from '@/components/KitArt';
-import { PricingGrid } from '@/components/Pricing';
-import { KITS, KIT_PARTS, SITE } from '@/config';
+import { PdAddOn, PricingGrid } from '@/components/Pricing';
+import { KITS, KIT_PARTS, PD, SITE, formatPrice } from '@/config';
+
+const pdCell = `Add-on, from ${formatPrice(PD.options[0].price)}`;
 
 type Cell = true | false | string;
 
@@ -19,6 +21,8 @@ const COMPARISON: { label: string; cells: Record<string, Cell> }[] = [
   { label: 'School-branded hub (name, logo, colors)', cells: { classroom: false, school: true, district: 'Per school' } },
   { label: 'Live teacher onboarding', cells: { classroom: false, school: '1 session', district: 'Per school' } },
   { label: 'Support', cells: { classroom: 'Email', school: 'Priority email', district: 'Dedicated contact' } },
+  { label: 'On-site professional development (2 or 3 days)', cells: { classroom: pdCell, school: pdCell, district: 'Add-on or built into your quote' } },
+  { label: 'Pay by card without a purchase order', cells: { classroom: true, school: true, district: false } },
   { label: 'Multi-year pricing', cells: { classroom: false, school: false, district: true } },
 ];
 
@@ -43,8 +47,10 @@ export default function Kits() {
           <Eyebrow>Kits & pricing</Eyebrow>
           <Heading as="h1" className="mt-2">The Brightside Wellness Learning Kit</Heading>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-cocoa-soft">
-            One curriculum, three ways to buy it. Every kit ships with the same four parts; the
-            difference is how many teachers and students it covers and how much support comes with it.
+            One curriculum, three ways to buy it: as a teacher, as a school, or as a district.
+            Every kit ships with the same four parts; the difference is how many teachers and
+            students it covers and how much support comes with it. On-site professional
+            development can be added to any of them.
           </p>
         </Container>
       </Section>
@@ -57,7 +63,7 @@ export default function Kits() {
             return (
               <figure
                 key={part.key}
-                className={['rounded-3xl p-4 shadow-card', ['bg-sage-soft', 'bg-mustard-soft', 'bg-peach-soft', 'bg-cream-deep'][i]].join(' ')}
+                className={['rounded-xl border border-cocoa/10 p-4', ['bg-sage-soft', 'bg-mustard-soft', 'bg-peach-soft', 'bg-cream-deep'][i]].join(' ')}
               >
                 <div className="aspect-square">
                   <Art />
@@ -75,6 +81,13 @@ export default function Kits() {
         </Container>
       </Section>
 
+      {/* Professional development add-on */}
+      <Section id="pd" className="scroll-mt-20 pt-0">
+        <Container>
+          <PdAddOn />
+        </Container>
+      </Section>
+
       {/* Comparison table */}
       <Section className="bg-paper/70">
         <Container>
@@ -82,7 +95,7 @@ export default function Kits() {
             <Eyebrow>Side by side</Eyebrow>
             <Heading className="mt-2">What each kit includes</Heading>
           </div>
-          <div className="mt-10 overflow-x-auto rounded-[2rem] border border-cocoa/10 bg-paper shadow-card">
+          <div className="mt-10 overflow-x-auto rounded-2xl border border-cocoa/10 bg-paper shadow-card">
             <table className="w-full min-w-[640px] text-left text-[15px]">
               <thead>
                 <tr className="border-b border-cocoa/10">
@@ -111,6 +124,45 @@ export default function Kits() {
         </Container>
       </Section>
 
+      {/* Buying as a teacher */}
+      <Section className="pb-0">
+        <Container className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div className="rounded-2xl border border-cocoa/10 bg-paper p-8 shadow-card sm:p-10 lg:order-2">
+            <Eyebrow>For teachers</Eyebrow>
+            <h3 className="mt-3 font-display text-3xl font-bold text-cocoa">Buying for your own classroom?</h3>
+            <p className="mt-3 text-cocoa/80">
+              The Classroom Kit is {formatPrice(KITS[0].price)} and you can pay by card today. It ships
+              to your school, and your class gets its own hub access the same week.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <ButtonLink href="/order?kit=classroom" variant="dark" size="lg">Order a Classroom Kit</ButtonLink>
+            </div>
+          </div>
+          <div className="lg:order-1">
+            <Eyebrow>No purchasing office needed</Eyebrow>
+            <Heading className="mt-2">Buying as a teacher</Heading>
+            <p className="mt-5 text-lg leading-relaxed text-cocoa-soft">
+              Many Brightside classrooms start with one teacher. You do not need a district contract
+              or an IT project to get going.
+            </p>
+            <ul className="mt-6 space-y-3 text-cocoa">
+              {[
+                'Pay by card, or request a quote your principal can approve',
+                'Everything arrives at your school within 5 business days',
+                'Hub accounts for you and your students, with Google sign-in',
+                'Scripted lessons and slides, so your first lesson can be next week',
+                'Ask about PD: a 2-day institute can train your whole building',
+              ].map((t) => (
+                <li key={t} className="flex gap-3">
+                  <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-sage" />
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Container>
+      </Section>
+
       {/* Buying for a district */}
       <Section>
         <Container className="grid gap-10 lg:grid-cols-2 lg:items-center">
@@ -129,6 +181,7 @@ export default function Kits() {
                 'Card and ACH payments through a secure checkout',
                 'Ships to one address per school, or one central warehouse',
                 'Hub accounts created from a roster spreadsheet you send us',
+                `On-site professional development (${PD.options[0].days} or ${PD.options[1].days} days) on the same quote`,
               ].map((t) => (
                 <li key={t} className="flex gap-3">
                   <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-sage" />
@@ -137,12 +190,12 @@ export default function Kits() {
               ))}
             </ul>
           </div>
-          <div className="rounded-[2.5rem] bg-cocoa p-8 text-cream shadow-soft sm:p-10">
-            <p className="font-script text-2xl text-mustard">Let's talk</p>
-            <h3 className="mt-1 font-display text-3xl font-semibold">Need a quote for several schools?</h3>
+          <div className="rounded-2xl bg-cocoa p-8 text-cream shadow-soft sm:p-10">
+            <Eyebrow tone="mustard">Let's talk</Eyebrow>
+            <h3 className="mt-3 font-display text-3xl font-bold">Need a quote for several schools?</h3>
             <p className="mt-3 text-cream/80">
-              Tell us how many schools, teachers and students you would like to include and we will
-              send a quote within two school days.
+              Tell us how many schools, teachers and students you would like to include, and whether
+              you want professional development on site, and we will send a quote within two school days.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <ButtonLink href="/order?kit=district" variant="secondary" size="lg">Request a district quote</ButtonLink>

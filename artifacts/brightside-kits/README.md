@@ -16,6 +16,14 @@ Pages:
 | `/thanks` | Confirmation (also the return page for Stripe checkout)          |
 | `/school-login` | School login: a school enters its access code and gets its hub links |
 
+The site sells to three audiences: individual teachers (Classroom Kit, card
+payment, no purchase order), schools, and districts. Every kit can be bought
+with the **on-site professional development** add-on: a 2-day or 3-day
+institute led in person by the program's creator. The order form has a step for
+it (`/order?pd=2` or `?pd=3` preselects it), the price is added to the
+estimated total, and the order email lists the requested dates, headcount and
+location.
+
 ## School login (access codes)
 
 Each school that buys a kit gets an access code and a hub address. The list
@@ -33,6 +41,12 @@ longer want it.
 Everything you are likely to change is in [src/config.ts](src/config.ts):
 prices, what each kit includes, the contact email, the hub URL, the FAQ and
 the list of hub centers. Page copy lives in `src/pages/`.
+
+The professional-development add-on is the `PD` object in the same file:
+`presenterName` (your name, shown as "led by … , creator of the program"),
+`groupSize`, `travelNote`, the two `options` (days, name, price, summary,
+"best for") and the day-by-day `days` agenda. The prices there are
+placeholders until you set them.
 
 The logo is `public/logo.png` (1000px, transparent background). Full-resolution
 copies: `public/logo-transparent-print.png` (transparent) and

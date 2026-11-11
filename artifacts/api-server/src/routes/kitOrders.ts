@@ -29,6 +29,14 @@ const PAYMENT_LABELS: Record<string, string> = {
   quote: "Quote only",
 };
 
+/** On-site professional development add-on: allowed lengths in days. */
+const PD_DAYS = new Set([2, 3]);
+
+export function parsePdDays(v: unknown): number {
+  const n = Number(v);
+  return PD_DAYS.has(n) ? n : 0;
+}
+
 // Very small in-memory rate limit per IP so the public form cannot be used to
 // flood the inbox. Resets when the process restarts, which is fine here.
 const recent = new Map<string, number[]>();
@@ -80,6 +88,11 @@ export interface KitOrderInput {
   schools: string;
   teachers: string;
   students: string;
+  /** 0 = no professional development; otherwise days on site (2 or 3). */
+  pdDays: number;
+  pdTiming: string;
+  pdParticipants: string;
+  pdLocation: string;
   payment: string;
   poNumber: string;
   notes: string;
@@ -116,6 +129,10 @@ export function parseKitOrder(body: unknown): { ok: true; order: KitOrderInput }
       schools: str(b.schools, 40),
       teachers: str(b.teachers, 40),
       students: str(b.students, 40),
+      pdDays: parsePdDays(b.pdDays),
+      pdTiming: str(b.pdTiming, 200),
+      pdParticipants: str(b.pdParticipants, 40),
+      pdLocation: str(b.pdLocation, 300),
       payment,
       poNumber: str(b.poNumber, 80),
       notes: str(b.notes, 4000),
@@ -138,6 +155,14 @@ function orderRows(order: KitOrderInput): [string, string][] {
   if (order.schools) rows.push(["Schools", order.schools]);
   if (order.teachers) rows.push(["Teachers", order.teachers]);
   if (order.students) rows.push(["Students", order.students]);
+  if (order.pdDays) {
+    rows.push(["Professional development", `${order.pdDays}-day on-site institute`]);
+    if (order.pdTiming) rows.push(["PD preferred dates", order.pdTiming]);
+    if (order.pdParticipants) rows.push(["PD educators attending", order.pdParticipants]);
+    if (order.pdLocation) rows.push(["PD location", order.pdLocation]);
+  } else {
+    rows.push(["Professional development", "None requested"]);
+  }
   rows.push(
     ["School / district", order.organization],
     ["Contact", order.role ? `${order.contactName} (${order.role})` : order.contactName],
@@ -191,7 +216,7 @@ router.post("/kits/orders", async (req, res) => {
   const rows = orderRows(order);
   const recipients = kitOrderRecipients();
 
-  logger.info({ reference, kit: order.kit, payment: order.payment, organization: order.organization }, "Kit order received");
+  logger.info({ reference, kit: order.kit, pdDays: order.pdDays, payment: order.payment, organization: order.organization }, "Kit order received");
 
   const smtpHost = process.env.SMTP_HOST;
   if (!smtpHost || !recipients.length) {
@@ -212,12 +237,13 @@ router.post("/kits/orders", async (req, res) => {
     const from = { name: "The Brightside Wellness Project", address: process.env.SMTP_USER ?? "" };
     const kitName = KIT_NAMES[order.kit];
     const isQuote = order.payment === "quote";
+    const pdSuffix = order.pdDays ? ` + ${order.pdDays}-day PD` : "";
 
     await transporter.sendMail({
       from,
       to: recipients,
       replyTo: order.email,
-      subject: `${isQuote ? "Quote request" : "Kit order"} ${reference}: ${kitName} for ${order.organization}`,
+      subject: `${isQuote ? "Quote request" : "Kit order"} ${reference}: ${kitName}${pdSuffix} for ${order.organization}`,
       text: `New ${isQuote ? "quote request" : "kit order"} from the Brightside kits site.\n\nReference: ${reference}\n${rowsText(rows)}\n\nReply to this email to answer ${order.contactName} directly.`,
       html: wrapHtml(
         `${isQuote ? "Quote request" : "Kit order"} ${reference}`,
@@ -233,15 +259,16 @@ router.post("/kits/orders", async (req, res) => {
         : order.payment === "purchase_order"
           ? "We will email a formal quote and invoice within two school days, along with a W-9 for your business office."
           : "We will email a quote within two school days.";
+    const pdNote = order.pdDays ? " We will also reach out to confirm dates for your on-site professional development." : "";
 
     await transporter.sendMail({
       from,
       to: order.email,
       subject: `We received your ${isQuote ? "quote request" : "order"} (${reference}) — The Brightside Wellness Project`,
-      text: `Hi ${order.contactName},\n\nThank you for your interest in The Brightside Wellness Project. ${nextStep}\n\nReference: ${reference}\n${rowsText(rows)}\n\nQuestions? Just reply to this email.`,
+      text: `Hi ${order.contactName},\n\nThank you for your interest in The Brightside Wellness Project. ${nextStep}${pdNote}\n\nReference: ${reference}\n${rowsText(rows)}\n\nQuestions? Just reply to this email.`,
       html: wrapHtml(
         `Thank you, ${order.contactName}!`,
-        `We received your ${isQuote ? "quote request" : "order"}. ${nextStep} Your reference is ${reference}.`,
+        `We received your ${isQuote ? "quote request" : "order"}. ${nextStep}${pdNote} Your reference is ${reference}.`,
         rows,
         "Questions? Just reply to this email.",
       ),

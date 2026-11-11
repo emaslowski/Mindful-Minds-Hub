@@ -2,12 +2,13 @@ import { useSearch } from 'wouter';
 
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { BrainMark } from '@/components/KitArt';
-import { SITE, kitById } from '@/config';
+import { SITE, kitById, pdOption } from '@/config';
 
 export default function Thanks() {
   const params = new URLSearchParams(useSearch());
   const reference = params.get('ref');
   const kit = kitById(params.get('kit'));
+  const pd = pdOption(params.get('pd'));
   const payment = params.get('payment');
   const fromStripe = params.has('session_id');
 
@@ -33,13 +34,22 @@ export default function Thanks() {
         </div>
         <Eyebrow className="mt-6">Thank you</Eyebrow>
         <Heading as="h1" className="mt-2">{headline}</Heading>
-        <p className="mt-5 text-lg text-cocoa-soft">{next}</p>
+        <p className="mt-5 text-lg text-cocoa-soft">
+          {next}
+          {pd && ' We will also reach out to confirm dates for your on-site professional development.'}
+        </p>
         {(kit || reference) && (
-          <dl className="mx-auto mt-8 grid max-w-md gap-3 rounded-[2rem] border border-cocoa/10 bg-paper p-6 text-left shadow-card">
+          <dl className="mx-auto mt-8 grid max-w-md gap-3 rounded-2xl border border-cocoa/10 bg-paper p-6 text-left shadow-card">
             {kit && (
               <div className="flex justify-between gap-4">
                 <dt className="text-cocoa-soft">Kit</dt>
-                <dd className="font-semibold text-cocoa">{kit.name}</dd>
+                <dd className="font-bold text-cocoa">{kit.name}</dd>
+              </div>
+            )}
+            {pd && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-cocoa-soft">Professional development</dt>
+                <dd className="font-semibold text-cocoa">{pd.name}</dd>
               </div>
             )}
             {reference && (

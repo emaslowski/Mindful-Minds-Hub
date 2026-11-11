@@ -54,7 +54,7 @@ export const KITS: Kit[] = [
     name: 'Classroom Kit',
     audience: 'One teacher, one class',
     price: 349,
-    priceNote: 'one-time, includes 12 months of hub access',
+    priceNote: 'one-time, includes 12 months of hub access. Pay by card, no purchase order needed.',
     checkoutUrl: '',
     teachers: '1 teacher account',
     students: 'Up to 35 students',
@@ -115,6 +115,90 @@ export function kitById(id: string | null | undefined): Kit | undefined {
 export function formatPrice(price: number | null): string {
   if (price === null) return 'Custom';
   return `$${price.toLocaleString('en-US')}`;
+}
+
+/**
+ * On-site professional development: the program's creator comes to the
+ * school or district and leads 2 or 3 days of training. It can be added to any
+ * kit for an additional rate. Prices are placeholders until you set them.
+ */
+export type PdDays = 0 | 2 | 3;
+
+export interface PdOption {
+  days: Exclude<PdDays, 0>;
+  name: string;
+  /** Whole dollars, in addition to the kit price. */
+  price: number;
+  summary: string;
+  bestFor: string;
+}
+
+export const PD = {
+  title: 'On-site professional development',
+  /** Shown on the site, e.g. "led by Jane Smith, creator of the program". Leave empty to say "the program's creator". */
+  presenterName: '',
+  /** How many educators one session is designed for. */
+  groupSize: 'Up to 30 educators per session',
+  /** Shown next to the prices. */
+  travelNote: 'Travel and lodging are billed at cost and quoted up front, so there are no surprises on the invoice.',
+  options: [
+    {
+      days: 2,
+      name: '2-day institute',
+      price: 4500,
+      summary: 'Foundations plus the hub: everything teachers need to launch the curriculum with confidence.',
+      bestFor: 'A single school or a small group of schools launching together',
+    },
+    {
+      days: 3,
+      name: '3-day institute',
+      price: 6500,
+      summary: 'The 2-day institute plus a coaching day: model lessons in real classrooms and a leadership planning session.',
+      bestFor: 'Districts rolling out across several buildings',
+    },
+  ] as PdOption[],
+  /** What happens on each day. Day 3 only applies to the 3-day institute. */
+  days: [
+    {
+      day: 1,
+      title: 'Foundations and the teacher manual',
+      points: [
+        'The why behind the program: belonging, self-awareness and creative communication',
+        'A guided walk through the manual, pacing guides and rubrics',
+        'Model lessons taught live, with teachers as the students',
+        'Leading sensitive conversations and knowing when to involve counselors',
+      ],
+    },
+    {
+      day: 2,
+      title: 'The hub in practice',
+      points: [
+        'Hands-on time in the Student Studio and the Teacher Command Center',
+        'Reviewing, publishing and celebrating student work',
+        'Private journaling, teacher alerts and student privacy',
+        'Building each teacher’s first-month plan before they leave',
+      ],
+    },
+    {
+      day: 3,
+      title: 'Coaching day (3-day institute only)',
+      points: [
+        'Co-teaching and observing the first lessons in real classrooms',
+        'Small-group coaching by grade band or subject',
+        'A leadership session on measuring impact and sustaining the program',
+        'A year-long rollout and renewal plan for the district',
+      ],
+    },
+  ],
+} as const;
+
+export function pdOption(days: number | string | null | undefined): PdOption | undefined {
+  const n = Number(days);
+  return PD.options.find((o) => o.days === n);
+}
+
+export function pdPresenter(): string {
+  return PD.presenterName ? `${PD.presenterName}, creator of ${SITE.name}` : `the creator of ${SITE.name}`;
 }
 
 /** The four parts of every kit, used across the site. */
@@ -205,5 +289,13 @@ export const FAQ = [
   {
     q: 'Can we customize the hub for our school?',
     a: 'School and District licenses include a branded hub with your school name, logo and colors. Teachers can also edit homepage text, add sections and manage events without a developer.',
+  },
+  {
+    q: 'Can I buy a kit as an individual teacher?',
+    a: 'Yes. The Classroom Kit is built for one teacher and one class, and you can pay by card without going through purchasing. If your school will reimburse you or wants to pay directly, choose "Purchase order" on the order form and we will send a quote you can hand to your principal.',
+  },
+  {
+    q: 'Can you come to our district for professional development?',
+    a: `Yes. ${PD.title} can be added to any kit: a 2-day institute covers the curriculum and the hub, and the 3-day institute adds a coaching day with model lessons in real classrooms and a leadership planning session. Sessions are led in person by ${pdPresenter()} for ${PD.groupSize.toLowerCase()}. Choose it on the order form and we will confirm dates with you.`,
   },
 ];

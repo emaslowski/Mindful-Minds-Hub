@@ -2,7 +2,7 @@ import { FAQ } from '@/config';
 
 export function Faq() {
   return (
-    <div className="mx-auto max-w-3xl divide-y divide-cocoa/10 rounded-[2rem] border border-cocoa/10 bg-paper px-6 shadow-card sm:px-8">
+    <div className="mx-auto max-w-3xl divide-y divide-cocoa/10 rounded-2xl border border-cocoa/10 bg-paper px-6 shadow-card sm:px-8">
       {FAQ.map((item) => (
         <details key={item.q} className="group py-5">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg font-semibold text-cocoa marker:hidden">

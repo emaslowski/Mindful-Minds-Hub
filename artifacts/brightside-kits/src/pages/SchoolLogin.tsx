@@ -103,14 +103,14 @@ export default function SchoolLogin() {
           </p>
 
           {school ? (
-            <div className="mt-10 rounded-[2rem] border border-mustard bg-paper p-7 shadow-card ring-4 ring-mustard/25">
+            <div className="mt-10 rounded-2xl border border-mustard bg-paper p-7 shadow-card ring-1 ring-mustard/40">
               <div className="flex items-start gap-4">
                 <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-peach-soft">
                   <BrainMark size={44} />
                 </span>
                 <div>
-                  <p className="font-script text-2xl text-coral">Welcome back</p>
-                  <h2 className="font-display text-3xl font-semibold text-cocoa">{school.name}</h2>
+                  <Eyebrow>Welcome back</Eyebrow>
+                  <h2 className="mt-2 font-display text-3xl font-bold text-cocoa">{school.name}</h2>
                   {school.note && <p className="mt-2 text-cocoa-soft">{school.note}</p>}
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default function SchoolLogin() {
                   href={school.hubUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="group rounded-3xl border-2 border-cocoa/10 bg-cream p-5 transition hover:border-coral"
+                  className="group rounded-xl border-2 border-cocoa/10 bg-cream p-5 transition hover:border-coral"
                 >
                   <Users className="h-7 w-7 text-coral" />
                   <span className="mt-3 block font-display text-xl font-semibold text-cocoa">Student site</span>
@@ -130,7 +130,7 @@ export default function SchoolLogin() {
                   href={school.studioUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="group rounded-3xl border-2 border-cocoa/10 bg-cream p-5 transition hover:border-coral"
+                  className="group rounded-xl border-2 border-cocoa/10 bg-cream p-5 transition hover:border-coral"
                 >
                   <GraduationCap className="h-7 w-7 text-coral" />
                   <span className="mt-3 block font-display text-xl font-semibold text-cocoa">Teacher sign-in</span>
@@ -150,7 +150,7 @@ export default function SchoolLogin() {
               </button>
             </div>
           ) : (
-            <form onSubmit={lookup} className="mt-10 rounded-[2rem] border border-cocoa/10 bg-paper p-7 shadow-card" noValidate>
+            <form onSubmit={lookup} className="mt-10 rounded-2xl border border-cocoa/10 bg-paper p-7 shadow-card" noValidate>
               <label htmlFor="code" className="mb-1.5 block font-display text-[15px] font-semibold text-cocoa">
                 School access code
               </label>
@@ -184,7 +184,7 @@ export default function SchoolLogin() {
           )}
         </div>
 
-        <aside className="rounded-[2rem] bg-cocoa p-7 text-cream shadow-soft">
+        <aside className="rounded-2xl bg-cocoa p-7 text-cream shadow-soft">
           <School className="h-8 w-8 text-peach" />
           <h2 className="mt-3 font-display text-2xl font-semibold">Can't find your code?</h2>
           <ul className="mt-4 space-y-3 text-cream/85">
