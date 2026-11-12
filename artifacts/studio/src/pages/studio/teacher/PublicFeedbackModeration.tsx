@@ -142,8 +142,6 @@ export function PublicFeedbackModeration({ data, isLoading, isError, refetch }: 
   const busy = isApproving || isRejecting || isDeleting;
   const getCommentPageHref = (section: string) => {
     if (/^\/content\/publication\/[0-9]+$/.test(section)) return section;
-    if (section === "/content/featured/chef-video") return "/create/cooking";
-    if (section === "/content/featured/homepage-video") return "/";
     return section;
   };
 

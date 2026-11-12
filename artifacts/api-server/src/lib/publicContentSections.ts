@@ -8,7 +8,6 @@ export function publicContentSection(value: unknown): string | null {
   const path = value.replace(/\/+$/, '') || '/';
   if (ROOTS.has(path)) return path;
   if (/^\/content\/publication\/[1-9][0-9]*$/.test(path)) return path;
-  if (/^\/content\/featured\/(?:homepage-video|chef-video)$/.test(path)) return path;
   // Explicit public routes only. Never allow private journal/identity paths.
   if (/^\/learn\/[a-z0-9-]+$/.test(path)) return path;
   if (/^\/create\/[a-z0-9-]+$/.test(path)) return path;

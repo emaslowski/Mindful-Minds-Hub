@@ -2,10 +2,8 @@ import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card } from "@workspace/mind-matters-ds/components/ui/card";
-import { PublicationVideo } from "@workspace/mind-matters-ds/components/PublicationVideo";
 import { WaveFooter } from "@/components/WaveFooter";
 import { HomeUpdates } from "@/components/HomeUpdates";
-import { PublicationDiscussion } from "@/components/PublicationDiscussion";
 import { useSiteContent } from "@/lib/siteContent";
 
 const TILE_COLORS = ["bg-muted/30", "bg-secondary/20", "bg-accent/25", "bg-accent/25", "bg-secondary/20", "bg-muted/30", "bg-secondary/20", "bg-muted/30", "bg-accent/25", "bg-secondary/20", "bg-muted/30", "bg-accent/25", "bg-secondary/20", "bg-muted/30"];
@@ -28,12 +26,12 @@ export default function Home() {
   const [bannerLine1, ...bannerRest] = hero.bannerTagline.split(/(?<=\.)\s+/);
   return (
     <div className="home-page w-full pb-8">
-      <section className="mx-auto grid w-full max-w-6xl items-center gap-5 px-2 pb-8 pt-5 md:grid-cols-2 md:gap-8 md:pb-10 md:pt-8" aria-labelledby="home-title">
-        <div className="order-2 md:order-1">
-          <h1 id="home-title" className="max-w-xl font-serif text-5xl font-bold leading-[0.93] tracking-tight text-foreground sm:text-6xl md:text-7xl">
+      <section className="mx-auto w-full max-w-6xl px-2 pb-8 pt-5 md:pb-10 md:pt-8" aria-labelledby="home-title">
+        <div className="max-w-3xl">
+          <h1 id="home-title" className="font-serif text-5xl font-bold leading-[0.93] tracking-tight text-foreground sm:text-6xl md:text-7xl">
             {hero.headline}
           </h1>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-foreground/85 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-foreground/85 sm:text-lg">
             {hero.intro}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -41,18 +39,10 @@ export default function Home() {
               <a href="#bright-spots">{hero.exploreButton} <ArrowDown aria-hidden="true" /></a>
             </Button>
           </div>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-foreground/85" data-testid="text-home-purpose">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-foreground/85" data-testid="text-home-purpose">
             {hero.purpose}
           </p>
         </div>
-        <Card className="order-1 overflow-hidden border-0 bg-transparent shadow-none md:order-2">
-          <img
-            src="/api/public/homepage-image"
-            alt="Hand-drawn Brightside Project illustration of students creating together, with a poster reading A kinder school, brighter tomorrow"
-            className="h-auto w-full object-contain"
-            fetchPriority="high"
-          />
-        </Card>
       </section>
 
       <div className="mx-auto mb-8 flex w-full max-w-6xl flex-col items-start gap-3 border-y border-border px-3 py-4 sm:flex-row sm:items-center md:mb-10 md:px-6">
@@ -67,23 +57,6 @@ export default function Home() {
           {hero.bannerMission}
         </p>
       </div>
-
-      <section className="mx-auto mb-8 w-full max-w-3xl px-1 md:mb-10" aria-label="The Brightside Wellness Project homepage video">
-        <Card className="overflow-hidden border-border bg-card p-3 sm:p-4">
-          <div className="[&_video]:mx-auto [&_video]:aspect-video [&_video]:max-h-[60dvh] [&_video]:w-full [&_video]:rounded-xl">
-            <PublicationVideo
-              src="/api/public/homepage-video"
-              fallbackSrc="/api/public/homepage-video?format=webm"
-              captions={{ src: "/media/homepage.en.vtt", srcLang: "en", label: "English" }}
-            />
-          </div>
-        </Card>
-        <PublicationDiscussion
-          section="/content/featured/homepage-video"
-          title="Homepage video"
-          testId="featured-homepage-video"
-        />
-      </section>
 
       <HomeUpdates />
 

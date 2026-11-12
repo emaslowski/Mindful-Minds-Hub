@@ -34,7 +34,6 @@ export function normalizePublicCommentSection(path: string): string | null {
     return normalized.replace("/connect/post/", "/connect/blog/");
   }
   if (/^\/content\/publication\/[0-9]+$/.test(normalized)) return normalized;
-  if (/^\/content\/featured\/(?:chef-video|homepage-video)$/.test(normalized)) return normalized;
   if (/^\/(?:move|listen)\/[a-z0-9-]+$/.test(normalized)) return normalized;
   if (normalized === "/grow/collab") return normalized;
   return null;

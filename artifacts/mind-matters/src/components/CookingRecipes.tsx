@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { useGetPublishedContent } from "@workspace/api-client-react";
 import { PublishedArticle, type PublicationEdition } from "@workspace/mind-matters-ds/components/PublishedArticle";
-import { PublicationVideo } from "@workspace/mind-matters-ds/components/PublicationVideo";
 import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card } from "@workspace/mind-matters-ds/components/ui/card";
 import {
@@ -55,51 +54,33 @@ export function CookingRecipes() {
     { query: { staleTime: 45_000, refetchOnWindowFocus: true } },
   );
   const recipes = (data?.publications ?? []) as RecipeEdition[];
-  const sourdough = recipes.find((recipe) =>
-    /\bsourdough\b/i.test(recipe.title)
-    || recipe.blocks?.some((block) => block.type === "recipe" && /\bsourdough\b/i.test(block.recipe?.name ?? "")),
-  );
-  const otherRecipes = recipes.filter((recipe) => recipe.projectId !== sourdough?.projectId);
+  // The first recipe published to the cooking section (lowest "Order in
+  // section") is shown in full; the rest appear as cards below it.
+  const [featured, ...otherRecipes] = recipes;
 
   return (
     <div className="space-y-8 text-left">
-      <div className="grid items-start gap-6 lg:grid-cols-5">
-        <section className="min-w-0 lg:col-span-3" aria-labelledby="featured-chef-title">
-          <h2 id="featured-chef-title" className="mb-4 font-handwritten text-3xl text-terracotta">Featured Chef</h2>
-          <Card className="overflow-hidden border-border bg-card p-3 [&_video]:aspect-video [&_video]:w-full [&_video]:rounded-xl">
-            <PublicationVideo
-              src="/api/public/featured-chef-video"
-              fallbackSrc="/api/public/featured-chef-video?format=webm"
-            />
-          </Card>
-          <PublicationDiscussion
-            section="/content/featured/chef-video"
-            title="Featured Chef video"
-            testId="featured-chef-video"
-          />
-        </section>
-        <section className="min-w-0 lg:col-span-2" aria-labelledby="sourdough-recipe-title">
-          <h2 id="sourdough-recipe-title" className="mb-4 font-handwritten text-3xl text-terracotta">Sourdough Recipe</h2>
-          <Card className="overflow-hidden border-border bg-card p-4 sm:p-5">
-            {isLoading ? <p role="status" className="text-sm text-muted-foreground">Loading the sourdough recipe…</p>
-              : isError ? <div role="alert">
-                <p className="mb-3 text-sm text-muted-foreground">The recipes could not be loaded.</p>
-                <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
-              </div>
-              : sourdough ? (
-                <>
-                  <PublishedArticle {...sourdough} />
-                  <PublicationDiscussion
-                    section={`/content/publication/${sourdough.projectId}`}
-                    title={sourdough.title}
-                    testId={`publication-${sourdough.projectId}`}
-                  />
-                </>
-              )
-              : <p className="text-sm text-muted-foreground">The sourdough recipe will appear here when it is published.</p>}
-          </Card>
-        </section>
-      </div>
+      <section className="mx-auto w-full max-w-3xl" aria-labelledby="featured-recipe-title">
+        <h2 id="featured-recipe-title" className="mb-4 font-handwritten text-3xl text-terracotta">Featured Recipe</h2>
+        <Card className="overflow-hidden border-border bg-card p-4 sm:p-5">
+          {isLoading ? <p role="status" className="text-sm text-muted-foreground">Loading recipes…</p>
+            : isError ? <div role="alert">
+              <p className="mb-3 text-sm text-muted-foreground">The recipes could not be loaded.</p>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
+            </div>
+            : featured ? (
+              <>
+                <PublishedArticle {...featured} />
+                <PublicationDiscussion
+                  section={`/content/publication/${featured.projectId}`}
+                  title={featured.title}
+                  testId={`publication-${featured.projectId}`}
+                />
+              </>
+            )
+            : <p className="text-sm text-muted-foreground">The first recipe published to Cooking Corner will appear here.</p>}
+        </Card>
+      </section>
       <section aria-labelledby="more-recipes-title">
         <h2 id="more-recipes-title" className="mb-4 font-handwritten text-2xl text-terracotta">More Recipes</h2>
         <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">

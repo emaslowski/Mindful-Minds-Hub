@@ -38,8 +38,7 @@ async function imageFromTemplate(template: ColoringTemplate): Promise<HTMLImageE
   } else {
     const sourceUrl = new URL(template.imageUrl!, window.location.href);
     const approvedPublication = /^\/api\/public\/publications\/\d+\/media\/\d+$/.test(sourceUrl.pathname);
-    const approvedColoringPage = /^\/api\/public\/coloring-pages\/2026-11-04\/[1-6]$/.test(sourceUrl.pathname);
-    if (sourceUrl.origin !== window.location.origin || !(approvedPublication || approvedColoringPage)) {
+    if (sourceUrl.origin !== window.location.origin || !approvedPublication) {
       throw new Error("This published coloring page does not use an approved same-site image.");
     }
     const response = await fetch(sourceUrl.href, { credentials: "same-origin" });
