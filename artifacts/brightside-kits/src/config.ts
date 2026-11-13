@@ -108,6 +108,30 @@ export const KITS: Kit[] = [
   },
 ];
 
+/**
+ * Launch offer for the first district to buy. Set `enabled: false` once it has
+ * been claimed and the badges, callouts and FAQ entry disappear. The
+ * percentage is a placeholder until you set it.
+ */
+const LAUNCH_DISCOUNT = 20;
+
+export const LAUNCH_OFFER = {
+  enabled: true,
+  name: 'Founding District offer',
+  /** Percent off the District License quote. */
+  discountPercent: LAUNCH_DISCOUNT,
+  /** Sent with district orders so the offer shows up in the order email. */
+  code: 'FOUNDING-DISTRICT',
+  short: `The first district to purchase saves ${LAUNCH_DISCOUNT}% on its District License.`,
+  details: [
+    'Applies to the full District License quote, including every school in the first year',
+    `Also takes ${LAUNCH_DISCOUNT}% off on-site professional development added to the same order`,
+    'Founding District status on the hub and in Brightside materials',
+    'Locked-in renewal pricing for the second year',
+  ],
+  fine: 'One district only, first come, first served. The discount is applied to the quote we send, not on this site.',
+};
+
 export function kitById(id: string | null | undefined): Kit | undefined {
   return KITS.find((k) => k.id === id);
 }
@@ -311,6 +335,14 @@ export const FAQ = [
     q: 'Can we customize the hub for our school?',
     a: 'School and District licenses include a branded hub with your school name, logo and colors. Teachers can also edit homepage text, add sections and manage events without a developer.',
   },
+  ...(LAUNCH_OFFER.enabled
+    ? [
+        {
+          q: 'What is the Founding District offer?',
+          a: `${LAUNCH_OFFER.short} ${LAUNCH_OFFER.details[0]}, and ${LAUNCH_OFFER.details[1].charAt(0).toLowerCase()}${LAUNCH_OFFER.details[1].slice(1)}. ${LAUNCH_OFFER.fine} Request a district quote and it is applied automatically if the offer is still open.`,
+        },
+      ]
+    : []),
   {
     q: 'Can I buy a kit as an individual teacher?',
     a: 'Yes. The Classroom Kit is built for one teacher and one class, and you can pay by card without going through purchasing. If your school will reimburse you or wants to pay directly, choose "Purchase order" on the order form and we will send a quote you can hand to your principal.',

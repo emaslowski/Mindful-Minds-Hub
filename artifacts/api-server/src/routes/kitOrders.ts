@@ -93,6 +93,8 @@ export interface KitOrderInput {
   pdTiming: string;
   pdParticipants: string;
   pdLocation: string;
+  /** Offer code the site attached (e.g. the founding-district discount). */
+  promo: string;
   payment: string;
   poNumber: string;
   notes: string;
@@ -133,6 +135,7 @@ export function parseKitOrder(body: unknown): { ok: true; order: KitOrderInput }
       pdTiming: str(b.pdTiming, 200),
       pdParticipants: str(b.pdParticipants, 40),
       pdLocation: str(b.pdLocation, 300),
+      promo: str(b.promo, 40).toUpperCase(),
       payment,
       poNumber: str(b.poNumber, 80),
       notes: str(b.notes, 4000),
@@ -170,6 +173,7 @@ function orderRows(order: KitOrderInput): [string, string][] {
   );
   if (order.phone) rows.push(["Phone", order.phone]);
   if (order.address) rows.push(["Shipping address", order.address]);
+  if (order.promo) rows.push(["Offer code", order.promo]);
   rows.push(["Payment", PAYMENT_LABELS[order.payment]]);
   if (order.poNumber) rows.push(["PO number", order.poNumber]);
   if (order.notes) rows.push(["Notes", order.notes]);

@@ -42,6 +42,11 @@ Everything you are likely to change is in [src/config.ts](src/config.ts):
 prices, what each kit includes, the contact email, the hub URL, the FAQ and
 the list of hub centers. Page copy lives in `src/pages/`.
 
+The launch discount for the first district is `LAUNCH_OFFER` (percentage,
+details, fine print). Set `enabled: false` once a district has claimed it and
+every badge, callout and FAQ entry about it disappears. District orders carry
+the offer `code` so it shows up in the order email as "Offer code".
+
 The "About the creator" section is the `ABOUT` object (name, title, photo in
 `public/`, bio paragraphs) and the student quotes are `TESTIMONIALS`.
 

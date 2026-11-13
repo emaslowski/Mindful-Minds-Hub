@@ -42,9 +42,12 @@ describe("parseKitOrder", () => {
 
   it("requires a shipping address except for district quotes", () => {
     assert.equal(parseKitOrder({ ...valid, address: "" }).ok, false);
-    const district = parseKitOrder({ ...valid, kit: "district", address: "", payment: "quote", quantity: 99 });
+    const district = parseKitOrder({ ...valid, kit: "district", address: "", payment: "quote", quantity: 99, promo: "founding-district" });
     assert.equal(district.ok, true);
-    if (district.ok) assert.equal(district.order.quantity, 1);
+    if (district.ok) {
+      assert.equal(district.order.quantity, 1);
+      assert.equal(district.order.promo, "FOUNDING-DISTRICT");
+    }
   });
 
   it("accepts the professional-development add-on only as 2 or 3 days", () => {

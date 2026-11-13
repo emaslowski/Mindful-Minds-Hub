@@ -3,7 +3,7 @@ import { BookOpenText, Presentation, NotebookPen, Globe2, PackageCheck, Users, R
 
 import { ButtonLink, Card, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { KIT_ART } from '@/components/KitArt';
-import { PdAddOn, PricingGrid } from '@/components/Pricing';
+import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
 import { Faq } from '@/components/Faq';
 import { ABOUT, HUB_CENTERS, KIT_PARTS, SITE, TESTIMONIALS } from '@/config';
 
@@ -324,6 +324,9 @@ export default function Home() {
           </div>
           <div className="mt-14">
             <PricingGrid compact />
+          </div>
+          <div className="mt-10">
+            <FoundingOffer compact />
           </div>
         </Container>
       </Section>

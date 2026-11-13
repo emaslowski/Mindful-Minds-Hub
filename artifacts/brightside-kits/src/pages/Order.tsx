@@ -4,7 +4,7 @@ import { CreditCard, FileText, MessageSquareQuote } from 'lucide-react';
 import clsx from 'clsx';
 
 import { Button, ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
-import { KITS, PD, SITE, formatPrice, kitById, pdOption, pdPresenter, type KitId, type PdDays } from '@/config';
+import { KITS, LAUNCH_OFFER, PD, SITE, formatPrice, kitById, pdOption, pdPresenter, type KitId, type PdDays } from '@/config';
 
 type PaymentMethod = 'card' | 'purchase_order' | 'quote';
 
@@ -113,6 +113,7 @@ export default function Order() {
 
   const kit = kitById(form.kit)!;
   const isDistrict = kit.id === 'district';
+  const offer = isDistrict && LAUNCH_OFFER.enabled ? LAUNCH_OFFER : null;
   const pd = pdOption(form.pdDays);
   const kitSubtotal = kit.price === null ? null : kit.price * Math.max(1, form.quantity);
   const total = kitSubtotal === null ? null : kitSubtotal + (pd?.price ?? 0);
@@ -129,7 +130,7 @@ export default function Order() {
       const res = await fetch(`${SITE.apiBaseUrl}/api/kits/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, source: window.location.origin }),
+        body: JSON.stringify({ ...form, promo: offer?.code ?? '', source: window.location.origin }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string; reference?: string };
       if (!res.ok) throw new Error(data.error ?? 'Something went wrong. Please try again.');
@@ -189,6 +190,9 @@ export default function Order() {
                     <span className="block font-display text-lg font-semibold text-cocoa">{k.name}</span>
                     <span className="block text-sm text-cocoa-soft">{k.audience}</span>
                     <span className="mt-2 block font-display text-xl font-semibold text-cocoa">{formatPrice(k.price)}</span>
+                    {k.id === 'district' && LAUNCH_OFFER.enabled && (
+                      <span className="mt-1 block text-sm font-semibold text-coral">First district: {LAUNCH_OFFER.discountPercent}% off</span>
+                    )}
                   </label>
                 ))}
               </div>
@@ -362,6 +366,12 @@ export default function Order() {
                   {pd ? `${pd.days} days · +${formatPrice(pd.price)}` : 'None'}
                 </dd>
               </div>
+              {offer && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-cocoa-soft">{offer.name}</dt>
+                  <dd className="text-right font-semibold text-coral">{offer.discountPercent}% off your quote</dd>
+                </div>
+              )}
               <div className="flex justify-between gap-4 border-t border-cocoa/10 pt-3">
                 <dt className="font-display text-lg font-semibold text-cocoa">Estimated total</dt>
                 <dd className="font-display text-2xl font-semibold text-cocoa">{total === null ? 'Quote' : formatPrice(total)}</dd>
@@ -369,6 +379,7 @@ export default function Order() {
             </dl>
             <p className="mt-3 text-xs text-cocoa-soft">
               Shipping{pd ? ', PD travel' : ''} and applicable tax are added to the invoice. Tax-exempt schools: add your certificate in the notes.
+              {offer && ` ${offer.fine}`}
             </p>
             <ul className="mt-5 space-y-2 text-sm text-cocoa">
               {kit.includes.slice(0, 5).map((line) => (

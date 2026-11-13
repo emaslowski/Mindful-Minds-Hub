@@ -3,7 +3,7 @@ import { Check as CheckIcon, Minus } from 'lucide-react';
 
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { KIT_ART } from '@/components/KitArt';
-import { PdAddOn, PricingGrid } from '@/components/Pricing';
+import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
 import { KITS, KIT_PARTS, PD, SITE, formatPrice } from '@/config';
 
 const pdCell = `Add-on, from ${formatPrice(PD.options[0].price)}`;
@@ -78,6 +78,9 @@ export default function Kits() {
       <Section id="pricing" className="scroll-mt-20">
         <Container>
           <PricingGrid />
+          <div className="mt-10">
+            <FoundingOffer />
+          </div>
         </Container>
       </Section>
 

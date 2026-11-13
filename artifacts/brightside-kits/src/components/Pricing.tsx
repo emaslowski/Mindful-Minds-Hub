@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import { CalendarDays, MapPin, Users } from 'lucide-react';
+import { BadgePercent, CalendarDays, MapPin, Users } from 'lucide-react';
 
 import { ButtonLink, Check, Eyebrow, Heading } from './ui';
-import { KITS, PD, SITE, formatPrice, pdPresenter, type Kit } from '@/config';
+import { KITS, LAUNCH_OFFER, PD, SITE, formatPrice, pdPresenter, type Kit } from '@/config';
 
 export function buyHref(kit: Kit): string {
   return kit.checkoutUrl || `/order?kit=${kit.id}`;
@@ -27,6 +27,11 @@ export function PricingGrid({ compact = false }: { compact?: boolean }) {
           {kit.highlight && (
             <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-mustard px-4 py-1 font-display text-sm font-semibold text-cocoa shadow">
               Most popular
+            </span>
+          )}
+          {kit.id === 'district' && LAUNCH_OFFER.enabled && (
+            <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-coral px-4 py-1 font-display text-sm font-semibold text-white shadow">
+              First district: {LAUNCH_OFFER.discountPercent}% off
             </span>
           )}
           <h3 className="font-display text-2xl font-bold text-cocoa">{kit.name}</h3>
@@ -75,6 +80,40 @@ export function PricingGrid({ compact = false }: { compact?: boolean }) {
       <p className="text-center text-sm text-cocoa-soft lg:col-span-3">
         Every kit includes {SITE.accessMonths} months of access to {SITE.hubName}. Renewals are available at a reduced rate.
       </p>
+    </div>
+  );
+}
+
+/** Callout for the launch discount. Renders nothing once the offer is disabled. */
+export function FoundingOffer({ compact = false }: { compact?: boolean }) {
+  if (!LAUNCH_OFFER.enabled) return null;
+  return (
+    <div className="rounded-2xl border border-coral/30 bg-peach-soft/50 p-6 sm:p-8">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-4">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-coral text-white">
+            <BadgePercent className="h-6 w-6" />
+          </span>
+          <div>
+            <p className="font-display text-xs font-bold uppercase tracking-[0.16em] text-coral">Limited to one district</p>
+            <h3 className="mt-1 font-display text-2xl font-bold text-cocoa">
+              {LAUNCH_OFFER.name}: {LAUNCH_OFFER.discountPercent}% off for the first district to purchase
+            </h3>
+            <p className="mt-2 max-w-2xl text-cocoa-soft">{LAUNCH_OFFER.short} {LAUNCH_OFFER.fine}</p>
+            {!compact && (
+              <ul className="mt-4 grid gap-2 text-[15px] text-cocoa sm:grid-cols-2">
+                {LAUNCH_OFFER.details.map((d) => (
+                  <li key={d} className="flex gap-2.5">
+                    <Check className="mt-0.5" />
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+        <ButtonLink href="/order?kit=district" className="shrink-0">Claim the Founding District offer</ButtonLink>
+      </div>
     </div>
   );
 }
