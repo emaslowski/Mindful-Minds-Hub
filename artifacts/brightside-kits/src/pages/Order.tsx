@@ -4,7 +4,7 @@ import { CreditCard, FileText, MessageSquareQuote } from 'lucide-react';
 import clsx from 'clsx';
 
 import { Button, ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
-import { KITS, LAUNCH_OFFER, PD, SITE, formatPrice, kitById, pdOption, pdPresenter, type KitId, type PdDays } from '@/config';
+import { EXTRAS, KITS, LAUNCH_OFFER, PD, SITE, formatPrice, kitById, pdOption, pdPresenter, type ExtraId, type KitId, type PdDays } from '@/config';
 
 type PaymentMethod = 'card' | 'purchase_order' | 'quote';
 
@@ -30,9 +30,16 @@ interface FormState {
   pdTiming: string;
   pdParticipants: string;
   pdLocation: string;
+  /** Extra materials by id → quantity. */
+  extras: Record<ExtraId, number>;
   payment: PaymentMethod;
   poNumber: string;
   notes: string;
+}
+
+function clampQty(v: unknown, max = 500): number {
+  const n = Math.floor(Number(v));
+  return Number.isFinite(n) ? Math.min(max, Math.max(0, n)) : 0;
 }
 
 const fieldCls =
@@ -69,6 +76,10 @@ export default function Order() {
     return {
       kit: kitById(params.get('kit'))?.id ?? 'school',
       pdDays: parsePdDays(params.get('pd')),
+      extras: {
+        workbooks: clampQty(params.get('workbooks')),
+        manual: clampQty(params.get('manual')),
+      } as Record<ExtraId, number>,
     };
   }, [search]);
 
@@ -88,6 +99,7 @@ export default function Order() {
     pdTiming: '',
     pdParticipants: '',
     pdLocation: '',
+    extras: initial.extras,
     payment: initial.kit === 'district' ? 'quote' : 'purchase_order',
     poNumber: '',
     notes: '',
@@ -116,10 +128,16 @@ export default function Order() {
   const offer = isDistrict && LAUNCH_OFFER.enabled ? LAUNCH_OFFER : null;
   const pd = pdOption(form.pdDays);
   const kitSubtotal = kit.price === null ? null : kit.price * Math.max(1, form.quantity);
-  const total = kitSubtotal === null ? null : kitSubtotal + (pd?.price ?? 0);
+  const extraLines = EXTRAS.filter((x) => form.extras[x.id] > 0).map((x) => ({ ...x, qty: form.extras[x.id], subtotal: x.price * form.extras[x.id] }));
+  const extrasSubtotal = extraLines.reduce((sum, l) => sum + l.subtotal, 0);
+  const total = kitSubtotal === null ? null : kitSubtotal + (pd?.price ?? 0) + extrasSubtotal;
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function setExtra(id: ExtraId, value: unknown) {
+    setForm((f) => ({ ...f, extras: { ...f.extras, [id]: clampQty(value) } }));
   }
 
   async function onSubmit(e: FormEvent) {
@@ -148,6 +166,7 @@ export default function Order() {
       `Kit: ${kit.name}`,
       `Quantity: ${form.quantity}`,
       `Professional development: ${pd ? `${pd.days} days on site (${form.pdTiming || 'dates TBD'})` : 'none'}`,
+      `Extra materials: ${extraLines.length ? extraLines.map((l) => `${l.qty} × ${l.name} (${l.unit})`).join(', ') : 'none'}`,
       `Organization: ${form.organization}`,
       `Contact: ${form.contactName} (${form.role})`,
       `Email: ${form.email}`,
@@ -264,9 +283,46 @@ export default function Order() {
               )}
             </fieldset>
 
+            {/* Extra materials */}
+            <fieldset>
+              <legend className="font-display text-2xl font-semibold text-cocoa">3. Add extra materials?</legend>
+              <p className="mt-2 max-w-xl text-cocoa-soft">
+                For additional classes or teachers beyond what the kit covers. Optional.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {EXTRAS.map((x) => (
+                  <div key={x.id} className={choiceCls(form.extras[x.id] > 0)}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <span className="block font-display text-lg font-semibold text-cocoa">{x.name}</span>
+                        <span className="block text-sm text-cocoa-soft">{formatPrice(x.price)} per {x.unit}</span>
+                      </div>
+                      <label className="shrink-0">
+                        <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-cocoa-soft">Qty</span>
+                        <input
+                          type="number"
+                          min={0}
+                          max={500}
+                          value={form.extras[x.id]}
+                          onChange={(e) => setExtra(x.id, e.target.value)}
+                          aria-label={`${x.name} quantity`}
+                          className="w-20 rounded-lg border border-cocoa/15 bg-paper px-3 py-2 text-cocoa focus:border-mustard"
+                        />
+                      </label>
+                    </div>
+                    {form.extras[x.id] > 0 && (
+                      <span className="mt-2 block font-display text-base font-semibold text-cocoa">
+                        {form.extras[x.id]} × {formatPrice(x.price)} = {formatPrice(x.price * form.extras[x.id])}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </fieldset>
+
             {/* Contact */}
             <fieldset>
-              <legend className="font-display text-2xl font-semibold text-cocoa">3. Your details</legend>
+              <legend className="font-display text-2xl font-semibold text-cocoa">4. Your details</legend>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <Field label="School or district" htmlFor="organization" required>
@@ -295,7 +351,7 @@ export default function Order() {
 
             {/* Payment */}
             <fieldset>
-              <legend className="font-display text-2xl font-semibold text-cocoa">4. How would you like to pay?</legend>
+              <legend className="font-display text-2xl font-semibold text-cocoa">5. How would you like to pay?</legend>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 {PAYMENT_OPTIONS.map(({ id, icon: Icon, title, text }) => (
                   <label key={id} className={choiceCls(form.payment === id)}>
@@ -366,6 +422,12 @@ export default function Order() {
                   {pd ? `${pd.days} days · +${formatPrice(pd.price)}` : 'None'}
                 </dd>
               </div>
+              {extraLines.map((l) => (
+                <div key={l.id} className="flex justify-between gap-4">
+                  <dt className="text-cocoa-soft">{l.qty} × {l.name}</dt>
+                  <dd className="text-right font-semibold text-cocoa">+{formatPrice(l.subtotal)}</dd>
+                </div>
+              ))}
               {offer && (
                 <div className="flex justify-between gap-4">
                   <dt className="text-cocoa-soft">{offer.name}</dt>

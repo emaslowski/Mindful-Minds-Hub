@@ -29,6 +29,22 @@ const PAYMENT_LABELS: Record<string, string> = {
   quote: "Quote only",
 };
 
+/** Materials that can be added to an order on their own. */
+const EXTRA_LABELS: Record<string, { name: string; unit: string }> = {
+  workbooks: { name: "Student workbooks", unit: "class set of 30" },
+  manual: { name: "Teacher manual", unit: "each" },
+};
+
+export function parseExtras(v: unknown): Record<string, number> {
+  const out: Record<string, number> = {};
+  const obj = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+  for (const id of Object.keys(EXTRA_LABELS)) {
+    const n = Math.floor(Number(obj[id]));
+    if (Number.isFinite(n) && n > 0) out[id] = Math.min(500, n);
+  }
+  return out;
+}
+
 /** On-site professional development add-on: allowed lengths in days. */
 const PD_DAYS = new Set([2, 3]);
 
@@ -93,6 +109,8 @@ export interface KitOrderInput {
   pdTiming: string;
   pdParticipants: string;
   pdLocation: string;
+  /** Extra materials by id → quantity (only ids in EXTRA_LABELS, only > 0). */
+  extras: Record<string, number>;
   /** Offer code the site attached (e.g. the founding-district discount). */
   promo: string;
   payment: string;
@@ -135,6 +153,7 @@ export function parseKitOrder(body: unknown): { ok: true; order: KitOrderInput }
       pdTiming: str(b.pdTiming, 200),
       pdParticipants: str(b.pdParticipants, 40),
       pdLocation: str(b.pdLocation, 300),
+      extras: parseExtras(b.extras),
       promo: str(b.promo, 40).toUpperCase(),
       payment,
       poNumber: str(b.poNumber, 80),
@@ -173,6 +192,10 @@ function orderRows(order: KitOrderInput): [string, string][] {
   );
   if (order.phone) rows.push(["Phone", order.phone]);
   if (order.address) rows.push(["Shipping address", order.address]);
+  for (const [id, qty] of Object.entries(order.extras)) {
+    const label = EXTRA_LABELS[id];
+    rows.push([`Extra: ${label.name}`, `${qty} × ${label.unit}`]);
+  }
   if (order.promo) rows.push(["Offer code", order.promo]);
   rows.push(["Payment", PAYMENT_LABELS[order.payment]]);
   if (order.poNumber) rows.push(["PO number", order.poNumber]);

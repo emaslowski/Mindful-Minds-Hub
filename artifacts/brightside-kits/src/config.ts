@@ -109,6 +109,43 @@ export const KITS: Kit[] = [
 ];
 
 /**
+ * Materials sold on their own, for schools that need extra copies or want to
+ * start with just the printed pieces. Also offered as add-ons on the order form.
+ */
+export type ExtraId = 'workbooks' | 'manual';
+
+export interface Extra {
+  id: ExtraId;
+  name: string;
+  /** What one unit is. */
+  unit: string;
+  /** Whole dollars per unit. */
+  price: number;
+  blurb: string;
+}
+
+export const EXTRAS: Extra[] = [
+  {
+    id: 'workbooks',
+    name: 'Student workbooks',
+    unit: 'class set of 30',
+    price: 250,
+    blurb: 'Printed workbooks with daily check-ins, journaling prompts and project planners. Order a set for each additional class, or a fresh set for next year.',
+  },
+  {
+    id: 'manual',
+    name: 'Teacher manual',
+    unit: 'each',
+    price: 115,
+    blurb: 'The full lesson-by-lesson manual with scripts, pacing guides and rubrics, in print with a PDF copy. One per additional teacher.',
+  },
+];
+
+export function extraById(id: string | null | undefined): Extra | undefined {
+  return EXTRAS.find((e) => e.id === id);
+}
+
+/**
  * Launch offer for the first district to buy. Set `enabled: false` once it has
  * been claimed and the badges, callouts and FAQ entry disappear. The
  * percentage is a placeholder until you set it.
@@ -343,6 +380,10 @@ export const FAQ = [
         },
       ]
     : []),
+  {
+    q: 'Can we buy workbooks or manuals on their own?',
+    a: `Yes. Student workbooks are ${formatPrice(EXTRAS[0].price)} for a ${EXTRAS[0].unit}, and the teacher manual is ${formatPrice(EXTRAS[1].price)} ${EXTRAS[1].unit}. Add them to any kit order, or order them by themselves for extra classes, new teachers or next year's students.`,
+  },
   {
     q: 'Can I buy a kit as an individual teacher?',
     a: 'Yes. The Classroom Kit is built for one teacher and one class, and you can pay by card without going through purchasing. If your school will reimburse you or wants to pay directly, choose "Purchase order" on the order form and we will send a quote you can hand to your principal.',

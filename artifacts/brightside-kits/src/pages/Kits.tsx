@@ -4,7 +4,7 @@ import { Check as CheckIcon, Minus } from 'lucide-react';
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { KIT_ART } from '@/components/KitArt';
 import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
-import { KITS, KIT_PARTS, PD, SITE, formatPrice } from '@/config';
+import { EXTRAS, KITS, KIT_PARTS, PD, SITE, formatPrice } from '@/config';
 
 const pdCell = `Add-on, from ${formatPrice(PD.options[0].price)}`;
 
@@ -14,6 +14,7 @@ const COMPARISON: { label: string; cells: Record<string, Cell> }[] = [
   { label: 'Teacher manual (print + PDF)', cells: { classroom: '1', school: '10', district: 'Per classroom' } },
   { label: 'Lesson slide decks (PowerPoint + Google Slides)', cells: { classroom: true, school: true, district: true } },
   { label: 'Student workbooks', cells: { classroom: '35', school: '350', district: 'Per student' } },
+  { label: `Extra workbooks (${EXTRAS[0].unit}) / extra manual`, cells: { classroom: `${formatPrice(EXTRAS[0].price)} / ${formatPrice(EXTRAS[1].price)}`, school: `${formatPrice(EXTRAS[0].price)} / ${formatPrice(EXTRAS[1].price)}`, district: 'Included in quote' } },
   { label: `Hub access (${SITE.accessMonths} months)`, cells: { classroom: '1 class', school: 'Whole school', district: 'District-wide' } },
   { label: 'Teacher accounts', cells: { classroom: '1', school: 'Up to 10', district: 'Unlimited' } },
   { label: 'Student Studio & portfolios', cells: { classroom: true, school: true, district: true } },
@@ -124,6 +125,46 @@ export default function Kits() {
               </tbody>
             </table>
           </div>
+        </Container>
+      </Section>
+
+      {/* Materials sold separately */}
+      <Section id="materials" className="scroll-mt-20 pt-0">
+        <Container>
+          <div className="mx-auto max-w-2xl text-center">
+            <Eyebrow>Materials sold separately</Eyebrow>
+            <Heading className="mt-3">Need extra workbooks or another manual?</Heading>
+            <p className="mt-4 text-lg text-cocoa-soft">
+              Add these to any kit order, or order them on their own for a new class, a new teacher
+              or next year's students.
+            </p>
+          </div>
+          <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
+            {EXTRAS.map((x) => {
+              const Art = KIT_ART[x.id === 'manual' ? 'manual' : 'workbooks'];
+              return (
+                <article key={x.id} className="flex gap-5 rounded-2xl border border-cocoa/10 bg-paper p-6 shadow-card">
+                  <div className={`${x.id === 'manual' ? 'bg-sage-soft' : 'bg-peach-soft'} h-28 w-28 shrink-0 rounded-xl p-2`}>
+                    <Art />
+                  </div>
+                  <div className="flex flex-1 flex-col">
+                    <h3 className="font-display text-xl font-bold text-cocoa">{x.name}</h3>
+                    <p className="mt-1 flex items-baseline gap-2">
+                      <span className="font-display text-3xl font-bold text-cocoa">{formatPrice(x.price)}</span>
+                      <span className="text-sm text-cocoa-soft">per {x.unit}</span>
+                    </p>
+                    <p className="mt-2 text-sm text-cocoa-soft">{x.blurb}</p>
+                    <div className="mt-4">
+                      <ButtonLink href={`/order?kit=classroom&${x.id}=1`} variant="dark">Add to an order</ButtonLink>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          <p className="mt-6 text-center text-sm text-cocoa-soft">
+            Prices are per unit before shipping. Slide decks and hub access are included with every kit and are not sold separately.
+          </p>
         </Container>
       </Section>
 

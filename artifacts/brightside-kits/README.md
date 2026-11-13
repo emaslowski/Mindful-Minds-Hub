@@ -42,6 +42,12 @@ Everything you are likely to change is in [src/config.ts](src/config.ts):
 prices, what each kit includes, the contact email, the hub URL, the FAQ and
 the list of hub centers. Page copy lives in `src/pages/`.
 
+Materials sold on their own (extra workbook sets, extra manuals) are `EXTRAS`:
+name, unit, price and blurb. They appear on the kits page, as step 3 of the
+order form (`/order?workbooks=2&manual=1` preselects quantities) and in the
+order email. The ids (`workbooks`, `manual`) must match `EXTRA_LABELS` in the
+API's `kitOrders.ts` if you add a new one.
+
 The launch discount for the first district is `LAUNCH_OFFER` (percentage,
 details, fine print). Set `enabled: false` once a district has claimed it and
 every badge, callout and FAQ entry about it disappears. District orders carry

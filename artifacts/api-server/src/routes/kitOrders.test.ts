@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
-import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays } from "./kitOrders";
+import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays, parseExtras } from "./kitOrders";
 
 const valid = {
   kit: "school",
@@ -69,6 +69,17 @@ describe("parseKitOrder", () => {
       assert.equal(withPd.order.pdParticipants, "24");
       assert.equal(withPd.order.pdLocation, "District office, Middleport NY");
     }
+  });
+
+  it("keeps only known extra materials with positive quantities", () => {
+    assert.deepEqual(parseExtras({ workbooks: 2, manual: "3", slides: 9, hub: 1 }), { workbooks: 2, manual: 3 });
+    assert.deepEqual(parseExtras({ workbooks: 0, manual: -1 }), {});
+    assert.deepEqual(parseExtras({ workbooks: 9999 }), { workbooks: 500 });
+    assert.deepEqual(parseExtras("nope"), {});
+    assert.deepEqual(parseExtras(undefined), {});
+    const r = parseKitOrder({ ...valid, extras: { manual: 1 } });
+    assert.equal(r.ok, true);
+    if (r.ok) assert.deepEqual(r.order.extras, { manual: 1 });
   });
 
   it("clamps quantity and trims long text", () => {
