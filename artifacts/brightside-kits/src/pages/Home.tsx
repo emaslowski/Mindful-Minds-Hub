@@ -5,7 +5,7 @@ import { ButtonLink, Card, Container, Eyebrow, Heading, Section } from '@/compon
 import { KIT_ART } from '@/components/KitArt';
 import { PdAddOn, PricingGrid } from '@/components/Pricing';
 import { Faq } from '@/components/Faq';
-import { HUB_CENTERS, KIT_PARTS, SITE } from '@/config';
+import { HUB_CENTERS, KIT_PARTS, SITE, TESTIMONIALS } from '@/config';
 
 const PART_ICONS = {
   manual: BookOpenText,
@@ -233,6 +233,30 @@ export default function Home() {
               </Card>
             ))}
           </div>
+        </Container>
+      </Section>
+
+      {/* Student testimonials */}
+      <Section id="students" className="scroll-mt-20 bg-cocoa text-cream">
+        <Container>
+          <div className="mx-auto max-w-2xl text-center">
+            <Eyebrow tone="mustard">What students say</Eyebrow>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">In their own words</h2>
+            <p className="mt-4 text-lg text-cream/80">
+              From 5th grade students who used the hub and the lessons this year.
+            </p>
+          </div>
+          <ul className="mt-12 grid gap-6 md:grid-cols-2">
+            {TESTIMONIALS.map((t) => (
+              <li key={t.quote} className="flex flex-col rounded-2xl border border-cream/15 bg-cream/5 p-7">
+                <span className="font-display text-5xl leading-none text-mustard" aria-hidden="true">&ldquo;</span>
+                <blockquote className="mt-2 text-lg leading-relaxed text-cream">
+                  <p>{t.quote}</p>
+                </blockquote>
+                <p className="mt-5 text-sm font-semibold uppercase tracking-[0.14em] text-peach">{t.who}</p>
+              </li>
+            ))}
+          </ul>
         </Container>
       </Section>
 

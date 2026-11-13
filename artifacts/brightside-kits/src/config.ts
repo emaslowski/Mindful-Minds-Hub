@@ -265,6 +265,14 @@ export const HUB_CENTERS = [
   { title: 'School & Community Events', blurb: 'Discover events, clubs and activities.' },
 ];
 
+/** Student testimonials, shown on the home page. Quotes are reproduced as written. */
+export const TESTIMONIALS = [
+  { quote: 'It made me feel better about myself.', who: '5th grade student' },
+  { quote: 'It helped me because it makes me feel connected with the people who like the same thing as me.', who: '5th grade student' },
+  { quote: 'It helped by giving me answers to my problems when I needed answers most.', who: '5th grade student' },
+  { quote: 'It helped me cheer up on a bad day once and I love all the podcasts and art videos!', who: '5th grade student' },
+];
+
 export const FAQ = [
   {
     q: 'Who is the kit for?',
