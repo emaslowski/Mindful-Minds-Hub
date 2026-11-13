@@ -135,7 +135,7 @@ export const EXTRAS: Extra[] = [
   {
     id: 'manual',
     name: 'Teacher manual',
-    unit: 'each',
+    unit: 'manual',
     price: 115,
     blurb: 'The full lesson-by-lesson manual with scripts, pacing guides and rubrics, in print with a PDF copy. One per additional teacher.',
   },
@@ -382,7 +382,7 @@ export const FAQ = [
     : []),
   {
     q: 'Can we buy workbooks or manuals on their own?',
-    a: `Yes. Student workbooks are ${formatPrice(EXTRAS[0].price)} for a ${EXTRAS[0].unit}, and the teacher manual is ${formatPrice(EXTRAS[1].price)} ${EXTRAS[1].unit}. Add them to any kit order, or order them by themselves for extra classes, new teachers or next year's students.`,
+    a: `Yes. Student workbooks are ${formatPrice(EXTRAS[0].price)} for a ${EXTRAS[0].unit}, and the teacher manual is ${formatPrice(EXTRAS[1].price)} each. Add them to any kit order, or order them by themselves for extra classes, new teachers or next year's students.`,
   },
   {
     q: 'Can I buy a kit as an individual teacher?',

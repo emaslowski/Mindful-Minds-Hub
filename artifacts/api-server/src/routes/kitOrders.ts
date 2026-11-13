@@ -32,7 +32,7 @@ const PAYMENT_LABELS: Record<string, string> = {
 /** Materials that can be added to an order on their own. */
 const EXTRA_LABELS: Record<string, { name: string; unit: string }> = {
   workbooks: { name: "Student workbooks", unit: "class set of 30" },
-  manual: { name: "Teacher manual", unit: "each" },
+  manual: { name: "Teacher manual", unit: "manual" },
 };
 
 export function parseExtras(v: unknown): Record<string, number> {
