@@ -326,6 +326,19 @@ export const HUB_CENTERS = [
   { title: 'School & Community Events', blurb: 'Discover events, clubs and activities.' },
 ];
 
+/**
+ * Classroom photos that fade through, very lightly, behind the home-page hero.
+ * Files live in public/students/. Add or remove entries freely; an empty list
+ * turns the backdrop off. Each is shown for `STUDENT_PHOTO_SECONDS` seconds.
+ */
+export const STUDENT_PHOTOS = [
+  { src: '/students/workbook-rules.jpg', alt: 'A fifth grader writing community promise rules in a Brightside workbook' },
+  { src: '/students/workbook-podcast.jpg', alt: 'A fifth grader reading a script into a podcast microphone' },
+  { src: '/students/workbook-drawing.jpg', alt: 'A fifth grader drawing a resource idea in a Brightside workbook' },
+];
+export const STUDENT_PHOTO_SECONDS = 7;
+export const STUDENT_PHOTO_CAPTION = 'Pictured: fifth graders working through their Brightside workbooks.';
+
 /** The "About the creator" section on the home page. */
 export const ABOUT = {
   name: 'Erica Maslowski, M.Ed.',

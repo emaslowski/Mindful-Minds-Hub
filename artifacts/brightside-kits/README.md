@@ -56,6 +56,14 @@ the offer `code` so it shows up in the order email as "Offer code".
 The "About the creator" section is the `ABOUT` object (name, title, photo in
 `public/`, bio paragraphs) and the student quotes are `TESTIMONIALS`.
 
+The faint classroom photos that fade through behind the home-page hero are
+`STUDENT_PHOTOS` (files in `public/students/`, resized to 1600px on the long
+side). `STUDENT_PHOTO_SECONDS` sets how long each one shows and
+`STUDENT_PHOTO_CAPTION` is the small line under the logo. An empty list turns
+the backdrop and caption off. The photos are decorative and washed out to about
+a fifth of their strength; viewers with "reduce motion" turned on see the first
+photo without the rotation. Only use photos you have permission to publish.
+
 The professional-development add-on is the `PD` object in the same file:
 `presenterName` (your name, shown as "led by … , creator of the program"),
 `groupSize`, `travelNote`, the two `options` (days, name, price, summary,

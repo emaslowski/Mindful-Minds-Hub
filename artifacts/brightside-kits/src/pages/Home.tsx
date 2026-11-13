@@ -5,7 +5,8 @@ import { ButtonLink, Card, Container, Eyebrow, Heading, Section } from '@/compon
 import { KIT_ART } from '@/components/KitArt';
 import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
 import { Faq } from '@/components/Faq';
-import { ABOUT, HUB_CENTERS, KIT_PARTS, SITE, TESTIMONIALS } from '@/config';
+import { PhotoBackdrop } from '@/components/PhotoBackdrop';
+import { ABOUT, HUB_CENTERS, KIT_PARTS, SITE, STUDENT_PHOTOS, STUDENT_PHOTO_CAPTION, TESTIMONIALS } from '@/config';
 
 const PART_ICONS = {
   manual: BookOpenText,
@@ -26,7 +27,8 @@ export default function Home() {
     <>
       {/* Hero */}
       <Section className="relative overflow-hidden pb-10 pt-10 sm:pt-16">
-        <Container className="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
+        <PhotoBackdrop />
+        <Container className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
           <div className="order-2 lg:order-1">
             <Eyebrow>For teachers, schools and districts</Eyebrow>
             <Heading as="h1" className="mt-3">
@@ -56,8 +58,8 @@ export default function Home() {
               ))}
             </ul>
           </div>
-          <div className="order-1 flex justify-center lg:order-2">
-            <div className="rounded-2xl border border-cocoa/10 bg-paper p-8 shadow-card sm:p-12">
+          <div className="order-1 flex flex-col items-center lg:order-2">
+            <div className="rounded-2xl border border-cocoa/10 bg-paper/90 p-8 shadow-card backdrop-blur-sm sm:p-12">
               <img
                 src="/logo.png"
                 alt="The Brightside Wellness Project"
@@ -67,6 +69,11 @@ export default function Home() {
                 fetchPriority="high"
               />
             </div>
+            {STUDENT_PHOTOS.length > 0 && (
+              <p className="mt-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-cocoa-soft/80">
+                {STUDENT_PHOTO_CAPTION}
+              </p>
+            )}
           </div>
         </Container>
       </Section>
