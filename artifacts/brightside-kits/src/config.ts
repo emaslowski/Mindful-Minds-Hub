@@ -136,7 +136,7 @@ export interface PdOption {
 export const PD = {
   title: 'On-site professional development',
   /** Shown on the site, e.g. "led by Jane Smith, creator of the program". Leave empty to say "the program's creator". */
-  presenterName: '',
+  presenterName: 'Erica Maslowski, M.Ed.',
   /** How many educators one session is designed for. */
   groupSize: 'Up to 30 educators per session',
   /** Shown next to the prices. */
@@ -264,6 +264,19 @@ export const HUB_CENTERS = [
   { title: 'Games & Challenges', blurb: 'Quizzes, puzzles and fun challenges.' },
   { title: 'School & Community Events', blurb: 'Discover events, clubs and activities.' },
 ];
+
+/** The "About the creator" section on the home page. */
+export const ABOUT = {
+  name: 'Erica Maslowski, M.Ed.',
+  title: 'Founder of The Brightside Wellness Project',
+  /** In /public. */
+  photo: '/erica-maslowski.jpg',
+  photoAlt: 'Erica Maslowski at her classroom desk',
+  paragraphs: [
+    'Welcome! I am the creator and founder of The Brightside Wellness Project. After over 10 years in education, I found that the mental health crisis of students has increased tenfold. I created this website because I wanted my students to have a place where they could feel understood, find encouragement, and see that other kids their age go through some of the same things they do.',
+    'I also wanted students to help build that space. In our Digital Literacy class, they write articles, plan podcasts, and create activities based on what they think would help another fifth grader. That might mean sharing what to do when you feel left out, how to ask for help, or a small way to make someone feel welcome. My hope is that every student who visits finds something they can use and leaves feeling a little more connected.',
+  ],
+};
 
 /** Student testimonials, shown on the home page. Quotes are reproduced as written. */
 export const TESTIMONIALS = [

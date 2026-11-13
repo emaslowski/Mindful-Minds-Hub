@@ -19,6 +19,7 @@ export function Footer() {
           <ul className="mt-3 space-y-2 text-cocoa-soft">
             <li><Link href="/#inside" className="hover:text-cocoa">What's inside</Link></li>
             <li><Link href="/#hub" className="hover:text-cocoa">The hub</Link></li>
+            <li><Link href="/#about" className="hover:text-cocoa">About the creator</Link></li>
             <li><Link href="/#pd" className="hover:text-cocoa">Professional development</Link></li>
             <li><Link href="/kits" className="hover:text-cocoa">Kits & pricing</Link></li>
             <li><Link href="/#faq" className="hover:text-cocoa">FAQ</Link></li>

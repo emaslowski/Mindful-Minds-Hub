@@ -5,7 +5,7 @@ import { ButtonLink, Card, Container, Eyebrow, Heading, Section } from '@/compon
 import { KIT_ART } from '@/components/KitArt';
 import { PdAddOn, PricingGrid } from '@/components/Pricing';
 import { Faq } from '@/components/Faq';
-import { HUB_CENTERS, KIT_PARTS, SITE, TESTIMONIALS } from '@/config';
+import { ABOUT, HUB_CENTERS, KIT_PARTS, SITE, TESTIMONIALS } from '@/config';
 
 const PART_ICONS = {
   manual: BookOpenText,
@@ -260,8 +260,41 @@ export default function Home() {
         </Container>
       </Section>
 
+      {/* About the creator */}
+      <Section id="about" className="scroll-mt-20">
+        <Container className="grid items-center gap-10 lg:grid-cols-[380px_1fr] lg:gap-16">
+          <figure className="mx-auto w-full max-w-sm lg:mx-0">
+            <img
+              src={ABOUT.photo}
+              alt={ABOUT.photoAlt}
+              width={900}
+              height={1200}
+              loading="lazy"
+              className="w-full rounded-2xl border border-cocoa/10 object-cover shadow-card"
+            />
+            <figcaption className="mt-4">
+              <p className="font-display text-xl font-bold text-cocoa">{ABOUT.name}</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-coral">{ABOUT.title}</p>
+            </figcaption>
+          </figure>
+          <div>
+            <Eyebrow>About the creator</Eyebrow>
+            <Heading className="mt-3">A teacher-built answer to a real classroom need</Heading>
+            <div className="mt-6 space-y-5 text-lg leading-relaxed text-cocoa-soft">
+              {ABOUT.paragraphs.map((p) => (
+                <p key={p.slice(0, 40)}>{p}</p>
+              ))}
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <ButtonLink href="/#pd" variant="dark">Bring Erica to your district</ButtonLink>
+              <ButtonLink href={`mailto:${SITE.contactEmail}`} variant="ghost">Email Erica</ButtonLink>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
       {/* Professional development */}
-      <Section id="pd" className="scroll-mt-20">
+      <Section id="pd" className="scroll-mt-20 pt-0">
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <Eyebrow>In person, in your district</Eyebrow>

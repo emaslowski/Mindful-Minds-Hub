@@ -42,6 +42,9 @@ Everything you are likely to change is in [src/config.ts](src/config.ts):
 prices, what each kit includes, the contact email, the hub URL, the FAQ and
 the list of hub centers. Page copy lives in `src/pages/`.
 
+The "About the creator" section is the `ABOUT` object (name, title, photo in
+`public/`, bio paragraphs) and the student quotes are `TESTIMONIALS`.
+
 The professional-development add-on is the `PD` object in the same file:
 `presenterName` (your name, shown as "led by … , creator of the program"),
 `groupSize`, `travelNote`, the two `options` (days, name, price, summary,
