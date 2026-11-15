@@ -37,6 +37,7 @@ import TeacherAthletes from '@/pages/studio/teacher/Athletes';
 import Assistant from '@/pages/studio/teacher/Assistant';
 import AssistantAccess from '@/pages/studio/teacher/AssistantAccess';
 import CodingLabAdmin from '@/pages/studio/teacher/CodingLabAdmin';
+import LessonResources from '@/pages/studio/teacher/LessonResources';
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ function StudioRouter() {
       <Route path="/studio/teacher/assistant-access" component={AssistantAccess} />
       <Route path="/studio/teacher/assistant" component={Assistant} />
       <Route path="/studio/teacher/coding-lab" component={CodingLabAdmin} />
+      <Route path="/studio/teacher/printables" component={LessonResources} />
       <Route path="/studio/teacher/artwork" component={TeacherArtwork} />
       <Route path="/studio/teacher/athletes" component={TeacherAthletes} />
       <Route path="/studio/teacher/review/:id" component={ProjectReview} />
