@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
-import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays, parseExtras } from "./kitOrders";
+import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays, parseExtras, chooseMailTransport } from "./kitOrders";
 
 const valid = {
   kit: "school",
@@ -93,9 +93,24 @@ describe("parseKitOrder", () => {
 });
 
 describe("POST /kits/orders", () => {
-  it("acknowledges an order with a reference when SMTP is not configured, and rejects bad input", async () => {
+  it("only offers a mail transport that can actually log in", () => {
     const saved = { ...process.env };
-    delete process.env.SMTP_HOST;
+    try {
+      for (const k of ["SMTP_HOST", "SMTP_USER", "SMTP_PASS", "GMAIL_REFRESH_TOKEN", "CREDENTIAL_EMAIL_SENDER"]) delete process.env[k];
+      assert.equal(chooseMailTransport(), null);
+      process.env.SMTP_HOST = "smtp.example.test";   // host alone: the server would reject the login
+      assert.equal(chooseMailTransport(), null);
+      process.env.SMTP_USER = "orders@example.test";
+      process.env.SMTP_PASS = "app-password";
+      assert.equal(chooseMailTransport()?.kind, "smtp");
+    } finally {
+      process.env = saved;
+    }
+  });
+
+  it("acknowledges an order with a reference when email is not configured, and rejects bad input", async () => {
+    const saved = { ...process.env };
+    for (const k of ["SMTP_HOST", "SMTP_USER", "SMTP_PASS", "GMAIL_REFRESH_TOKEN", "CREDENTIAL_EMAIL_SENDER"]) delete process.env[k];
     const app = express();
     app.use(express.json());
     app.use("/api", kitOrdersRouter);
@@ -105,8 +120,9 @@ describe("POST /kits/orders", () => {
       const url = `http://127.0.0.1:${port}/api/kits/orders`;
       const ok = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(valid) });
       assert.equal(ok.status, 200);
-      const body = (await ok.json()) as { ok: boolean; reference: string };
+      const body = (await ok.json()) as { ok: boolean; reference: string; emailed: boolean };
       assert.equal(body.ok, true);
+      assert.equal(body.emailed, false);
       assert.match(body.reference, /^BSK-\d{8}-[0-9A-F]{4}$/);
 
       const bad = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...valid, email: "nope" }) });

@@ -10,7 +10,8 @@ export interface GmailClient {
 }
 
 interface CredentialMessage {
-  to: string;
+  to: string | string[];
+  replyTo?: string;
   subject: string;
   text: string;
   html: string;
@@ -93,6 +94,7 @@ export async function sendCredentialEmail(
   const compiled = await composer.sendMail({
     from: { name: 'The Brightside Wellness Project LLC', address: sender },
     to: message.to,
+    replyTo: message.replyTo,
     subject: message.subject,
     text: message.text,
     html: message.html,

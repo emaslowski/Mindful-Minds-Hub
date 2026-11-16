@@ -12,6 +12,7 @@ export default function Thanks() {
   const pd = pdOption(params.get('pd'));
   const payment = params.get('payment');
   const fromStripe = params.has('session_id');
+  const emailed = params.get('emailed') !== '0';
 
   const headline = fromStripe
     ? 'Payment received. Thank you!'
@@ -60,6 +61,12 @@ export default function Thanks() {
               </div>
             )}
           </dl>
+        )}
+        {!emailed && (
+          <p role="status" className="mx-auto mt-6 max-w-md rounded-xl border border-mustard/60 bg-mustard-soft p-4 text-left text-sm text-cocoa">
+            Your request was recorded{reference ? ` under reference ${reference}` : ''}, but our confirmation email could not be sent just now.
+            If you have not heard from us within two school days, email us and mention your reference.
+          </p>
         )}
         <p className="mt-8 text-cocoa-soft">Questions in the meantime?</p>
         <ContactEmail className="mx-auto mt-3 max-w-lg text-left" />

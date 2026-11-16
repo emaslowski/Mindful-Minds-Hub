@@ -14,8 +14,42 @@ import { randomBytes } from "node:crypto";
 import { Router, type IRouter } from "express";
 import nodemailer from "nodemailer";
 import { logger } from "../lib/logger";
+import { createGmailClientFromEnv, sendCredentialEmail } from "../lib/credentialEmail";
 
 const router: IRouter = Router();
+
+interface OrderMail {
+  to: string | string[];
+  replyTo?: string;
+  subject: string;
+  text: string;
+  html: string;
+}
+
+/**
+ * How order emails leave the server, in order of preference:
+ * 1. the school Gmail account the hub already uses for credential emails
+ *    (CREDENTIAL_EMAIL_SENDER + GMAIL_REFRESH_TOKEN), no password involved;
+ * 2. SMTP, but only when SMTP_HOST, SMTP_USER and SMTP_PASS are all set:
+ *    a host without a login would be rejected by the mail server;
+ * 3. none: the order is written to the server log instead.
+ */
+export function chooseMailTransport(): { kind: "gmail" | "smtp"; send: (mail: OrderMail) => Promise<void> } | null {
+  const sender = process.env.CREDENTIAL_EMAIL_SENDER?.trim();
+  const gmail = createGmailClientFromEnv();
+  if (sender && gmail) {
+    return { kind: "gmail", send: async (mail) => { await sendCredentialEmail(mail, { sender, gmail }); } };
+  }
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (host && user && pass) {
+    const transporter = nodemailer.createTransport({ host, port: Number(process.env.SMTP_PORT ?? 587), secure: false, auth: { user, pass } });
+    const from = { name: "The Brightside Wellness Project", address: user };
+    return { kind: "smtp", send: async (mail) => { await transporter.sendMail({ from, ...mail }); } };
+  }
+  return null;
+}
 
 const KIT_NAMES: Record<string, string> = {
   classroom: "Classroom Kit",
@@ -245,29 +279,21 @@ router.post("/kits/orders", async (req, res) => {
 
   logger.info({ reference, kit: order.kit, pdDays: order.pdDays, payment: order.payment, organization: order.organization }, "Kit order received");
 
-  const smtpHost = process.env.SMTP_HOST;
-  if (!smtpHost || !recipients.length) {
+  const transport = chooseMailTransport();
+  if (!transport || !recipients.length) {
     // Email not configured: log the full order so it is not lost, and still
     // acknowledge so the form works.
-    logger.warn({ reference, order }, "Kit order could not be emailed (SMTP or recipients not configured)");
-    res.status(200).json({ ok: true, reference, note: "Email not configured — order recorded in the server log." });
+    logger.warn({ reference, order }, "Kit order could not be emailed (email delivery or recipients not configured)");
+    res.status(200).json({ ok: true, reference, emailed: false });
     return;
   }
 
-  try {
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: Number(process.env.SMTP_PORT ?? 587),
-      secure: false,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    });
-    const from = { name: "The Brightside Wellness Project", address: process.env.SMTP_USER ?? "" };
-    const kitName = KIT_NAMES[order.kit];
-    const isQuote = order.payment === "quote";
-    const pdSuffix = order.pdDays ? ` + ${order.pdDays}-day PD` : "";
+  const kitName = KIT_NAMES[order.kit];
+  const isQuote = order.payment === "quote";
+  const pdSuffix = order.pdDays ? ` + ${order.pdDays}-day PD` : "";
 
-    await transporter.sendMail({
-      from,
+  try {
+    await transport.send({
       to: recipients,
       replyTo: order.email,
       subject: `${isQuote ? "Quote request" : "Kit order"} ${reference}: ${kitName}${pdSuffix} for ${order.organization}`,
@@ -279,7 +305,15 @@ router.post("/kits/orders", async (req, res) => {
         `Reply to this email to answer ${order.contactName} directly.`,
       ),
     });
+  } catch (err) {
+    // The buyer must never see a failure for a problem on our side: keep the
+    // full order in the log and tell the site the confirmation did not go out.
+    logger.error({ err, reference, order, transport: transport.kind }, "Kit order email failed; order recorded in the log");
+    res.status(200).json({ ok: true, reference, emailed: false });
+    return;
+  }
 
+  {
     const nextStep =
       order.payment === "card"
         ? "We will email a secure checkout link within two school days. Your kit ships as soon as payment clears."
@@ -288,8 +322,7 @@ router.post("/kits/orders", async (req, res) => {
           : "We will email a quote within two school days.";
     const pdNote = order.pdDays ? " We will also reach out to confirm dates for your on-site professional development." : "";
 
-    await transporter.sendMail({
-      from,
+    await transport.send({
       to: order.email,
       subject: `We received your ${isQuote ? "quote request" : "order"} (${reference}) — The Brightside Wellness Project`,
       text: `Hi ${order.contactName},\n\nThank you for your interest in The Brightside Wellness Project. ${nextStep}${pdNote}\n\nReference: ${reference}\n${rowsText(rows)}\n\nQuestions? Just reply to this email.`,
@@ -304,10 +337,7 @@ router.post("/kits/orders", async (req, res) => {
       logger.warn({ err, reference }, "Kit order: buyer confirmation email failed");
     });
 
-    res.status(200).json({ ok: true, reference });
-  } catch (err) {
-    logger.error({ err, reference }, "Kit order email failed");
-    res.status(500).json({ error: "We could not send your order. Please try again or email us directly." });
+    res.status(200).json({ ok: true, reference, emailed: true });
   }
 });
 

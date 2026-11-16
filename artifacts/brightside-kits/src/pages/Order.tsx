@@ -150,10 +150,11 @@ export default function Order() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, promo: offer?.code ?? '', source: window.location.origin }),
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string; reference?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string; reference?: string; emailed?: boolean };
       if (!res.ok) throw new Error(data.error ?? 'Something went wrong. Please try again.');
       const q = new URLSearchParams({ ref: data.reference ?? '', kit: kit.id, payment: form.payment });
       if (pd) q.set('pd', String(pd.days));
+      if (data.emailed === false) q.set('emailed', '0');
       navigate(`/thanks?${q.toString()}`);
     } catch (err) {
       setStatus('error');
