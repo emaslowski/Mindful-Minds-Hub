@@ -66,8 +66,8 @@ export function Printables({ code }: { code: string }) {
 
   return (
     <section id="printables" className="mt-10 rounded-2xl border border-cocoa/10 bg-paper p-7 shadow-card" aria-labelledby="printables-heading">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
           <Eyebrow tone="sage">Lesson printables</Eyebrow>
           <h2 id="printables-heading" className="mt-2 font-display text-2xl font-bold text-cocoa">Printables for every lesson</h2>
           <p className="mt-2 max-w-2xl text-cocoa-soft">

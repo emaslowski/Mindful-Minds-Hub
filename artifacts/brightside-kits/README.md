@@ -36,6 +36,9 @@ with code LINCOLN-2026 and hub URL https://…". Each entry has `name`, `code`,
 A demo entry (`BRIGHT-DEMO`) points at the main hub; remove it when you no
 longer want it.
 
+A welcome email can link straight to `/school-login?code=XXXX`: the page signs
+the school in on arrival.
+
 ### Lesson printables
 
 After a valid code, the same page shows the **Lesson printables** library: a

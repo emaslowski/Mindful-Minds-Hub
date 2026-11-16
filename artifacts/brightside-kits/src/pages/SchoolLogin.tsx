@@ -48,8 +48,13 @@ export default function SchoolLogin() {
 
   useEffect(() => {
     document.title = `School login — ${SITE.name}`;
+    // A welcome email can link straight here with ?code=XXXX so the school is signed in on arrival.
+    const fromLink = new URLSearchParams(window.location.search).get('code')?.trim();
     const saved = readSaved();
-    if (saved) {
+    if (fromLink) {
+      setCode(fromLink);
+      void lookup(null, fromLink);
+    } else if (saved) {
       setCode(saved.code);
       setSchool(saved.school);
     }
@@ -58,9 +63,9 @@ export default function SchoolLogin() {
     };
   }, []);
 
-  async function lookup(e: FormEvent) {
-    e.preventDefault();
-    const trimmed = code.trim();
+  async function lookup(e: FormEvent | null, value = code) {
+    e?.preventDefault();
+    const trimmed = value.trim();
     if (!trimmed) {
       setError('Enter your school access code.');
       setStatus('error');
