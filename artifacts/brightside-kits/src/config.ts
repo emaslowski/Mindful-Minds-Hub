@@ -391,12 +391,12 @@ export const HUB_CENTERS = [
  * turns the backdrop off. Each is shown for `STUDENT_PHOTO_SECONDS` seconds.
  */
 export const STUDENT_PHOTOS = [
-  { src: '/students/workbook-rules.jpg', alt: 'A fifth grader writing community promise rules in a Brightside workbook' },
-  { src: '/students/workbook-podcast.jpg', alt: 'A fifth grader reading a script into a podcast microphone' },
-  { src: '/students/workbook-drawing.jpg', alt: 'A fifth grader drawing a resource idea in a Brightside workbook' },
+  { src: '/students/workbook-rules.jpg', alt: 'A student writing community promise rules in a Brightside workbook' },
+  { src: '/students/workbook-podcast.jpg', alt: 'A student reading a script into a podcast microphone' },
+  { src: '/students/workbook-drawing.jpg', alt: 'A student drawing a resource idea in a Brightside workbook' },
 ];
 export const STUDENT_PHOTO_SECONDS = 7;
-export const STUDENT_PHOTO_CAPTION = 'Pictured: fifth graders working through their Brightside workbooks.';
+export const STUDENT_PHOTO_CAPTION = 'Pictured: students working through their Brightside workbooks.';
 
 /** The "About the creator" section on the home page. */
 export const ABOUT = {
@@ -407,22 +407,22 @@ export const ABOUT = {
   photoAlt: 'Erica Maslowski at her classroom desk',
   paragraphs: [
     'Welcome! I am the creator and founder of The Brightside Wellness Project. After over 10 years in education, I found that the mental health crisis of students has increased tenfold. I created this website because I wanted my students to have a place where they could feel understood, find encouragement, and see that other kids their age go through some of the same things they do.',
-    'I also wanted students to help build that space. In our Digital Literacy class, they write articles, plan podcasts, and create activities based on what they think would help another fifth grader. That might mean sharing what to do when you feel left out, how to ask for help, or a small way to make someone feel welcome. My hope is that every student who visits finds something they can use and leaves feeling a little more connected.',
+    'I also wanted students to help build that space. In our Digital Literacy class, they write articles, plan podcasts, and create activities based on what they think would help another student their age. That might mean sharing what to do when you feel left out, how to ask for help, or a small way to make someone feel welcome. My hope is that every student who visits finds something they can use and leaves feeling a little more connected.',
   ],
 };
 
 /** Student testimonials, shown on the home page. Quotes are reproduced as written. */
 export const TESTIMONIALS = [
-  { quote: 'It made me feel better about myself.', who: '5th grade student' },
-  { quote: 'It helped me because it makes me feel connected with the people who like the same thing as me.', who: '5th grade student' },
-  { quote: 'It helped by giving me answers to my problems when I needed answers most.', who: '5th grade student' },
-  { quote: 'It helped me cheer up on a bad day once and I love all the podcasts and art videos!', who: '5th grade student' },
+  { quote: 'It made me feel better about myself.', who: 'Brightside student' },
+  { quote: 'It helped me because it makes me feel connected with the people who like the same thing as me.', who: 'Brightside student' },
+  { quote: 'It helped by giving me answers to my problems when I needed answers most.', who: 'Brightside student' },
+  { quote: 'It helped me cheer up on a bad day once and I love all the podcasts and art videos!', who: 'Brightside student' },
 ];
 
 export const FAQ = [
   {
     q: 'Who is the kit for?',
-    a: 'Upper elementary through high school classrooms: advisory periods, health classes, ELA electives, counseling groups and after-school programs. The lessons are written so any teacher can lead them, not only health or counseling staff.',
+    a: 'Students in grades 3 to 6, in classrooms, advisory periods, health classes, ELA blocks, counseling groups and after-school programs. The lessons are aligned to the ISTE Standards for Students and to NGSS engineering design (3-5-ETS1 for grades 3 to 5, MS-ETS1 for grade 6), and they are written so any teacher can lead them, not only health or counseling staff.',
   },
   {
     q: 'How long does the curriculum take?',

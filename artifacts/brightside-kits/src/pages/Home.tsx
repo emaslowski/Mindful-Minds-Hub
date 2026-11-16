@@ -251,7 +251,7 @@ export default function Home() {
             <Eyebrow tone="mustard">What students say</Eyebrow>
             <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">In their own words</h2>
             <p className="mt-4 text-lg text-cream/80">
-              From 5th grade students who used the hub and the lessons this year.
+              From students in grades 3 to 6 who used the hub and the lessons this year.
             </p>
           </div>
           <ul className="mt-12 grid gap-6 md:grid-cols-2">

@@ -710,6 +710,6 @@ export const AUTHOR_DISPLAY_OPTIONS = [
   'The Brightside Wellness Project Team',
   'The Brightside Wellness Project Blog Team',
   'Student Wellness Team',
-  'Grade 5 Brightside Wellness Project Team',
+  'Grades 3-6 Brightside Wellness Project Team',
   'Anonymous Student Contributor',
 ];

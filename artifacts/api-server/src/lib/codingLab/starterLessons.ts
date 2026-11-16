@@ -223,11 +223,11 @@ That is exactly the path every page on this website has taken. You are now one o
 
 A vague prompt: "Write something about plants."
 
-A clear prompt: "Write three short tips for a fifth grader who wants to keep a classroom plant alive. Use friendly words."
+A clear prompt: "Write three short tips for a student in grades 3-6 who wants to keep a classroom plant alive. Use friendly words."
 
 The second prompt tells the AI:
 
-- **Who** the writing is for (a fifth grader)
+- **Who** the writing is for (a student in grades 3-6)
 - **What** to make (three short tips)
 - **How** it should sound (friendly words)
 
@@ -240,7 +240,7 @@ Good prompts usually have a **task**, some **details**, and a **style** or **for
         groups: [
           { label: 'Task', chips: ['Write three tips', 'Explain in two sentences', 'Make a short list', 'Write a friendly welcome message'] },
           { label: 'Topic', chips: ['about keeping a classroom plant alive', 'about calming down before a test', 'about being a good friend at recess', 'about why sleep helps your brain'] },
-          { label: 'Audience', chips: ['for a fifth grader', 'for a kindergartener', 'for a new student at our school'] },
+          { label: 'Audience', chips: ['for a student in grades 3-6', 'for a kindergartener', 'for a new student at our school'] },
           { label: 'Style', chips: ['Use simple, friendly words.', 'Make it cheerful.', 'Keep it very short.'] },
         ],
         allowAi: true,
@@ -252,11 +252,11 @@ Good prompts usually have a **task**, some **details**, and a **style** or **for
         options: [
           'Plants',
           'Tell me stuff about plants',
-          'Give me three easy tips for keeping a classroom plant alive, for a fifth grader',
+          'Give me three easy tips for keeping a classroom plant alive, for a student in grades 3-6',
           'Why',
         ],
         answer: 2,
-        explanation: 'It says what to make (three tips), the topic (a classroom plant) and who it is for (a fifth grader). Details help the AI guess what you really want.',
+        explanation: 'It says what to make (three tips), the topic (a classroom plant) and who it is for (a student in grades 3-6). Details help the AI guess what you really want.',
       },
     ],
   },

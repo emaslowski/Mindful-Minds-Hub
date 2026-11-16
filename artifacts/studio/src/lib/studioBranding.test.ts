@@ -7,7 +7,7 @@ test('legacy branding uses The Brightside Wellness Project without duplicating T
   assert.equal(formatStudioBrandLabel('The Middle School Matters Studio'), 'The Brightside Wellness Project Studio');
   assert.equal(formatStudioBrandLabel('middle school matters Blog Team'), 'The Brightside Wellness Project Blog Team');
   assert.equal(formatStudioBrandLabel('Mind Matters Student Team'), 'The Brightside Wellness Project Student Team');
-  assert.equal(formatStudioBrandLabel('Grade 5 Middle School Matters Team'), 'Grade 5 Brightside Wellness Project Team');
+  assert.equal(formatStudioBrandLabel('Grade 5 Middle School Matters Team'), 'Grades 3-6 Brightside Wellness Project Team');
   assert.equal(formatStudioBrandLabel('The Brightside Wellness Project Team'), 'The Brightside Wellness Project Team');
 });
 

@@ -13,7 +13,7 @@ const DEFAULT_AUTHOR_OPTIONS = [
   'The Brightside Wellness Project Team',
   'The Brightside Wellness Project Blog Team',
   'Student Wellness Team',
-  'Grade 5 Brightside Wellness Project Team',
+  'Grades 3-6 Brightside Wellness Project Team',
   'Anonymous Student Contributor',
 ];
 
@@ -21,16 +21,17 @@ const LEGACY_AUTHOR_LABELS: Record<string, string> = {
   'The Brightside Project Team': 'The Brightside Wellness Project Team',
   'The Brightside Project Blog Team': 'The Brightside Wellness Project Blog Team',
   'The Brightside Project Student Team': 'The Brightside Wellness Project Student Team',
-  'Grade 5 Brightside Project Team': 'Grade 5 Brightside Wellness Project Team',
+  'Grade 5 Brightside Project Team': 'Grades 3-6 Brightside Wellness Project Team',
+  'Grade 5 Brightside Wellness Project Team': 'Grades 3-6 Brightside Wellness Project Team',
   'Mind Matter Team': 'The Brightside Wellness Project Team',
   'Mind Matters Team': 'The Brightside Wellness Project Team',
   'Mind Matters Student Team': 'The Brightside Wellness Project Team',
   'Mind Matters Blog Team': 'The Brightside Wellness Project Blog Team',
-  'Grade 5 Mind Matters Team': 'Grade 5 Brightside Wellness Project Team',
+  'Grade 5 Mind Matters Team': 'Grades 3-6 Brightside Wellness Project Team',
   'Middle School Matters Team': 'The Brightside Wellness Project Team',
   'Middle School Matters Student Team': 'The Brightside Wellness Project Team',
   'Middle School Matters Blog Team': 'The Brightside Wellness Project Blog Team',
-  'Grade 5 Middle School Matters Team': 'Grade 5 Brightside Wellness Project Team',
+  'Grade 5 Middle School Matters Team': 'Grades 3-6 Brightside Wellness Project Team',
 };
 
 async function getAuthorDisplayOptions(): Promise<string[]> {

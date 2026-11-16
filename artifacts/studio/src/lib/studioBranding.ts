@@ -2,7 +2,7 @@
 export function formatStudioBrandLabel(label: string): string {
   return label
     .replace(/\b(?:the\s+)?(?:middle\s+school\s+matters|mind\s+matters|mind\s+matter|brightside\s+project)\b/gi, 'The Brightside Wellness Project')
-    .replace(/^Grade 5 The Brightside Wellness Project Team$/i, 'Grade 5 Brightside Wellness Project Team');
+    .replace(/^Grade 5 (?:The )?Brightside Wellness Project Team$/i, 'Grades 3-6 Brightside Wellness Project Team');
 }
 
 export function normalizeStudioBranding<T>(data: T, teamNames = false): T {
