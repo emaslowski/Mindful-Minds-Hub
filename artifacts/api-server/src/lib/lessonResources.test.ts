@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { FOLDERS, contentTypeFor, folderTitle, lessonFolder, parseFilename, parseFolder } from '../../../lib/lessonResources';
+import { FOLDERS, contentTypeFor, folderTitle, lessonFolder, parseFilename, parseFolder } from './lessonResources';
 
 describe('lesson resources library', () => {
   it('knows the unit folder and twelve lesson folders', () => {

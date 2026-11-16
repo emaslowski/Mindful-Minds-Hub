@@ -3,6 +3,7 @@ import { GraduationCap, KeyRound, LogOut, School, Users } from 'lucide-react';
 
 import { Button, ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { BrainMark } from '@/components/KitArt';
+import { Printables } from '@/components/Printables';
 import { SITE } from '@/config';
 
 interface SchoolInfo {
@@ -96,13 +97,14 @@ export default function SchoolLogin() {
       <Container className="grid gap-10 lg:grid-cols-[1fr_420px] lg:items-start">
         <div>
           <Eyebrow>Already a Brightside school?</Eyebrow>
-          <Heading as="h1" className="mt-2">Find your school's hub</Heading>
+          <Heading as="h1" className="mt-2">Your school's hub and printables</Heading>
           <p className="mt-4 max-w-xl text-lg text-cocoa-soft">
-            Every school that buys a kit gets its own hub address. Enter the access code from your
-            welcome email to get your links for students and teachers.
+            Every school that buys a kit gets its own hub address and the printables for all 12 lessons.
+            Enter the access code from your welcome email to get your links and your downloads.
           </p>
 
           {school ? (
+            <>
             <div className="mt-10 rounded-2xl border border-mustard bg-paper p-7 shadow-card ring-1 ring-mustard/40">
               <div className="flex items-start gap-4">
                 <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-peach-soft">
@@ -149,6 +151,8 @@ export default function SchoolLogin() {
                 <LogOut className="h-4 w-4" /> Not your school? Use a different code
               </button>
             </div>
+            <Printables code={code.trim()} />
+            </>
           ) : (
             <form onSubmit={lookup} className="mt-10 rounded-2xl border border-cocoa/10 bg-paper p-7 shadow-card" noValidate>
               <label htmlFor="code" className="mb-1.5 block font-display text-[15px] font-semibold text-cocoa">
@@ -169,7 +173,7 @@ export default function SchoolLogin() {
                   />
                 </div>
                 <Button type="submit" size="lg" disabled={status === 'loading'}>
-                  {status === 'loading' ? 'Looking up…' : 'Find my hub'}
+                  {status === 'loading' ? 'Looking up…' : 'Sign in'}
                 </Button>
               </div>
               {error && (
@@ -189,6 +193,7 @@ export default function SchoolLogin() {
           <h2 className="mt-3 font-display text-2xl font-semibold">Can't find your code?</h2>
           <ul className="mt-4 space-y-3 text-cream/85">
             <li>Check the welcome email sent to the contact on your order. It has your access code and both links.</li>
+            <li>One code per school unlocks the hub links and every lesson's printables for all of its teachers.</li>
             <li>Ask the teacher or administrator who placed the order. Every school has one code.</li>
             <li>Email us from a school address and we will look it up for you.</li>
           </ul>

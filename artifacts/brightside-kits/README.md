@@ -36,6 +36,22 @@ with code LINCOLN-2026 and hub URL https://…". Each entry has `name`, `code`,
 A demo entry (`BRIGHT-DEMO`) points at the main hub; remove it when you no
 longer want it.
 
+### Lesson printables
+
+After a valid code, the same page shows the **Lesson printables** library: a
+section for the whole unit (complete workbook, printables and slides as PDF,
+plus the editable PowerPoint files) and one per lesson (that lesson's workbook
+pages, teacher printables and slides). The files are read from the hub's
+storage bucket under `<PRIVATE_OBJECT_DIR>/lesson-resources/<folder>/` where
+`folder` is `unit` or `lesson-01` … `lesson-12`; the file name is the title
+shown. Add, replace or delete files in that bucket folder (Cloud Console →
+Storage → `brightside-project-uploads` → `.private/lesson-resources`) and the
+page updates on the next visit, no deploy needed. Only `.pdf`, `.pptx`, `.docx`,
+`.xlsx`, `.png`, `.jpg` and `.zip` files are listed. The API endpoints are
+`GET /api/kits/schools/:code/resources` and
+`GET /api/kits/schools/:code/resources/:folder/:file` (`?download=1` saves
+instead of opening).
+
 ## Edit the content
 
 Everything you are likely to change is in [src/config.ts](src/config.ts):
