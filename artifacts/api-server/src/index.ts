@@ -1,6 +1,7 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { runSeed } from "./lib/seed";
+import { initDatabase } from "./lib/dbInit";
 import { ensureStudioVideoProductions } from "./lib/studioVideoMigration";
 import { repairOrphanedEditorialAssignments } from "./lib/editorialRouting";
 
@@ -12,7 +13,7 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-ensureStudioVideoProductions().then(repairOrphanedEditorialAssignments).then(() => app.listen(port, (err) => {
+initDatabase().then(ensureStudioVideoProductions).then(repairOrphanedEditorialAssignments).then(() => app.listen(port, (err) => {
   if (err) {
     logger.error({ err }, "Error listening on port");
     process.exit(1);

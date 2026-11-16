@@ -56,6 +56,42 @@ Health check: `GET /api/healthz`.
    Apply it with `gcloud storage buckets update gs://YOUR_BUCKET --cors-file=cors.json`.
 3. **Credential emails**: enable the Gmail API. Using the OAuth client above, get a refresh token for the school sender mailbox with the `gmail.send` and `gmail.readonly` scopes (the [OAuth Playground](https://developers.google.com/oauthplayground) works; tick "Use your own OAuth credentials"). Put it in `GMAIL_REFRESH_TOKEN`.
 
+## A hub for each school
+
+Every school that buys a kit gets its own hub: its own Cloud Run service
+(`hub-<slug>`) and its own database on the shared Cloud SQL instance, running the
+same image as the main hub. Nothing is shared between schools except the code.
+
+```powershell
+.\scripts\new-school-hub.ps1 -Slug lincoln -SchoolName "Lincoln Middle School" `
+    -TeacherEmails "jdoe@lincoln.k12.ny.us" -Code LINCOLN-2026
+# add -Domain lincoln.thebrightsidewellnessproject.com for a custom address
+```
+
+The script creates the database, deploys the service with the main hub's settings
+(overriding `DATABASE_NAME`, `ADMIN_EMAILS`, `SITE_OWNER_EMAILS`, the storage
+folders and `APP_URL`), allows the new address in the bucket's CORS rule, and
+prints the two manual steps: the OAuth redirect URI to add to the Google sign-in
+client, and the Site Assistant sentence that registers the school's code and hub
+URL for the kits site. With `DB_INIT_ON_START=1` the hub creates its own tables
+on first start from `lib/db/schema-sql/` (a `drizzle-kit generate` snapshot of the
+schema) plus the repeatable `lib/db/post-merge/` files, then seeds the default
+jobs, teams and teacher accounts. The main hub keeps that flag unset.
+
+After the main hub is updated (every push to `main`), run
+`.\scripts\update-school-hubs.ps1` to roll the new image to every school hub.
+When the database schema changes, regenerate the snapshot before provisioning
+another school:
+
+```powershell
+# from the repo root; the placeholder URL is never contacted
+$env:DATABASE_URL='postgres://x:y@localhost/placeholder'
+node node_modules\.pnpm\node_modules\drizzle-kit\bin.cjs generate --config lib\db\drizzle.gen.config.ts --name full_schema
+```
+
+(`drizzle.gen.config.ts` is `drizzle.config.ts` with `out` set to a scratch
+folder; copy the generated file over `lib/db/schema-sql/0000_full_schema.sql`.)
+
 ## Moving data off Replit
 
 Do this **before** shutting down the Replit project:
