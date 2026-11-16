@@ -21,6 +21,8 @@ import {
 import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
+import { sendMail } from '../../../lib/mail';
+import { ownerEmails } from '../../../lib/notifications';
 import {
   ASSISTANT_MODEL,
   applyAction,
@@ -107,6 +109,18 @@ router.post('/teacher/assistant/access-requests', teacherOnly, async (req: Reque
     requestedPlan: plan, note: typeof note === 'string' && note.trim() ? note.trim() : null,
   }).returning();
   res.status(201).json({ request: publicAccessRequest(created!) });
+
+  // Let the site owner know; the request also waits on the Assistant Access page.
+  const who = `${user.displayName ?? 'A teacher'}${user.email ? ` (${user.email})` : ''}`;
+  const planLabel = planById(plan)?.label ?? plan;
+  const noteText = typeof note === 'string' && note.trim() ? note.trim() : '';
+  const base = (process.env.APP_URL ?? '').replace(/\/+$/, '');
+  void ownerEmails().then((owners) => sendMail({
+    to: owners,
+    subject: `Site Assistant access request from ${user.displayName ?? user.email ?? 'a teacher'}`,
+    text: `${who} asked for Site Assistant access on the ${planLabel} plan.${noteText ? `\n\nNote: ${noteText}` : ''}\n\nApprove or decline it in the Command Center: ${base}/studio/teacher/assistant-access`,
+    html: `<p><strong>${who}</strong> asked for Site Assistant access on the <strong>${planLabel}</strong> plan.</p>${noteText ? `<blockquote>${noteText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</blockquote>` : ''}<p>Approve or decline it in the Command Center: <a href="${base}/studio/teacher/assistant-access">Assistant Access</a>.</p>`,
+  }, 'assistant access request'));
 });
 
 // ── Owner administration ────────────────────────────────────────────────────

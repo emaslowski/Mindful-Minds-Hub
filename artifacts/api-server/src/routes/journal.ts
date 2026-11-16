@@ -6,8 +6,8 @@ import {
   gratitudeEntriesTable,
 } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
-import nodemailer from "nodemailer";
 import { getSiteContent } from "../lib/siteContent";
+import { notifyTeachers } from "../lib/notifications";
 
 const router = Router();
 
@@ -178,26 +178,8 @@ async function sendRedFlagAlert(
   prompt: string,
   studentIdentity: string,
 ) {
-  const smtpHost = process.env.SMTP_HOST ?? "smtp.gmail.com";
-  const teacherEmails = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((email) => email.trim())
-    .filter(Boolean);
-  if (teacherEmails.length === 0) return;
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: Number(process.env.SMTP_PORT ?? 587),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
-    to: teacherEmails.join(", "),
+  // Goes to the teachers' notification list (Command Center → Settings), else ADMIN_EMAILS.
+  await notifyTeachers({
     subject: "⚠️ URGENT: Concerning Journal Entry — The Brightside Wellness Project",
     text: `A student has written something that may need immediate attention.\n\nPrompt: ${prompt}\n\nEntry:\n${content}\n\nStudent identity: ${studentIdentity}\n\nPlease check in with this student as soon as possible.`,
     html: `<h2 style="color:red">⚠️ URGENT: Concerning Student Journal Entry</h2>
@@ -207,7 +189,7 @@ async function sendRedFlagAlert(
       <blockquote style="background:#fff3cd;padding:12px;border-left:4px solid red">${content.replace(/\n/g, "<br>")}</blockquote>
       <p><strong>Student identity:</strong> ${studentIdentity}</p>
       <p>Please check in with this student as soon as possible.</p>`,
-  });
+  }, "red-flag journal alert");
 }
 
 async function getWellnessUser(

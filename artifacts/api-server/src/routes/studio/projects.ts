@@ -12,8 +12,9 @@ import { eq, and, desc, or } from 'drizzle-orm';
 import { Router, type Request, type Response } from 'express';
 import { requireStudioRole } from '../../middlewares/studioAuthMiddleware';
 import { checkContent } from '../../lib/safetyCheck';
-import nodemailer from 'nodemailer';
 import { logger } from '../../lib/logger';
+import { sendMail } from '../../lib/mail';
+import { getNotificationEmails } from '../../lib/notifications';
 import { resolveEditorialJobId } from '../../lib/editorialRouting';
 
 const router = Router();
@@ -42,22 +43,11 @@ async function sendReadyForReviewEmail(
   studentDisplayName: string,
   teacherEmails: string[],
 ): Promise<void> {
-  const smtpHost = process.env.SMTP_HOST;
-  if (!smtpHost || teacherEmails.length === 0) return;
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: Number(process.env.SMTP_PORT ?? 587),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
-    to: teacherEmails.join(', '),
+  // Teacher profiles on this hub plus the notification list from Settings.
+  const { emails: notified } = await getNotificationEmails();
+  const to = Array.from(new Set([...teacherEmails, ...notified].map((e) => e.trim().toLowerCase()).filter(Boolean)));
+  await sendMail({
+    to,
     subject: `📬 New Submission Ready for Review — ${projectTitle}`,
     text: [
       `A student has submitted a project for your review.`,
@@ -82,7 +72,7 @@ async function sendReadyForReviewEmail(
       </table>
       <p>Please log in to <strong>The Brightside Wellness Project Command Center</strong> to review and provide feedback.</p>
     `,
-  });
+  }, 'ready-for-review notification');
 }
 
 const WORKFLOW_TRANSITIONS: Record<string, string[]> = {

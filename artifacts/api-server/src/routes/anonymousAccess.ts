@@ -18,6 +18,7 @@ import {
 import { hashPassword, verifyPassword } from '../lib/password';
 import { requireStudioRole } from '../middlewares/studioAuthMiddleware';
 import { sendCredentialEmail } from '../lib/credentialEmail';
+import { notifyTeachers } from '../lib/notifications';
 
 const router = Router();
 
@@ -51,13 +52,6 @@ function parseId(value: string | string[] | undefined): number | null {
   const raw = Array.isArray(value) ? value[0] : value;
   const id = Number.parseInt(raw ?? '', 10);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
-}
-
-function getTeacherEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? '')
-    .split(',')
-    .map((email) => email.trim())
-    .filter(Boolean);
 }
 
 function cleanStudentDetail(value: unknown, label: string): string {
@@ -125,29 +119,8 @@ async function sendAccessRequestEmail(
     studentEmail: string;
   },
 ): Promise<void> {
-  const smtpHost = process.env.SMTP_HOST;
-  const teacherEmails = getTeacherEmails();
-  if (!smtpHost || teacherEmails.length === 0) {
-    req.log.warn(
-      { requestCode: request.requestCode, smtpConfigured: Boolean(smtpHost), teacherRecipients: teacherEmails.length },
-      'Anonymous access request created without email notification',
-    );
-    return;
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: Number(process.env.SMTP_PORT ?? 587),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: process.env.SMTP_USER,
-    to: teacherEmails.join(', '),
+  // Teachers on the notification list (Command Center → Settings), else ADMIN_EMAILS.
+  const sent = await notifyTeachers({
     subject: 'New private journal access request — The Brightside Wellness Project',
     text: [
       'A student requested private access to The Brightside Wellness Project journal and gratitude journal.',
@@ -168,7 +141,10 @@ async function sendAccessRequestEmail(
       <p><strong>Request ID:</strong> ${escapeHtml(request.requestCode)}</p>
       <p>Open <strong>The Brightside Wellness Project Studio → Anonymous Access</strong> to approve the request and issue a code and password.</p>
     `,
-  });
+  }, 'private journal access request');
+  if (!sent) {
+    req.log.warn({ requestCode: request.requestCode }, 'Anonymous access request created without email notification');
+  }
 }
 
 async function sendCredentialsEmail(

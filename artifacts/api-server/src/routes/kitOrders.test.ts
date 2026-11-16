@@ -1,7 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
-import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays, parseExtras, chooseMailTransport } from "./kitOrders";
+import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays, parseExtras } from "./kitOrders";
+import { chooseMailTransport } from "../lib/mail";
 
 const valid = {
   kit: "school",

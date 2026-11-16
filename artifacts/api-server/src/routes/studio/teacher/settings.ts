@@ -3,6 +3,7 @@ import { requireStudioRole } from '../../../middlewares/studioAuthMiddleware';
 import { db } from '@workspace/db';
 import { studioAppSettingsTable } from '@workspace/db/schema';
 import { eq } from 'drizzle-orm';
+import { MAX_NOTIFICATION_EMAILS, getNotificationEmails, parseEmailList, setNotificationEmails } from '../../../lib/notifications';
 
 const router = Router();
 
@@ -72,10 +73,15 @@ router.get(
     });
 
     const authorDisplayOptions = await getAuthorDisplayOptions();
+    const notifications = await getNotificationEmails();
 
     res.json({
       adminEmails: maskedEmails.length > 0 ? maskedEmails : ['(not configured — set ADMIN_EMAILS env var)'],
       authorDisplayOptions,
+      // Who receives red-flag alerts, submissions waiting for review, board posts and comments,
+      // blog posts and private-journal access requests. Falls back to the sign-in list.
+      notificationEmails: notifications.emails,
+      notificationEmailsSource: notifications.source,
     });
   },
 );
@@ -84,9 +90,26 @@ router.patch(
   '/teacher/settings',
   requireStudioRole('teacher'),
   async (req: Request, res: Response) => {
-    const { authorDisplayOptions: newOptions } = req.body as {
+    const { authorDisplayOptions: newOptions, notificationEmails } = req.body as {
       authorDisplayOptions?: string[];
+      notificationEmails?: unknown;
     };
+
+    if (notificationEmails !== undefined) {
+      const cleaned = parseEmailList(notificationEmails);
+      if (!cleaned) {
+        res.status(400).json({ error: 'Enter valid email addresses, one per entry.' });
+        return;
+      }
+      if (cleaned.length > MAX_NOTIFICATION_EMAILS) {
+        res.status(400).json({ error: `Keep the notification list to ${MAX_NOTIFICATION_EMAILS} addresses or fewer.` });
+        return;
+      }
+      await setNotificationEmails(cleaned);
+      const notifications = await getNotificationEmails();
+      res.json({ notificationEmails: notifications.emails, notificationEmailsSource: notifications.source });
+      return;
+    }
 
     if (newOptions !== undefined) {
       if (

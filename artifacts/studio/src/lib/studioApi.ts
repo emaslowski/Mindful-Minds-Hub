@@ -242,9 +242,14 @@ export const teacherModeration = {
 // ── Teacher: Settings ─────────────────────────────────────────────────────
 export const teacherSettings = {
   get: () =>
-    studioFetch<{ adminEmails: string[]; authorDisplayOptions: string[] }>(
+    studioFetch<{ adminEmails: string[]; authorDisplayOptions: string[]; notificationEmails: string[]; notificationEmailsSource: 'settings' | 'admin' }>(
       '/teacher/settings',
     ),
+  updateNotificationEmails: (notificationEmails: string[]) =>
+    studioFetch<{ notificationEmails: string[]; notificationEmailsSource: 'settings' | 'admin' }>('/teacher/settings', {
+      method: 'PATCH',
+      body: JSON.stringify({ notificationEmails }),
+    }),
   getAuthorDisplayOptions: () =>
     studioFetch<{ authorDisplayOptions: string[] }>(
       '/teacher/settings/author-display-options',

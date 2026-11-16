@@ -2,41 +2,12 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { collabPostsTable, collabCommentsTable } from "@workspace/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import nodemailer from "nodemailer";
 import { logger } from "../lib/logger";
+import { notifyTeachers } from "../lib/notifications";
 
 const router = Router();
-const MODERATOR_EMAIL = "mindmatters0526@gmail.com";
 
-function createModeratorTransport() {
-  const smtpHost = process.env.SMTP_HOST ?? "smtp.gmail.com";
-  const smtpPort = Number(process.env.SMTP_PORT ?? 587);
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-
-  if (!smtpUser || !smtpPass) {
-    logger.error(
-      { recipient: MODERATOR_EMAIL },
-      "Collaboration moderation email was not sent because SMTP credentials are missing",
-    );
-    return null;
-  }
-
-  return {
-    smtpUser,
-    transporter: nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpPort === 465,
-      requireTLS: smtpPort === 587,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    }),
-  };
-}
-
+/** Approval requests go to the teachers' notification list (Command Center → Settings). */
 async function sendModeratorEmail({
   subject,
   text,
@@ -48,47 +19,8 @@ async function sendModeratorEmail({
   html: string;
   notificationType: "post" | "comment";
 }) {
-  const mailer = createModeratorTransport();
-  if (!mailer) return;
-
-  try {
-    const info = await mailer.transporter.sendMail({
-      from: { name: "The Brightside Wellness Project LLC", address: mailer.smtpUser },
-      replyTo: mailer.smtpUser,
-      to: MODERATOR_EMAIL,
-      subject,
-      text,
-      html,
-    });
-
-    if (info.rejected.includes(MODERATOR_EMAIL)) {
-      logger.error(
-        {
-          accepted: info.accepted,
-          rejected: info.rejected,
-          response: info.response,
-          recipient: MODERATOR_EMAIL,
-        },
-        `Collaboration ${notificationType} approval email was rejected`,
-      );
-      return;
-    }
-
-    logger.info(
-      {
-        accepted: info.accepted,
-        messageId: info.messageId,
-        recipient: MODERATOR_EMAIL,
-        response: info.response,
-      },
-      `Collaboration ${notificationType} approval email accepted by SMTP`,
-    );
-  } catch (error) {
-    logger.error(
-      { err: error, recipient: MODERATOR_EMAIL },
-      `Failed to send collaboration ${notificationType} approval email`,
-    );
-  }
+  const sent = await notifyTeachers({ subject, text, html }, `collaboration ${notificationType} approval`);
+  if (sent) logger.info({ notificationType }, "Collaboration approval email sent");
 }
 
 async function notifyAdminNewPost(authorName: string, content: string) {

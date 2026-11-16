@@ -571,6 +571,16 @@ export const ASSISTANT_TOOLS: AssistantTool[] = [
     summarize: (i) => `Set author display options (${(i.authorDisplayOptions as string[]).length})`,
   },
   {
+    name: 'update_notification_emails',
+    mode: 'write',
+    description: 'Replace the list of email addresses that receive teacher notifications: red-flag journal alerts, submissions waiting for review, collaboration board posts and comments, blog posts, and private-journal access requests. Send the complete new list (read the current one with get_settings first). An empty list falls back to the teacher sign-in addresses.',
+    inputSchema: obj({
+      notificationEmails: { type: 'array', items: { type: 'string', minLength: 3 }, maxItems: 10 },
+    }, ['notificationEmails']),
+    toRequest: (i) => ({ method: 'PATCH', path: '/teacher/settings', body: { notificationEmails: i.notificationEmails } }),
+    summarize: (i) => `Set notification emails: ${(i.notificationEmails as string[]).join(', ') || '(back to sign-in list)'}`,
+  },
+  {
     name: 'update_impact_visibility',
     mode: 'write',
     description: 'Choose which impact statistics are shown on the public site. Setting keys come from get_analytics.',

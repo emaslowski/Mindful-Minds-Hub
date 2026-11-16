@@ -1,33 +1,11 @@
 import { Router } from "express";
 import { db, blogPostsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
-import nodemailer from "nodemailer";
 import { SubmitBlogPostBody } from "@workspace/api-zod";
 import { isExampleBlogPost } from "../lib/exampleBlogPosts";
+import { notifyTeachers } from "../lib/notifications";
 
 const router = Router();
-const MODERATOR_EMAIL = "mindmatters0526@gmail.com";
-
-function getTransporter() {
-  // Use environment variables for email config
-  // SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS must be set
-  // For Gmail: SMTP_HOST=smtp.gmail.com, SMTP_PORT=587, SMTP_USER=youraddress@gmail.com, SMTP_PASS=your-app-password
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (!host || !user || !pass) {
-    return null;
-  }
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
-}
 
 // GET /api/blog-posts — return approved posts
 router.get("/blog-posts", async (req, res) => {
@@ -110,14 +88,12 @@ router.post("/blog-submissions", async (req, res) => {
       approved: false,
     });
 
-    // Send email notification to admin
-    const transporter = getTransporter();
-    if (transporter) {
-      try {
-        await transporter.sendMail({
-          from: process.env.SMTP_USER,
-          to: MODERATOR_EMAIL,
+    // Tell the teachers on the notification list (Command Center → Settings).
+    {
+      {
+        await notifyTeachers({
           subject: `[The Brightside Wellness Project] New Blog Post Submission: "${title}"`,
+          text: `New blog post submission.\n\nTitle: ${title}\nAuthor: ${author}\n\n${content}\n\nLog into The Brightside Wellness Project Command Center to authorize or leave this post pending.`,
           html: `
             <h2>New Blog Post Submission</h2>
             <p><strong>Title:</strong> ${title}</p>
@@ -127,12 +103,8 @@ router.post("/blog-submissions", async (req, res) => {
             <hr />
             <p><em>Log into The Brightside Wellness Project Command Center to authorize or leave this post pending.</em></p>
           `,
-        });
-      } catch (emailErr) {
-        req.log.warn({ emailErr }, "Failed to send email notification, but submission was saved");
+        }, "blog submission notification");
       }
-    } else {
-      req.log.warn("Email not configured (SMTP_HOST/SMTP_USER/SMTP_PASS not set). Submission saved to DB only.");
     }
 
     res.status(201).json({
