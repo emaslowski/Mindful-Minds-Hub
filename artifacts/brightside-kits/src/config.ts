@@ -16,7 +16,7 @@ export const SITE = {
   /** Public address of this site. */
   siteUrl: 'https://www.thebrightsidewellnessproject.com',
   /** Where buyers' questions and orders are sent (shown on the site). */
-  contactEmail: 'elittle9514@gmail.com',
+  contactEmail: 'brightsidewellnesshub@gmail.com',
   /** The live student wellness website that comes with every kit. */
   hubUrl: 'https://thebrightsidehub-480156548115.us-east1.run.app',
   hubName: 'The Brightside Project Hub',

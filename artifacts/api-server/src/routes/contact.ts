@@ -35,9 +35,13 @@ router.post("/contact", async (req, res) => {
 
     const gradeLabel = grade ? ` (Grade ${grade})` : "";
 
+    // Messages go to the site owner(s); the first SITE_OWNER_EMAILS entry, then the mailbox itself.
+    const to = (process.env.SITE_OWNER_EMAILS ?? "").split(",").map((s) => s.trim()).filter(Boolean)[0]
+      ?? process.env.SMTP_USER ?? "brightsidewellnesshub@gmail.com";
+
     await transporter.sendMail({
       from: process.env.SMTP_USER,
-      to: "elittle9514@gmail.com",
+      to,
       subject: `💌 New Message from ${name}${gradeLabel} — The Brightside Wellness Project LLC`,
       text: `You have a new message from a student on The Brightside Wellness Project.\n\nName: ${name}${gradeLabel}\n\nMessage:\n${message}`,
       html: `
