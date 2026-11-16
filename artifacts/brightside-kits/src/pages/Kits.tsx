@@ -3,6 +3,7 @@ import { Check as CheckIcon, Minus } from 'lucide-react';
 
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { KIT_ART } from '@/components/KitArt';
+import { ContactEmail } from '@/components/ContactEmail';
 import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
 import { EXTRAS, KITS, KIT_PARTS, PD, SITE, formatPrice } from '@/config';
 
@@ -243,10 +244,8 @@ export default function Kits() {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <ButtonLink href="/order?kit=district" variant="secondary" size="lg">Request a district quote</ButtonLink>
-              <ButtonLink href={`mailto:${SITE.contactEmail}`} variant="ghost" size="lg" className="border-cream/30 text-cream hover:bg-cream/10 hover:text-cream">
-                Email {SITE.contactEmail}
-              </ButtonLink>
             </div>
+            <ContactEmail subject="District quote" tone="dark" className="mt-5" />
           </div>
         </Container>
       </Section>

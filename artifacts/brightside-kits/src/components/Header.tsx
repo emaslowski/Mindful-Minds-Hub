@@ -5,6 +5,13 @@ import clsx from 'clsx';
 
 import { ButtonLink, Container } from './ui';
 import { SITE } from '@/config';
+import { scrollToHash } from '@/lib/scroll';
+
+/** Clicking the link for the section you are already looking at should still scroll to it. */
+function rescrollIfSame(href: string) {
+  const hash = href.slice(href.indexOf('#'));
+  if (href.includes('#') && window.location.pathname + window.location.hash === href) scrollToHash(hash);
+}
 
 const NAV = [
   { href: '/#inside', label: "What's inside" },
@@ -35,6 +42,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => rescrollIfSame(item.href)}
               className={clsx(
                 'whitespace-nowrap font-display text-sm font-medium text-cocoa-soft transition hover:text-cocoa xl:text-[15px]',
                 location === item.href && 'text-cocoa',
@@ -66,7 +74,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); rescrollIfSame(item.href); }}
                 className="rounded-lg px-3 py-3 font-display text-lg font-medium text-cocoa hover:bg-paper"
               >
                 {item.label}

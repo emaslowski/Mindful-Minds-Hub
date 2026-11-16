@@ -6,6 +6,7 @@ import { KIT_ART } from '@/components/KitArt';
 import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
 import { Faq } from '@/components/Faq';
 import { PhotoBackdrop } from '@/components/PhotoBackdrop';
+import { ContactEmail } from '@/components/ContactEmail';
 import { ABOUT, HUB_CENTERS, KIT_PARTS, SITE, STUDENT_PHOTOS, STUDENT_PHOTO_CAPTION, TESTIMONIALS } from '@/config';
 
 const PART_ICONS = {
@@ -294,8 +295,8 @@ export default function Home() {
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href="/#pd" variant="dark">Bring Erica to your district</ButtonLink>
-              <ButtonLink href={`mailto:${SITE.contactEmail}`} variant="ghost">Email Erica</ButtonLink>
             </div>
+            <ContactEmail className="mt-5 max-w-lg" />
           </div>
         </Container>
       </Section>
@@ -362,8 +363,9 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <ButtonLink href="/order" size="lg">Order a kit</ButtonLink>
-              <ButtonLink href={`mailto:${SITE.contactEmail}`} size="lg" variant="ghost" className="border-cream/40 text-cream hover:bg-cream/10 hover:text-cream">Email us</ButtonLink>
+              <ButtonLink href="/order?kit=district" size="lg" variant="ghost" className="border-cream/40 text-cream hover:bg-cream/10 hover:text-cream">Request a district quote</ButtonLink>
             </div>
+            <ContactEmail tone="dark" className="mx-auto mt-6 max-w-lg text-left" />
           </div>
         </Container>
       </Section>

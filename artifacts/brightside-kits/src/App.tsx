@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
-import { Route, Switch, useLocation } from 'wouter';
+import { Route, Switch } from 'wouter';
+import { useLocationProperty } from 'wouter/use-browser-location';
 
+import { scrollToHash } from '@/lib/scroll';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import Home from '@/pages/Home';
@@ -10,20 +12,19 @@ import Thanks from '@/pages/Thanks';
 import SchoolLogin from '@/pages/SchoolLogin';
 import NotFound from '@/pages/NotFound';
 
-/** Scroll to the top on route change, or to a #hash when one is given. */
+const currentHref = () => window.location.pathname + window.location.search + window.location.hash;
+
+/**
+ * Scroll to the top on route change, or to a #hash when one is given.
+ * Watches the full URL (not just the path), so "/#about" clicked while already on
+ * the home page still scrolls: wouter cancels the browser's own jump for those links.
+ */
 function ScrollManager() {
-  const [location] = useLocation();
+  const href = useLocationProperty(currentHref, () => '');
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      const el = document.querySelector(hash);
-      if (el) {
-        el.scrollIntoView({ block: 'start' });
-        return;
-      }
-    }
+    if (scrollToHash(window.location.hash)) return;
     window.scrollTo({ top: 0 });
-  }, [location]);
+  }, [href]);
   return null;
 }
 

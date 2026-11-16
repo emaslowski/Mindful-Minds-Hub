@@ -2,6 +2,7 @@ import { useSearch } from 'wouter';
 
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { BrainMark } from '@/components/KitArt';
+import { ContactEmail } from '@/components/ContactEmail';
 import { SITE, kitById, pdOption } from '@/config';
 
 export default function Thanks() {
@@ -60,9 +61,8 @@ export default function Thanks() {
             )}
           </dl>
         )}
-        <p className="mt-8 text-cocoa-soft">
-          Questions in the meantime? Email <a href={`mailto:${SITE.contactEmail}`} className="font-semibold text-coral underline-offset-4 hover:underline">{SITE.contactEmail}</a>.
-        </p>
+        <p className="mt-8 text-cocoa-soft">Questions in the meantime?</p>
+        <ContactEmail className="mx-auto mt-3 max-w-lg text-left" />
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <ButtonLink href="/" variant="dark">Back to home</ButtonLink>
           <ButtonLink href={SITE.hubUrl} external variant="ghost">Visit the hub</ButtonLink>

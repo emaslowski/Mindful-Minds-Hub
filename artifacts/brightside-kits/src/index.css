@@ -31,6 +31,10 @@
   html {
     scroll-behavior: smooth;
   }
+  /* Section anchors land below the sticky header instead of underneath it. */
+  [id] {
+    scroll-margin-top: 5.5rem;
+  }
   body {
     @apply bg-cream font-sans text-ink antialiased;
   }

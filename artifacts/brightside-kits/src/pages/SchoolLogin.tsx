@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { GraduationCap, KeyRound, LogOut, School, Users } from 'lucide-react';
 
-import { Button, ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
+import { Button, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { BrainMark } from '@/components/KitArt';
+import { ContactEmail } from '@/components/ContactEmail';
 import { Printables } from '@/components/Printables';
 import { SITE } from '@/config';
 
@@ -202,11 +203,7 @@ export default function SchoolLogin() {
             <li>Ask the teacher or administrator who placed the order. Every school has one code.</li>
             <li>Email us from a school address and we will look it up for you.</li>
           </ul>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <ButtonLink href={`mailto:${SITE.contactEmail}?subject=${encodeURIComponent('School access code')}`} variant="secondary">
-              Email {SITE.contactEmail}
-            </ButtonLink>
-          </div>
+          <ContactEmail subject="School access code" tone="dark" className="mt-6" />
           <p className="mt-6 border-t border-cream/15 pt-5 text-sm text-cream/70">
             Not a Brightside school yet? <a href="/kits" className="font-semibold text-mustard underline-offset-4 hover:underline">See the kits</a>.
           </p>
