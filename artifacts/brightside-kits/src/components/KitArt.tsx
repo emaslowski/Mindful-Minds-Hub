@@ -70,7 +70,8 @@ export function SlidesArt({ className }: { className?: string }) {
       <text x="48" y="114" fontFamily="Caveat, cursive" fontWeight="700" fontSize="17" fill="#d96b5a">Naming big feelings</text>
       <rect x="48" y="124" width="70" height="4" rx="2" fill={COCOA} opacity="0.35" />
       <rect x="48" y="133" width="54" height="4" rx="2" fill={COCOA} opacity="0.25" />
-      <g transform="translate(140 80)"><BrainMarkSmall /></g>
+      {/* top-right corner of the slide, clear of the title lines */}
+      <g transform="translate(156 64) scale(0.8)"><BrainMarkSmall /></g>
       <rect x="110" y="166" width="20" height="28" rx="4" fill={COCOA} />
       <rect x="80" y="192" width="80" height="8" rx="4" fill={COCOA} />
     </svg>
@@ -126,7 +127,8 @@ export function HubArt({ className }: { className?: string }) {
       ].map(([c, x, y]) => (
         <rect key={`${x}-${y}`} x={x as number} y={y as number} width="30" height="30" rx="8" fill={c as string} />
       ))}
-      <g transform="translate(134 90) scale(0.55)"><BrainMarkSmall /></g>
+      {/* inside the first tile, not across two */}
+      <g transform="translate(125 93) scale(0.55)"><BrainMarkSmall /></g>
       <path d="M100 170h40l6 14H94z" fill={COCOA} />
       <rect x="60" y="184" width="120" height="6" rx="3" fill={COCOA} />
       <g transform="translate(196 36)">

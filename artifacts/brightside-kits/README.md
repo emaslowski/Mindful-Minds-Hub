@@ -67,6 +67,13 @@ order form (`/order?workbooks=2&manual=1` preselects quantities) and in the
 order email. The ids (`workbooks`, `manual`) must match `EXTRA_LABELS` in the
 API's `kitOrders.ts` if you add a new one.
 
+The Site Assistant add-on is `ASSISTANT`: three 12-month plans (Starter,
+Standard, Plus) with a monthly request allowance and placeholder prices. It
+appears on the kits page, as step 3 of the order form (`/order?assistant=standard`
+preselects a plan) and in the order email. The plan ids must match the
+`ASSISTANT_PLANS` on the hub (`lib/assistant/access.ts`), where you grant the
+school's teachers their membership after the order comes in.
+
 The launch discount for the first district is `LAUNCH_OFFER` (percentage,
 details, fine print). Set `enabled: false` once a district has claimed it and
 every badge, callout and FAQ entry about it disappears. District orders carry

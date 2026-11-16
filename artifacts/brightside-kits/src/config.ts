@@ -262,6 +262,65 @@ export function pdPresenter(): string {
   return PD.presenterName ? `${PD.presenterName}, creator of ${SITE.name}` : `the creator of ${SITE.name}`;
 }
 
+/**
+ * Site Assistant add-on: the AI helper inside the Teacher Command Center that
+ * moderates, publishes and edits the hub on a teacher's instructions. Sold as a
+ * 12-month plan with a monthly request allowance, matching the hub access that
+ * comes with every kit. The plan ids must match ASSISTANT_PLANS on the hub.
+ * Prices are placeholders until you set them.
+ */
+export type AssistantPlanId = 'starter' | 'standard' | 'plus';
+
+export interface AssistantPlan {
+  id: AssistantPlanId;
+  name: string;
+  /** Teacher requests per month (one request = one message to the assistant). */
+  requestsPerMonth: number;
+  /** Whole dollars for 12 months. */
+  price: number;
+  blurb: string;
+  bestFor: string;
+}
+
+export const ASSISTANT = {
+  title: 'Site Assistant',
+  tagline: 'An AI helper in the Teacher Command Center',
+  summary:
+    'Teachers tell the Site Assistant what they need in plain English and it does the clicking: approve student work, publish a page, add an event, update the site text, look up who still owes a draft. Every change is shown before it is applied, and the teacher stays in charge.',
+  termMonths: 12,
+  note: 'Each plan runs 12 months, the same as your hub access, and covers every teacher at the school. Requests reset on the first of each month.',
+  plans: [
+    {
+      id: 'starter',
+      name: 'Starter',
+      requestsPerMonth: 50,
+      price: 120,
+      blurb: 'A few questions or changes a week.',
+      bestFor: 'One teacher running the hub for a class',
+    },
+    {
+      id: 'standard',
+      name: 'Standard',
+      requestsPerMonth: 200,
+      price: 360,
+      blurb: 'Moderating, publishing and editing most days.',
+      bestFor: 'A school with two or three teachers sharing the work',
+    },
+    {
+      id: 'plus',
+      name: 'Plus',
+      requestsPerMonth: 600,
+      price: 840,
+      blurb: 'Heavy daily use, or a teacher who runs the site for others.',
+      bestFor: 'A district hub or a large school',
+    },
+  ] as AssistantPlan[],
+} as const;
+
+export function assistantPlan(id: string | null | undefined): AssistantPlan | undefined {
+  return ASSISTANT.plans.find((p) => p.id === id);
+}
+
 /** The four parts of every kit, used across the site. */
 export const KIT_PARTS = [
   {
@@ -396,6 +455,10 @@ export const FAQ = [
   {
     q: 'Can we buy workbooks or manuals on their own?',
     a: `Yes. Student workbooks are ${formatPrice(EXTRAS[0].price)} for a ${EXTRAS[0].unit}, and the teacher manual is ${formatPrice(EXTRAS[1].price)} each. Add them to any kit order, or order them by themselves for extra classes, new teachers or next year's students.`,
+  },
+  {
+    q: 'What is the Site Assistant?',
+    a: `An AI helper inside the Teacher Command Center. Teachers describe what they need in plain English (approve these projects, add this event, change this text) and it does the work, showing every change before it is applied. It is sold as a ${ASSISTANT.termMonths}-month add-on with a monthly request allowance: ${ASSISTANT.plans.map((p) => `${p.name} (${p.requestsPerMonth} a month) ${formatPrice(p.price)}`).join(', ')}. One plan covers every teacher at the school.`,
   },
   {
     q: 'Can I buy a kit as an individual teacher?',

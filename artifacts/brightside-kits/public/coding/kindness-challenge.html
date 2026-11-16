@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brightside Kindness Challenge (finished example)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #faf6f1; color: #3a2d23; margin: 0; padding: 40px 20px; }
+    main { max-width: 560px; margin: 0 auto; background: #fff; border: 1px solid rgba(58,45,35,0.12); border-radius: 16px; padding: 28px 32px; }
+    h1 { margin-top: 0; }
+    button { background: #c95f4e; color: #fff; border: 0; border-radius: 10px; padding: 12px 18px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    button:hover { background: #b3503f; }
+    #challenge { font-size: 18px; min-height: 1.5em; }
+    .note { font-size: 13px; color: #655548; border-top: 1px solid rgba(58,45,35,0.12); margin-top: 28px; padding-top: 14px; }
+    code { background: #f1e8df; padding: 1px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<main>
+<!-- Lesson 12 finished example. The part below the line is exactly the Coding Starter from the slides. -->
+<h1>Brightside Kindness Challenge</h1>
+<p>Click the button to find one small act of kindness to try today.</p>
+
+<button type="button" onclick="showChallenge()">Give Me a Challenge</button>
+<p id="challenge" aria-live="polite">Your challenge will appear here.</p>
+
+<script>
+  // Replace these four lines with challenges your team writes.
+  const challenges = [
+    "Write your first kindness challenge here.",
+    "Write your second kindness challenge here.",
+    "Write your third kindness challenge here.",
+    "Write your fourth kindness challenge here."
+  ];
+
+  let nextChallenge = 0;
+
+  function showChallenge() {
+    document.getElementById("challenge").textContent =
+      challenges[nextChallenge];
+
+    nextChallenge = nextChallenge + 1;
+
+    if (nextChallenge === challenges.length) {
+      nextChallenge = 0;
+    }
+  }
+</script>
+
+<p class="note">
+  This is the finished example from Lesson 12 of The Brightside Wellness Project. To see the code, right-click this page and choose
+  <strong>View page source</strong>, or press <code>Ctrl</code>+<code>U</code>. Your team's version replaces the four challenge lines.
+</p>
+</main>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
-import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays, parseExtras } from "./kitOrders";
+import kitOrdersRouter, { parseKitOrder, kitOrderRecipients, parsePdDays, parseExtras, parseAssistantPlan } from "./kitOrders";
 import { chooseMailTransport } from "../lib/mail";
 
 const valid = {
@@ -70,6 +70,15 @@ describe("parseKitOrder", () => {
       assert.equal(withPd.order.pdParticipants, "24");
       assert.equal(withPd.order.pdLocation, "District office, Middleport NY");
     }
+  });
+
+  it("accepts only the Site Assistant plans the hub knows", () => {
+    assert.equal(parseAssistantPlan("standard"), "standard");
+    assert.equal(parseAssistantPlan(" Plus "), "plus");
+    assert.equal(parseAssistantPlan("unlimited"), "");
+    assert.equal(parseAssistantPlan(undefined), "");
+    const r = parseKitOrder({ ...valid, assistant: "starter" });
+    assert.equal(r.ok && r.order.assistant, "starter");
   });
 
   it("keeps only known extra materials with positive quantities", () => {

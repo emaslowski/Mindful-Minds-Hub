@@ -4,8 +4,9 @@ import { Check as CheckIcon, Minus } from 'lucide-react';
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { KIT_ART } from '@/components/KitArt';
 import { ContactEmail } from '@/components/ContactEmail';
+import { AssistantAddOn } from '@/components/AssistantAddOn';
 import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
-import { EXTRAS, KITS, KIT_PARTS, PD, SITE, formatPrice } from '@/config';
+import { ASSISTANT, EXTRAS, KITS, KIT_PARTS, PD, SITE, formatPrice } from '@/config';
 
 const pdCell = `Add-on, from ${formatPrice(PD.options[0].price)}`;
 
@@ -17,6 +18,7 @@ const COMPARISON: { label: string; cells: Record<string, Cell> }[] = [
   { label: 'Student workbooks', cells: { classroom: '35', school: '350', district: 'Per student' } },
   { label: `Extra workbooks (${EXTRAS[0].unit}) / extra manual`, cells: { classroom: `${formatPrice(EXTRAS[0].price)} / ${formatPrice(EXTRAS[1].price)}`, school: `${formatPrice(EXTRAS[0].price)} / ${formatPrice(EXTRAS[1].price)}`, district: 'Included in quote' } },
   { label: `Hub access (${SITE.accessMonths} months)`, cells: { classroom: '1 class', school: 'Whole school', district: 'District-wide' } },
+  { label: 'Site Assistant (AI helper for teachers)', cells: { classroom: `Add-on, from ${formatPrice(ASSISTANT.plans[0].price)}`, school: `Add-on, from ${formatPrice(ASSISTANT.plans[0].price)}`, district: 'Add-on, quoted' } },
   { label: 'Teacher accounts', cells: { classroom: '1', school: 'Up to 10', district: 'Unlimited' } },
   { label: 'Student Studio & portfolios', cells: { classroom: true, school: true, district: true } },
   { label: 'Teacher Command Center', cells: { classroom: true, school: true, district: true } },
@@ -126,6 +128,13 @@ export default function Kits() {
               </tbody>
             </table>
           </div>
+        </Container>
+      </Section>
+
+      {/* Site Assistant add-on */}
+      <Section id="assistant" className="scroll-mt-20 pt-0">
+        <Container>
+          <AssistantAddOn />
         </Container>
       </Section>
 

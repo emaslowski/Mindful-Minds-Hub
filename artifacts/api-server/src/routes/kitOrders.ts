@@ -46,6 +46,18 @@ export function parseExtras(v: unknown): Record<string, number> {
 }
 
 /** On-site professional development add-on: allowed lengths in days. */
+/** Site Assistant plans sold with a kit; ids match ASSISTANT_PLANS in lib/assistant/access.ts. */
+const ASSISTANT_PLAN_LABELS: Record<string, string> = {
+  starter: "Starter (50 requests a month, 12 months)",
+  standard: "Standard (200 requests a month, 12 months)",
+  plus: "Plus (600 requests a month, 12 months)",
+};
+
+export function parseAssistantPlan(v: unknown): string {
+  const id = String(v ?? "").trim().toLowerCase();
+  return ASSISTANT_PLAN_LABELS[id] ? id : "";
+}
+
 const PD_DAYS = new Set([2, 3]);
 
 export function parsePdDays(v: unknown): number {
@@ -111,6 +123,8 @@ export interface KitOrderInput {
   pdLocation: string;
   /** Extra materials by id → quantity (only ids in EXTRA_LABELS, only > 0). */
   extras: Record<string, number>;
+  /** Site Assistant plan id, or "" for none. */
+  assistant: string;
   /** Offer code the site attached (e.g. the founding-district discount). */
   promo: string;
   payment: string;
@@ -154,6 +168,7 @@ export function parseKitOrder(body: unknown): { ok: true; order: KitOrderInput }
       pdParticipants: str(b.pdParticipants, 40),
       pdLocation: str(b.pdLocation, 300),
       extras: parseExtras(b.extras),
+      assistant: parseAssistantPlan(b.assistant),
       promo: str(b.promo, 40).toUpperCase(),
       payment,
       poNumber: str(b.poNumber, 80),
@@ -196,6 +211,7 @@ function orderRows(order: KitOrderInput): [string, string][] {
     const label = EXTRA_LABELS[id];
     rows.push([`Extra: ${label.name}`, `${qty} × ${label.unit}`]);
   }
+  rows.push(["Site Assistant", order.assistant ? ASSISTANT_PLAN_LABELS[order.assistant] : "None requested"]);
   if (order.promo) rows.push(["Offer code", order.promo]);
   rows.push(["Payment", PAYMENT_LABELS[order.payment]]);
   if (order.poNumber) rows.push(["PO number", order.poNumber]);

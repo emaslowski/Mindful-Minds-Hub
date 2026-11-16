@@ -4,7 +4,7 @@ import { CreditCard, FileText, MessageSquareQuote } from 'lucide-react';
 import clsx from 'clsx';
 
 import { Button, ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
-import { EXTRAS, KITS, LAUNCH_OFFER, PD, SITE, formatPrice, kitById, pdOption, pdPresenter, type ExtraId, type KitId, type PdDays } from '@/config';
+import { ASSISTANT, EXTRAS, KITS, LAUNCH_OFFER, PD, SITE, assistantPlan, formatPrice, kitById, pdOption, pdPresenter, type AssistantPlanId, type ExtraId, type KitId, type PdDays } from '@/config';
 
 type PaymentMethod = 'card' | 'purchase_order' | 'quote';
 
@@ -32,6 +32,8 @@ interface FormState {
   pdLocation: string;
   /** Extra materials by id → quantity. */
   extras: Record<ExtraId, number>;
+  /** Site Assistant plan, or '' for none. */
+  assistant: AssistantPlanId | '';
   payment: PaymentMethod;
   poNumber: string;
   notes: string;
@@ -80,6 +82,7 @@ export default function Order() {
         workbooks: clampQty(params.get('workbooks')),
         manual: clampQty(params.get('manual')),
       } as Record<ExtraId, number>,
+      assistant: (assistantPlan(params.get('assistant'))?.id ?? '') as AssistantPlanId | '',
     };
   }, [search]);
 
@@ -100,6 +103,7 @@ export default function Order() {
     pdParticipants: '',
     pdLocation: '',
     extras: initial.extras,
+    assistant: initial.assistant,
     payment: initial.kit === 'district' ? 'quote' : 'purchase_order',
     poNumber: '',
     notes: '',
@@ -112,6 +116,7 @@ export default function Order() {
       ...f,
       kit: initial.kit,
       pdDays: initial.pdDays || f.pdDays,
+      assistant: initial.assistant || f.assistant,
       payment: initial.kit === 'district' ? 'quote' : f.payment,
     }));
   }, [initial]);
@@ -130,7 +135,8 @@ export default function Order() {
   const kitSubtotal = kit.price === null ? null : kit.price * Math.max(1, form.quantity);
   const extraLines = EXTRAS.filter((x) => form.extras[x.id] > 0).map((x) => ({ ...x, qty: form.extras[x.id], subtotal: x.price * form.extras[x.id] }));
   const extrasSubtotal = extraLines.reduce((sum, l) => sum + l.subtotal, 0);
-  const total = kitSubtotal === null ? null : kitSubtotal + (pd?.price ?? 0) + extrasSubtotal;
+  const assistant = assistantPlan(form.assistant);
+  const total = kitSubtotal === null ? null : kitSubtotal + (pd?.price ?? 0) + extrasSubtotal + (assistant?.price ?? 0);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -154,6 +160,7 @@ export default function Order() {
       if (!res.ok) throw new Error(data.error ?? 'Something went wrong. Please try again.');
       const q = new URLSearchParams({ ref: data.reference ?? '', kit: kit.id, payment: form.payment });
       if (pd) q.set('pd', String(pd.days));
+      if (assistant) q.set('assistant', assistant.id);
       if (data.emailed === false) q.set('emailed', '0');
       navigate(`/thanks?${q.toString()}`);
     } catch (err) {
@@ -284,9 +291,33 @@ export default function Order() {
               )}
             </fieldset>
 
+            {/* Site Assistant */}
+            <fieldset>
+              <legend className="font-display text-2xl font-semibold text-cocoa">3. Add the Site Assistant?</legend>
+              <p className="mt-2 max-w-xl text-cocoa-soft">
+                {ASSISTANT.tagline}: teachers say what they need and it does the clicking, with every change shown first. {ASSISTANT.termMonths} months, every teacher at the school. Optional.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-4">
+                <label className={choiceCls(form.assistant === '')}>
+                  <input type="radio" name="assistant" value="" checked={form.assistant === ''} onChange={() => set('assistant', '')} className="sr-only" />
+                  <span className="block font-display text-lg font-semibold text-cocoa">Not now</span>
+                  <span className="block text-sm text-cocoa-soft">You can add it later.</span>
+                  <span className="mt-2 block font-display text-xl font-semibold text-cocoa">$0</span>
+                </label>
+                {ASSISTANT.plans.map((p) => (
+                  <label key={p.id} className={choiceCls(form.assistant === p.id)}>
+                    <input type="radio" name="assistant" value={p.id} checked={form.assistant === p.id} onChange={() => set('assistant', p.id)} className="sr-only" />
+                    <span className="block font-display text-lg font-semibold text-cocoa">{p.name}</span>
+                    <span className="block text-sm text-cocoa-soft">{p.requestsPerMonth} requests a month. {p.blurb}</span>
+                    <span className="mt-2 block font-display text-xl font-semibold text-cocoa">+{formatPrice(p.price)}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
             {/* Extra materials */}
             <fieldset>
-              <legend className="font-display text-2xl font-semibold text-cocoa">3. Add extra materials?</legend>
+              <legend className="font-display text-2xl font-semibold text-cocoa">4. Add extra materials?</legend>
               <p className="mt-2 max-w-xl text-cocoa-soft">
                 For additional classes or teachers beyond what the kit covers. Optional.
               </p>
@@ -323,7 +354,7 @@ export default function Order() {
 
             {/* Contact */}
             <fieldset>
-              <legend className="font-display text-2xl font-semibold text-cocoa">4. Your details</legend>
+              <legend className="font-display text-2xl font-semibold text-cocoa">5. Your details</legend>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <Field label="School or district" htmlFor="organization" required>
@@ -352,7 +383,7 @@ export default function Order() {
 
             {/* Payment */}
             <fieldset>
-              <legend className="font-display text-2xl font-semibold text-cocoa">5. How would you like to pay?</legend>
+              <legend className="font-display text-2xl font-semibold text-cocoa">6. How would you like to pay?</legend>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 {PAYMENT_OPTIONS.map(({ id, icon: Icon, title, text }) => (
                   <label key={id} className={choiceCls(form.payment === id)}>
@@ -421,6 +452,12 @@ export default function Order() {
                 <dt className="text-cocoa-soft">On-site PD</dt>
                 <dd className="text-right font-semibold text-cocoa">
                   {pd ? `${pd.days} days · +${formatPrice(pd.price)}` : 'None'}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-cocoa-soft">Site Assistant</dt>
+                <dd className="text-right font-semibold text-cocoa">
+                  {assistant ? `${assistant.name} · +${formatPrice(assistant.price)}` : 'None'}
                 </dd>
               </div>
               {extraLines.map((l) => (

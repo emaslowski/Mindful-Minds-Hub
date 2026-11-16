@@ -19,8 +19,9 @@ import { useToast } from '@/hooks/use-toast';
 import { PublicFeedbackModeration } from '@/pages/studio/teacher/PublicFeedbackModeration';
 import {
   Users, FolderOpen, ClipboardCheck, Star, KeyRound, HeartHandshake,
-  RefreshCw, AlertCircle, ChevronRight, Trash2, CheckCircle2, FileText, MessageSquare,
+  RefreshCw, AlertCircle, ChevronRight, Trash2, CheckCircle2, FileText, MessageSquare, Sparkles,
 } from 'lucide-react';
+import { assistantAdminApi } from '@/lib/assistantApi';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 
@@ -60,6 +61,15 @@ export default function CommandCenter() {
     enabled: !!user,
     refetchOnWindowFocus: true,
     refetchInterval: 30_000,
+  });
+
+  // Site Assistant access requests wait for the owner on the Assistant Access page.
+  const { data: assistantAdmin } = useQuery({
+    queryKey: ['assistant-admin'],
+    queryFn: assistantAdminApi.overview,
+    enabled: !!user?.isOwner,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
   });
 
   const { data: friendshipRequests, isLoading: friendshipLoading, isError: friendshipError, refetch: refetchFriendship } = useQuery({
@@ -146,7 +156,11 @@ export default function CommandCenter() {
     comment: { label: 'Comment', icon: <MessageSquare className="h-4 w-4 text-[#d4a44c]" /> },
   };
 
+  const pendingAssistantRequests = (assistantAdmin?.requests ?? []).filter((r) => r.status === 'pending').length;
   const summaryCards = [
+    ...(user.isOwner
+      ? [{ label: 'Site Assistant Requests', value: pendingAssistantRequests, icon: <Sparkles className="h-5 w-5 text-[#d4a44c]" />, href: '/studio/teacher/assistant-access' }]
+      : []),
     { label: 'Journal Access Requests', value: accessError ? '!' : accessLoading ? '…' : pendingAccessRequests.length, icon: <KeyRound className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/anonymous-access' },
     { label: 'Matchmaker Requests', value: friendshipError ? '!' : friendshipLoading ? '…' : friendshipRequests?.length ?? 0, icon: <HeartHandshake className="h-5 w-5 text-[#688a52]" />, href: '#friendship-requests' },
     { label: 'Active Students', value: s?.activeStudents ?? 0, icon: <Users className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/students' },

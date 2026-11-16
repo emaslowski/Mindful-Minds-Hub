@@ -3,13 +3,14 @@ import { useSearch } from 'wouter';
 import { ButtonLink, Container, Eyebrow, Heading, Section } from '@/components/ui';
 import { BrainMark } from '@/components/KitArt';
 import { ContactEmail } from '@/components/ContactEmail';
-import { SITE, kitById, pdOption } from '@/config';
+import { SITE, assistantPlan, kitById, pdOption } from '@/config';
 
 export default function Thanks() {
   const params = new URLSearchParams(useSearch());
   const reference = params.get('ref');
   const kit = kitById(params.get('kit'));
   const pd = pdOption(params.get('pd'));
+  const assistant = assistantPlan(params.get('assistant'));
   const payment = params.get('payment');
   const fromStripe = params.has('session_id');
   const emailed = params.get('emailed') !== '0';
@@ -52,6 +53,12 @@ export default function Thanks() {
               <div className="flex justify-between gap-4">
                 <dt className="text-cocoa-soft">Professional development</dt>
                 <dd className="font-semibold text-cocoa">{pd.name}</dd>
+              </div>
+            )}
+            {assistant && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-cocoa-soft">Site Assistant</dt>
+                <dd className="font-semibold text-cocoa">{assistant.name} plan</dd>
               </div>
             )}
             {reference && (
