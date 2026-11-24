@@ -7,6 +7,8 @@
   own database on the shared Cloud SQL instance. The hub creates its own tables on
   first start (DB_INIT_ON_START=1), then seeds the default jobs, teams and the teacher
   accounts listed in ADMIN_EMAILS. Nothing is shared between schools except the code.
+  The school's kit code (-Code) also becomes the hub's access code: visitors type it
+  once before the site or the Studio opens, so the hub is private to the school.
 
   Run from a PowerShell window where gcloud.cmd is signed in as the project owner.
 
@@ -54,6 +56,7 @@ $override = @{
   SITE_OWNER_EMAILS         = "$teachers,$Owner"
   DATABASE_NAME             = $dbName
   DB_INIT_ON_START          = '1'
+  HUB_ACCESS_CODE           = $Code   # visitors type this once before the hub opens; teachers can change it in Settings
   PRIVATE_OBJECT_DIR        = "/brightside-project-uploads/.private/schools/$Slug"
   PUBLIC_OBJECT_SEARCH_PATHS = "/brightside-project-uploads/public/schools/$Slug"
 }
@@ -118,6 +121,7 @@ Write-Host "================ $SchoolName hub is up ================" -Foreground
 Write-Host "Hub (students):      $appUrl"
 Write-Host "Command Center:      $appUrl/studio/"
 Write-Host "Teachers who can sign in: $teachers (plus $Owner)"
+Write-Host "School access code:  $Code   (visitors type it once; change it in Command Center > Settings)"
 Write-Host ""
 Write-Host "Finish these by hand:" -ForegroundColor Yellow
 Write-Host "1. Google sign-in: Cloud Console > APIs & Services > Credentials > the OAuth client, add this Authorized redirect URI:"

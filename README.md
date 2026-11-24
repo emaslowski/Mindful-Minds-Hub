@@ -12,6 +12,8 @@ The app is one Node.js server that serves:
 
 A separate static site for selling the learning kits lives in [artifacts/brightside-kits](artifacts/brightside-kits/README.md) (`pnpm run dev:kits`, `pnpm run build:kits`). Its order form posts to this server's `POST /api/kits/orders`.
 
+A hub can be kept private to one school: set `HUB_ACCESS_CODE` (or Command Center → Settings → School access code) and every visitor types that code once before the site or the Studio opens.
+
 It needs three outside services: **PostgreSQL**, **Google Cloud** (sign-in, file storage, and Gmail for credential emails), and an **SMTP** mailbox for notifications. All settings are in [.env.example](.env.example).
 
 ## Run it locally

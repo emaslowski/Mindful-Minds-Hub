@@ -105,7 +105,7 @@ export default function SchoolLogin() {
           <Eyebrow>Already a Brightside school?</Eyebrow>
           <Heading as="h1" className="mt-2">Your school's hub and printables</Heading>
           <p className="mt-4 max-w-xl text-lg text-cocoa-soft">
-            Every school that buys a kit gets its own hub address and the printables for all 12 lessons.
+            Every school that buys a kit gets its own private hub address and the printables for every lesson.
             Enter the access code from your welcome email to get your links and your downloads.
           </p>
 
@@ -200,6 +200,7 @@ export default function SchoolLogin() {
           <ul className="mt-4 space-y-3 text-cream/85">
             <li>Check the welcome email sent to the contact on your order. It has your access code and both links.</li>
             <li>One code per school unlocks the hub links and every lesson's printables for all of its teachers.</li>
+            <li>The same code opens the hub itself: students and families type it once on each device, so only your school community can get in.</li>
             <li>Ask the teacher or administrator who placed the order. Every school has one code.</li>
             <li>Email us from a school address and we will look it up for you.</li>
           </ul>

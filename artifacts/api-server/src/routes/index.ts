@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import healthRouter from "./health";
 import authRouter from "./auth";
 import anonymousAccessRouter from "./anonymousAccess";
+import hubAccessRouter from "./hubAccess";
 import blogRouter from "./blog";
 import journalRouter from "./journal";
 import plantJournalRouter from "./plantJournal";
@@ -45,6 +46,7 @@ import { requireRole } from "../middlewares/requireRoleMiddleware";
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(hubAccessRouter);
 router.use(authRouter);
 router.use(anonymousAccessRouter);
 router.use(blogRouter);

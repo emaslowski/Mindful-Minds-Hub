@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { HubAccessGate } from '@/components/HubAccessGate';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 // Studio pages — students
@@ -100,9 +101,11 @@ function App() {
       <TooltipProvider>
         {/* Empty base: all route paths keep their full /studio/* prefix */}
         <WouterRouter base="">
-          <RoutedErrorBoundary>
-            <StudioRouter />
-          </RoutedErrorBoundary>
+          <HubAccessGate>
+            <RoutedErrorBoundary>
+              <StudioRouter />
+            </RoutedErrorBoundary>
+          </HubAccessGate>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

@@ -8,6 +8,7 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import { studioAuthMiddleware } from "./middlewares/studioAuthMiddleware";
+import { hubAccessGate } from "./lib/hubAccess";
 
 const app: Express = express();
 
@@ -39,6 +40,9 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(authMiddleware);
 app.use(studioAuthMiddleware);
+// School access code: with HUB_ACCESS_CODE (or the teacher's Settings code) set,
+// API calls need the code cookie. See lib/hubAccess.ts.
+app.use(hubAccessGate);
 
 app.use("/api", router);
 
