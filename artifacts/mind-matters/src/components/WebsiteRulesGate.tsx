@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7,37 +7,58 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/mind-matters-ds/components/ui/alert-dialog';
+import { useSiteContent } from '@/lib/siteContent';
 
-const ACKNOWLEDGMENT_KEY = 'middle-school-matters-website-rules-v1';
-const WebsiteRulesContext = createContext(false);
+/**
+ * First-visit agreement. The rules come from the editable site content
+ * entry `site.rules`, which starts empty on a new hub: with no rules there
+ * is no dialog. Once the teacher publishes the class's Community Promise
+ * (Command Center → Settings → Website Rules, or through the Site
+ * Assistant), every visitor reads and accepts it once per browser. The
+ * acknowledgment is keyed by the rules' text, so a changed list asks again.
+ */
+const STORAGE_PREFIX = 'brightside-website-rules:';
+const WebsiteRulesContext = createContext(true);
 export const useWebsiteRulesAcknowledged = () => useContext(WebsiteRulesContext);
 
-const rules = [
-  "Please don't share personal information (no last names, phone numbers, or addresses).",
-  'Use respectful language when posting.',
-  'Everyone is welcomed and celebrated here.',
-  'All information is researched before publishing.',
-  'Mrs. Maslowski has to approve everything before it is posted.',
-];
+function rulesKey(rules: string[]) {
+  // Small string hash; the key only has to change when the text changes.
+  let h = 0;
+  const text = rules.join('\n');
+  for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
+  return STORAGE_PREFIX + (h >>> 0).toString(36);
+}
 
-function alreadyAcknowledged() {
+function alreadyAcknowledged(key: string) {
   try {
-    return window.localStorage.getItem(ACKNOWLEDGMENT_KEY) === 'acknowledged';
+    return window.localStorage.getItem(key) === 'acknowledged';
   } catch {
     return false;
   }
 }
 
 export function WebsiteRulesGate({ children }: { children?: ReactNode }) {
-  const [acknowledged, setAcknowledged] = useState(alreadyAcknowledged);
+  const raw = useSiteContent('site.rules');
+  const rules = useMemo(
+    () => (Array.isArray(raw) ? raw.filter((r): r is string => typeof r === 'string' && r.trim().length > 0) : []),
+    [raw],
+  );
+  const key = rulesKey(rules);
+  const [acknowledgedKey, setAcknowledgedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAcknowledgedKey(alreadyAcknowledged(key) ? key : null);
+  }, [key]);
+
+  const acknowledged = rules.length === 0 || acknowledgedKey === key;
 
   function acknowledge() {
     try {
-      window.localStorage.setItem(ACKNOWLEDGMENT_KEY, 'acknowledged');
+      window.localStorage.setItem(key, 'acknowledged');
     } catch {
       // Storage may be disabled; the acknowledgment still lasts until reload.
     }
-    setAcknowledged(true);
+    setAcknowledgedKey(key);
   }
 
   return (
@@ -58,7 +79,7 @@ export function WebsiteRulesGate({ children }: { children?: ReactNode }) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <ol className="list-decimal space-y-3 pl-6 text-base leading-relaxed text-foreground marker:font-bold marker:text-primary">
-          {rules.map((rule) => <li key={rule} className="pl-1">{rule}</li>)}
+          {rules.map((rule, i) => <li key={`${i}-${rule}`} className="pl-1">{rule}</li>)}
         </ol>
         <AlertDialogAction
           onClick={acknowledge}

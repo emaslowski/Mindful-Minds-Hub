@@ -92,6 +92,12 @@ export const SITE_CONTENT = {
       { name: 'Demo School', code: 'BRIGHT-DEMO', hubUrl: 'https://thebrightsidehub-480156548115.us-east1.run.app', note: 'This is the demo hub. Your school gets its own address when your kit is set up.' },
     ],
   }),
+  'site.rules': entry({
+    label: 'Website Rules (first-visit agreement)',
+    page: 'Every page, first visit',
+    description: 'The rules every first-time visitor must read and accept before entering the site, one rule per list item. The list starts EMPTY on a new hub so no dialog shows; after Lesson 3 the class writes its Community Promise and the teacher publishes it here. Change the list and every visitor is asked to accept again. Clear the list to turn the dialog off.',
+    default: [] as string[],
+  }),
   'journal.dailyPrompts': entry({
     label: 'Daily journal prompts',
     page: 'Grow → Journal',
@@ -129,7 +135,14 @@ export function validateSiteContent(key: SiteContentKey, value: unknown): string
 function matchShape(template: unknown, value: unknown, path: string): string | null {
   if (Array.isArray(template)) {
     if (!Array.isArray(value)) return `${path} must be a list`;
-    if (template.length === 0) return null;
+    if (template.length === 0) {
+      // An entry whose default is an empty list holds plain text items.
+      for (let i = 0; i < value.length; i++) {
+        if (typeof value[i] !== 'string') return `${path}[${i}] must be text`;
+        if ((value[i] as string).length > 5000) return `${path}[${i}] is too long (max 5000 characters)`;
+      }
+      return null;
+    }
     for (let i = 0; i < value.length; i++) {
       const err = matchShape(template[0], value[i], `${path}[${i}]`);
       if (err) return err;

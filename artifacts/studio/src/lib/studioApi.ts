@@ -240,6 +240,33 @@ export const teacherModeration = {
 };
 
 // ── Teacher: Settings ─────────────────────────────────────────────────────
+export interface HubAccessSetting {
+  /** The code visitors must type, or '' when the hub is open to anyone with the link. */
+  code: string;
+  source: 'settings' | 'env' | 'none';
+  /** Whether the hub was created with a code (HUB_ACCESS_CODE) to fall back to. */
+  envCode: boolean;
+}
+
+export const hubAccessApi = {
+  get: () => studioFetch<HubAccessSetting>('/teacher/hub-access'),
+  update: (code: string) =>
+    studioFetch<HubAccessSetting>('/teacher/hub-access', { method: 'PUT', body: JSON.stringify({ code }) }),
+  reset: () => studioFetch<HubAccessSetting>('/teacher/hub-access', { method: 'DELETE' }),
+};
+
+export const siteContentApi = {
+  get: () =>
+    studioFetch<{ entries: { key: string; label: string; value: unknown; default: unknown; overridden: boolean }[] }>(
+      '/teacher/site-content',
+    ),
+  update: (key: string, value: unknown) =>
+    studioFetch<{ key: string; value: unknown; overridden: boolean }>(`/teacher/site-content/${encodeURIComponent(key)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ value }),
+    }),
+};
+
 export const teacherSettings = {
   get: () =>
     studioFetch<{ adminEmails: string[]; authorDisplayOptions: string[]; notificationEmails: string[]; notificationEmailsSource: 'settings' | 'admin' }>(

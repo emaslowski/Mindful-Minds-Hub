@@ -1,13 +1,165 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudioLayout, StudioPage } from '@/components/studio/StudioLayout';
 import { useRequireStudioRole } from '@/hooks/useStudioAuth';
-import { teacherSettings } from '@/lib/studioApi';
+import { hubAccessApi, siteContentApi, teacherSettings } from '@/lib/studioApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Mail, Tag, Plus, X, Info } from 'lucide-react';
+import { Bell, Mail, Tag, Plus, X, Info, ScrollText, KeyRound } from 'lucide-react';
+
+const RULES_KEY = 'site.rules';
+
+/** Website Rules card: the first-visit agreement, one rule per line. Empty = no dialog on the site. */
+function WebsiteRulesCard() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const [text, setText] = useState('');
+  const [dirty, setDirty] = useState(false);
+  const { data } = useQuery({ queryKey: ['teacher-site-content'], queryFn: () => siteContentApi.get() });
+  const saved = data?.entries.find((e) => e.key === RULES_KEY);
+  const savedRules: string[] = Array.isArray(saved?.value) ? (saved!.value as unknown[]).filter((r): r is string => typeof r === 'string') : [];
+
+  useEffect(() => {
+    if (!dirty) setText(savedRules.join('\n'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedRules.join('\n')]);
+
+  const { mutate: save, isPending } = useMutation({
+    mutationFn: (rules: string[]) => siteContentApi.update(RULES_KEY, rules),
+    onSuccess: (_r, rules) => {
+      qc.invalidateQueries({ queryKey: ['teacher-site-content'] });
+      setDirty(false);
+      toast({ title: rules.length ? 'Website Rules published' : 'Website Rules cleared', description: rules.length ? 'Every visitor will read and accept them on their next visit.' : 'The first-visit dialog is off.' });
+    },
+    onError: (e: Error) => toast({ title: 'Could not save', description: e.message, variant: 'destructive' }),
+  });
+
+  const rules = text.split('\n').map((l) => l.replace(/^\s*(?:\d+[.)]|[-•*])\s*/, '').trim()).filter(Boolean);
+
+  return (
+    <Card className="bg-[#eee6d8] border-[#d5cabe]">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base font-serif text-[#453329] flex items-center gap-2">
+          <ScrollText className="h-4 w-4 text-[#c4622d]" />
+          Website Rules
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-[#688a52]">
+          The agreement every first-time visitor reads and accepts before entering the site. It starts empty, so no dialog shows.
+          After Lesson 3, paste your class’s Community Promise here, one rule per line, and publish it. Change the list and
+          everyone is asked to accept again; clear it to turn the dialog off.
+        </p>
+        <Textarea
+          value={text}
+          onChange={(e) => { setText(e.target.value); setDirty(true); }}
+          rows={6}
+          className="bg-white border-[#d5cabe] text-sm"
+          placeholder={'We ask before we post.\nWe keep personal information private.\nWe use kind words, every time.'}
+        />
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs text-[#688a52]">
+            {savedRules.length === 0 ? 'Not published yet: visitors see no dialog.' : `${savedRules.length} rule${savedRules.length === 1 ? '' : 's'} published.`}
+          </span>
+          <Button
+            className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full flex-shrink-0"
+            onClick={() => save(rules)}
+            disabled={isPending || !dirty}
+          >
+            {rules.length ? 'Publish rules' : 'Clear rules'}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** School access code card: the code every visitor types before the hub opens. Empty = open to anyone with the link. */
+function HubAccessCard() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const [text, setText] = useState('');
+  const [dirty, setDirty] = useState(false);
+  const { data } = useQuery({ queryKey: ['teacher-hub-access'], queryFn: () => hubAccessApi.get() });
+  const savedCode = data?.code ?? '';
+
+  useEffect(() => {
+    if (!dirty) setText(savedCode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedCode]);
+
+  const done = (result: { code: string }) => {
+    qc.setQueryData(['teacher-hub-access'], result);
+    qc.invalidateQueries({ queryKey: ['teacher-hub-access'] });
+    setDirty(false);
+    toast({
+      title: result.code ? 'School code saved' : 'School code turned off',
+      description: result.code
+        ? `Visitors now type ${result.code} once before the hub opens. Anyone who had the old code will be asked again.`
+        : 'Anyone with the link can open the hub.',
+    });
+  };
+  const fail = (e: Error) => toast({ title: 'Could not save', description: e.message, variant: 'destructive' });
+  const { mutate: save, isPending: saving } = useMutation({ mutationFn: (code: string) => hubAccessApi.update(code), onSuccess: done, onError: fail });
+  const { mutate: reset, isPending: resetting } = useMutation({ mutationFn: () => hubAccessApi.reset(), onSuccess: done, onError: fail });
+
+  const cleaned = text.trim().toUpperCase().replace(/\s+/g, '-');
+  const valid = cleaned === '' || /^[A-Z0-9-]{4,32}$/.test(cleaned);
+  const busy = saving || resetting;
+
+  return (
+    <Card className="bg-[#eee6d8] border-[#d5cabe]">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base font-serif text-[#453329] flex items-center gap-2">
+          <KeyRound className="h-4 w-4 text-[#c4622d]" />
+          School access code
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-[#688a52]">
+          Keeps the hub private to your school. With a code set, every visitor (students, families, staff) types it once on
+          each device before the site or the Studio opens; signed-in teachers and students are never asked. Share it the way
+          you share a Wi-Fi password. Change it and everyone is asked again. Leave it empty to open the hub to anyone with the link.
+        </p>
+        <Input
+          value={text}
+          onChange={(e) => { setText(e.target.value.toUpperCase()); setDirty(true); }}
+          placeholder="LINCOLN-2026"
+          autoComplete="off"
+          spellCheck={false}
+          className="bg-white border-[#d5cabe] font-mono tracking-wider"
+        />
+        {!valid && <p className="text-xs text-red-700">Use 4 to 32 letters, numbers or dashes.</p>}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-[#688a52]">
+            {savedCode
+              ? `Visitors type ${savedCode}.`
+              : data?.source === 'settings' && data.envCode
+                ? 'Turned off here; the hub was created with a code.'
+                : 'No code: the hub is open to anyone with the link.'}
+          </span>
+          <div className="flex gap-2">
+            {data?.source === 'settings' && data.envCode && (
+              <Button variant="outline" className="rounded-full border-[#d5cabe]" onClick={() => reset()} disabled={busy}>
+                Use the hub's original code
+              </Button>
+            )}
+            <Button
+              className="bg-[#c4622d] hover:bg-[#a85226] text-white rounded-full flex-shrink-0"
+              onClick={() => save(cleaned)}
+              disabled={busy || !dirty || !valid}
+            >
+              {cleaned ? 'Save code' : 'Turn off the code'}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Settings() {
   const { user, isLoading } = useRequireStudioRole('teacher');
@@ -83,6 +235,9 @@ export default function Settings() {
         subtitle="Command Center configuration"
       >
         <div className="space-y-6 max-w-2xl">
+          <HubAccessCard />
+          <WebsiteRulesCard />
+
           {/* Notification emails */}
           <Card className="bg-[#eee6d8] border-[#d5cabe]">
             <CardHeader className="pb-2">
