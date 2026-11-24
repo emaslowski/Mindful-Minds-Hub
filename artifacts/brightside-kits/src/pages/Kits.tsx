@@ -54,7 +54,7 @@ export default function Kits() {
             One curriculum, three ways to buy it: as a teacher, as a school, or as a district.
             Every kit ships with the same four parts; the difference is how many teachers and
             students it covers and how much support comes with it. On-site professional
-            development can be added to any of them.
+            development and the Site Assistant can be added to any of them.
           </p>
         </Container>
       </Section>

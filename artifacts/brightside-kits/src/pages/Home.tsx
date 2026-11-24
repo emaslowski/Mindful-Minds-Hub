@@ -51,7 +51,7 @@ export default function Home() {
               <Link href="/school-login" className="font-semibold text-coral underline-offset-4 hover:underline">Find your school's hub</Link>
             </p>
             <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-cocoa-soft">
-              {['Teacher manual', 'Slide decks', 'Student workbooks', `${SITE.accessMonths}-month hub access`, 'Optional on-site PD'].map((t) => (
+              {['Teacher manual', 'Slide decks', 'Student workbooks', `${SITE.accessMonths}-month hub access`, 'Optional on-site PD', 'Optional Site Assistant'].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-mustard" aria-hidden="true" />
                   {t}

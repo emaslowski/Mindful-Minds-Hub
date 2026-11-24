@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { BadgePercent, CalendarDays, MapPin, Users } from 'lucide-react';
 
 import { ButtonLink, Check, Eyebrow, Heading } from './ui';
-import { KITS, LAUNCH_OFFER, PD, SITE, formatPrice, pdPresenter, type Kit } from '@/config';
+import { ASSISTANT, KITS, LAUNCH_OFFER, PD, SITE, formatPrice, pdPresenter, type Kit } from '@/config';
 
 export function buyHref(kit: Kit): string {
   return kit.checkoutUrl || `/order?kit=${kit.id}`;
@@ -61,10 +61,15 @@ export function PricingGrid({ compact = false }: { compact?: boolean }) {
               ))}
             </ul>
           )}
-          <p className="mt-4 rounded-xl border border-dashed border-mustard/60 bg-mustard-soft/40 px-3 py-2 text-sm text-cocoa">
-            <span className="font-semibold">Add-on:</span> {PD.options[0].days} or {PD.options[1].days} days of on-site PD from{' '}
-            {formatPrice(PD.options[0].price)}
-          </p>
+          <div className="mt-4 rounded-xl border border-dashed border-mustard/60 bg-mustard-soft/40 px-3 py-2 text-sm text-cocoa">
+            <p>
+              <span className="font-semibold">Add-ons:</span> {PD.options[0].days} or {PD.options[1].days} days of on-site PD from{' '}
+              {formatPrice(PD.options[0].price)}
+            </p>
+            <p className="mt-1">
+              <span className="font-semibold">{ASSISTANT.title}</span> ({ASSISTANT.tagline.toLowerCase()}) from {formatPrice(ASSISTANT.plans[0].price)} for {ASSISTANT.termMonths} months
+            </p>
+          </div>
           <div className="mt-auto pt-7">
             <ButtonLink href={buyHref(kit)} variant={kit.highlight ? 'primary' : 'dark'} className="w-full">
               {buyLabel(kit)}
