@@ -67,7 +67,7 @@ export function PricingGrid({ compact = false }: { compact?: boolean }) {
               {formatPrice(PD.options[0].price)}
             </p>
             <p className="mt-1">
-              <span className="font-semibold">{ASSISTANT.title}</span> ({ASSISTANT.tagline.toLowerCase()}) from {formatPrice(ASSISTANT.plans[0].price)} for {ASSISTANT.termMonths} months
+              <span className="font-semibold">{ASSISTANT.title}</span> (AI helper for teachers) from {formatPrice(ASSISTANT.plans[0].price)} for {ASSISTANT.termMonths} months
             </p>
           </div>
           <div className="mt-auto pt-7">
