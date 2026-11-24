@@ -19,6 +19,7 @@ import artworkRouter from "./artwork";
 import athleteRouter from "./athlete";
 import siteContentRouter from "./siteContent";
 import sectionsRouter from "./sections";
+import craftsRouter from "./crafts";
 import kitOrdersRouter from "./kitOrders";
 import kitSchoolsRouter from "./kitSchools";
 // Studio routes
@@ -65,6 +66,7 @@ router.use(artworkRouter);
 router.use(athleteRouter);
 router.use(siteContentRouter);
 router.use(sectionsRouter);
+router.use(craftsRouter);
 router.use(kitOrdersRouter);
 router.use(kitSchoolsRouter);
 // Studio — student

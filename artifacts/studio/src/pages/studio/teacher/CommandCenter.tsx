@@ -19,9 +19,10 @@ import { useToast } from '@/hooks/use-toast';
 import { PublicFeedbackModeration } from '@/pages/studio/teacher/PublicFeedbackModeration';
 import {
   Users, FolderOpen, ClipboardCheck, Star, KeyRound, HeartHandshake,
-  RefreshCw, AlertCircle, ChevronRight, Trash2, CheckCircle2, FileText, MessageSquare, Sparkles,
+  RefreshCw, AlertCircle, ChevronRight, Trash2, CheckCircle2, FileText, MessageSquare, Sparkles, Scissors, Plus,
 } from 'lucide-react';
 import { assistantAdminApi } from '@/lib/assistantApi';
+import { craftsApi } from '@/lib/craftsApi';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 
@@ -70,6 +71,14 @@ export default function CommandCenter() {
     enabled: !!user?.isOwner,
     refetchOnWindowFocus: true,
     refetchInterval: 60_000,
+  });
+
+  // Craft Corner posts shown to students on the hub homepage.
+  const { data: craftsData, isLoading: craftsLoading, isError: craftsError } = useQuery({
+    queryKey: ['teacher-crafts'],
+    queryFn: () => craftsApi.list(),
+    enabled: !!user,
+    refetchOnWindowFocus: true,
   });
 
   const { data: friendshipRequests, isLoading: friendshipLoading, isError: friendshipError, refetch: refetchFriendship } = useQuery({
@@ -161,6 +170,7 @@ export default function CommandCenter() {
     ...(user.isOwner
       ? [{ label: 'Site Assistant Requests', value: pendingAssistantRequests, icon: <Sparkles className="h-5 w-5 text-[#d4a44c]" />, href: '/studio/teacher/assistant-access' }]
       : []),
+    { label: 'Craft Corner Posts', value: craftsError ? '!' : craftsLoading ? '…' : (craftsData?.crafts ?? []).filter((c) => c.published).length, icon: <Scissors className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/crafts' },
     { label: 'Journal Access Requests', value: accessError ? '!' : accessLoading ? '…' : pendingAccessRequests.length, icon: <KeyRound className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/anonymous-access' },
     { label: 'Matchmaker Requests', value: friendshipError ? '!' : friendshipLoading ? '…' : friendshipRequests?.length ?? 0, icon: <HeartHandshake className="h-5 w-5 text-[#688a52]" />, href: '#friendship-requests' },
     { label: 'Active Students', value: s?.activeStudents ?? 0, icon: <Users className="h-5 w-5 text-[#c4622d]" />, href: '/studio/teacher/students' },
@@ -195,6 +205,65 @@ export default function CommandCenter() {
             </Link>
           ))}
         </div>
+
+        {/* Craft Corner: crafts teachers post for students on the hub homepage. */}
+        <section aria-labelledby="craft-corner-heading" className="mb-8">
+          <div className="flex items-center justify-between mb-3 gap-3">
+            <div>
+              <h2 id="craft-corner-heading" className="font-serif text-lg font-semibold text-[#453329]">Craft Corner</h2>
+              <p className="text-xs text-[#688a52] mt-0.5">
+                Craft ideas you post here show up in the Craft Corner on the hub homepage and at /crafts.
+              </p>
+            </div>
+            <Link href="/studio/teacher/crafts" className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#c4622d] px-4 py-2 text-sm font-medium text-white hover:bg-[#a85226]">
+              <Plus className="h-4 w-4" aria-hidden="true" /> Post a craft
+            </Link>
+          </div>
+          {craftsError ? (
+            <Card className="bg-[#eee6d8] border-[#d5cabe]">
+              <CardContent className="p-6 text-sm text-red-700">Could not load the Craft Corner.</CardContent>
+            </Card>
+          ) : craftsLoading ? (
+            <Card className="bg-[#eee6d8] border-[#d5cabe]">
+              <CardContent className="p-6 text-sm text-[#688a52]">Loading crafts…</CardContent>
+            </Card>
+          ) : !craftsData?.crafts.length ? (
+            <Card className="bg-[#eee6d8] border-[#d5cabe]">
+              <CardContent className="p-6 flex items-center gap-3 text-sm text-[#688a52]">
+                <Scissors className="h-5 w-5" aria-hidden="true" />
+                No crafts posted yet. Post the first one and students will see it on the homepage.
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-[#eee6d8] border-[#d5cabe] overflow-hidden">
+              <div className="divide-y divide-[#d5cabe]">
+                {craftsData.crafts.slice(0, 4).map((craft) => (
+                  <Link key={craft.id} href="/studio/teacher/crafts" className="flex items-center gap-3 p-3 hover:bg-[#e6dccb]">
+                    {craft.imageUrl ? (
+                      <img src={craft.imageUrl} alt="" className="h-12 w-16 shrink-0 rounded-md object-cover border border-[#d5cabe] bg-white" loading="lazy" />
+                    ) : (
+                      <span className="h-12 w-16 shrink-0 rounded-md border border-dashed border-[#d5cabe] bg-white grid place-items-center text-[#d5cabe]" aria-hidden="true">
+                        <Scissors className="h-5 w-5" />
+                      </span>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-[#453329] truncate">{craft.title}</p>
+                      <p className="text-xs text-[#688a52]">
+                        {craft.published ? 'Visible to students' : 'Draft'} · posted {formatDistanceToNow(new Date(craft.createdAt), { addSuffix: true })}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-[#688a52]" aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+              {craftsData.crafts.length > 4 && (
+                <div className="border-t border-[#d5cabe] px-4 py-2 text-xs text-[#688a52]">
+                  <Link href="/studio/teacher/crafts" className="underline">See all {craftsData.crafts.length} crafts</Link>
+                </div>
+              )}
+            </Card>
+          )}
+        </section>
 
         {/* Private journal access requests require teacher approval before credentials are issued. */}
         <div className="flex items-center justify-between mb-3">

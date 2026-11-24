@@ -39,6 +39,7 @@ import BlogPost from '@/pages/BlogPost';
 import SubmitPost from '@/pages/SubmitPost';
 import Resources from '@/pages/Resources';
 import Events from '@/pages/Events';
+import Crafts from '@/pages/Crafts';
 import CheckIn from '@/pages/CheckIn';
 import Review from '@/pages/Review';
 import Contact from '@/pages/Contact';
@@ -78,6 +79,7 @@ function PublicRouter() {
         <Route path="/about"><Redirect to="/" /></Route>
         <Route path="/resources" component={Resources} />
         <Route path="/events" component={Events} />
+        <Route path="/crafts" component={Crafts} />
         <Route path="/s/:slug" component={SectionPage} />
         <Route path="/contact" component={Contact} />
         <Route path="/anonymous-access" component={AnonymousAccess} />

@@ -465,6 +465,23 @@ CREATE TABLE "assistant_usage" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "crafts" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"description" text DEFAULT '' NOT NULL,
+	"materials" text DEFAULT '' NOT NULL,
+	"steps" text DEFAULT '' NOT NULL,
+	"link" text,
+	"published" boolean DEFAULT true NOT NULL,
+	"image_object_path" text,
+	"image_content_type" text,
+	"image_size" integer,
+	"image_ready" boolean DEFAULT false NOT NULL,
+	"created_by" varchar,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "site_content" (
 	"key" text PRIMARY KEY NOT NULL,
 	"value" jsonb NOT NULL,

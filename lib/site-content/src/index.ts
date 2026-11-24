@@ -51,6 +51,7 @@ export const SITE_CONTENT = {
       { title: 'Student Stories & Blogs', description: 'Ideas, encouragement, and student voices.', href: '/connect', image: 'tile-1.jpg' },
       { title: 'Podcasts & Videos', description: 'Listen, watch, and learn from peers.', href: '/listen/podcast', image: 'tile-2.jpg' },
       { title: 'Art & Drawing Studio', description: 'Create art and follow drawing tutorials.', href: '/create', image: 'tile-3.jpg' },
+      { title: 'Craft Corner', description: 'Hands-on crafts picked by your teachers, with steps to follow.', href: '/crafts', image: 'tile-3.jpg' },
       { title: 'Games & Challenges', description: 'Try quizzes, activities, and fun challenges.', href: '/games', image: 'tile-4.jpg' },
       { title: 'Plants & Gardening', description: 'Grow plants, learn gardening tips, and explore student projects.', href: '/gardening', image: 'tile-5.jpg' },
       { title: 'Journaling Center', description: 'Reflect with private writing prompts.', href: '/grow/journal', image: 'tile-6.jpg' },

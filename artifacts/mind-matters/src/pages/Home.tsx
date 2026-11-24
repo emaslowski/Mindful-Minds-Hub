@@ -4,6 +4,7 @@ import { Button } from "@workspace/mind-matters-ds/components/ui/button";
 import { Card } from "@workspace/mind-matters-ds/components/ui/card";
 import { WaveFooter } from "@/components/WaveFooter";
 import { HomeUpdates } from "@/components/HomeUpdates";
+import { HomeCrafts } from "@/components/HomeCrafts";
 import { useSiteContent } from "@/lib/siteContent";
 
 const TILE_COLORS = ["bg-muted/30", "bg-secondary/20", "bg-accent/25", "bg-accent/25", "bg-secondary/20", "bg-muted/30", "bg-secondary/20", "bg-muted/30", "bg-accent/25", "bg-secondary/20", "bg-muted/30", "bg-accent/25", "bg-secondary/20", "bg-muted/30"];
@@ -87,6 +88,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <HomeCrafts />
 
       <section id="student-creators" className="mx-auto mt-10 w-full max-w-6xl scroll-mt-6" aria-labelledby="creators-title">
         <SectionHeading id="creators-title">{hero.creatorsTitle}</SectionHeading>
