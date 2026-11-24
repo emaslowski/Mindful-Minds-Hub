@@ -30,11 +30,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-cocoa/10 bg-cream/85 backdrop-blur">
       <Container className="flex h-18 items-center justify-between gap-4 py-2">
         <Link href="/" className="flex items-center gap-3" aria-label={`${SITE.name} home`} onClick={() => setOpen(false)}>
-          <img src="/logo.png" alt="" width={1000} height={796} className="h-12 w-auto" />
-          <span className="font-display text-base font-bold leading-tight text-cocoa sm:text-lg lg:hidden xl:block">
-            The Brightside
-            <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-coral">Wellness Project</span>
-          </span>
+          <img src="/logo-cloud.png" alt="" width={1200} height={785} className="h-12 w-auto sm:h-16" />
         </Link>
 
         <nav className="hidden items-center gap-4 lg:flex xl:gap-5" aria-label="Main">

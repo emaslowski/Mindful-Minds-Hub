@@ -7,7 +7,7 @@ import { FoundingOffer, PdAddOn, PricingGrid } from '@/components/Pricing';
 import { Faq } from '@/components/Faq';
 import { PhotoBackdrop } from '@/components/PhotoBackdrop';
 import { ContactEmail } from '@/components/ContactEmail';
-import { ABOUT, HUB_CENTERS, KIT_PARTS, SITE, STUDENT_PHOTOS, STUDENT_PHOTO_CAPTION, TESTIMONIALS } from '@/config';
+import { ABOUT, HUB_CENTERS, KIT_PARTS, SITE, TESTIMONIALS } from '@/config';
 
 const PART_ICONS = {
   manual: BookOpenText,
@@ -68,11 +68,6 @@ export default function Home() {
               className="w-[300px] max-w-full drop-shadow-[0_14px_28px_rgba(58,45,35,0.22)] sm:w-[420px] lg:w-[540px]"
               fetchPriority="high"
             />
-            {STUDENT_PHOTOS.length > 0 && (
-              <p className="mt-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-cocoa-soft/80">
-                {STUDENT_PHOTO_CAPTION}
-              </p>
-            )}
           </div>
         </Container>
       </Section>
