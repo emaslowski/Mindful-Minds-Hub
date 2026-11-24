@@ -67,7 +67,7 @@ export function SlidesArt({ className }: { className?: string }) {
       <circle cx="46" cy="55" r="4" fill="#fffdfa" />
       <circle cx="60" cy="55" r="4" fill="#fffdfa" opacity="0.7" />
       <text x="48" y="96" fontFamily="Fredoka, Nunito, sans-serif" fontWeight="700" fontSize="15" fill={COCOA}>Lesson 3</text>
-      <text x="48" y="114" fontFamily="Caveat, cursive" fontWeight="700" fontSize="17" fill="#d96b5a">Naming big feelings</text>
+      <text x="48" y="113" fontFamily="Manrope, Inter, sans-serif" fontWeight="700" fontSize="13" fill="#d96b5a">Naming big feelings</text>
       <rect x="48" y="124" width="70" height="4" rx="2" fill={COCOA} opacity="0.35" />
       <rect x="48" y="133" width="54" height="4" rx="2" fill={COCOA} opacity="0.25" />
       {/* top-right corner of the slide, clear of the title lines */}
@@ -93,7 +93,7 @@ export function WorkbookArt({ className }: { className?: string }) {
         <rect x="76" y="54" width="80" height="54" rx="10" fill="#fbf4ee" />
         <g transform="translate(90 56) scale(0.8)"><BrainMarkSmall /></g>
         <text x="116" y="134" textAnchor="middle" fontFamily="Fredoka, Nunito, sans-serif" fontWeight="700" fontSize="15" fill={COCOA}>My Brightside</text>
-        <text x="116" y="152" textAnchor="middle" fontFamily="Caveat, cursive" fontWeight="700" fontSize="20" fill={COCOA}>Workbook</text>
+        <text x="116" y="152" textAnchor="middle" fontFamily="Manrope, Inter, sans-serif" fontWeight="700" fontSize="16" fill={COCOA}>Workbook</text>
         <rect x="84" y="164" width="64" height="4" rx="2" fill={COCOA} opacity="0.35" />
         <rect x="94" y="174" width="44" height="4" rx="2" fill={COCOA} opacity="0.25" />
       </g>

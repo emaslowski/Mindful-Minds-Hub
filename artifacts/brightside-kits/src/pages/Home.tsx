@@ -60,16 +60,14 @@ export default function Home() {
             </ul>
           </div>
           <div className="order-1 flex flex-col items-center lg:order-2">
-            <div className="rounded-2xl border border-cocoa/10 bg-paper/90 p-8 shadow-card backdrop-blur-sm sm:p-12">
-              <img
-                src="/logo.png"
-                alt="The Brightside Wellness Project"
-                width={1000}
-                height={796}
-                className="w-[260px] max-w-full sm:w-[340px] lg:w-[420px]"
-                fetchPriority="high"
-              />
-            </div>
+            <img
+              src="/logo-cloud.png"
+              alt="The Brightside Wellness Project"
+              width={1200}
+              height={785}
+              className="w-[300px] max-w-full drop-shadow-[0_14px_28px_rgba(58,45,35,0.22)] sm:w-[420px] lg:w-[540px]"
+              fetchPriority="high"
+            />
             {STUDENT_PHOTOS.length > 0 && (
               <p className="mt-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-cocoa-soft/80">
                 {STUDENT_PHOTO_CAPTION}
